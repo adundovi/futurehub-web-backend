@@ -1,0 +1,19 @@
+[Unit]
+Description=FutureHub Web, Rocket.rs backend server
+After=network.target
+
+[Service]
+Type=simple
+User=krizevcieu
+Group=www-users
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/srv/www/vhosts/krizevci.eu/subdomains/futurehub/backend
+Environment="ROCKET_ENV=prod"
+Environment="ROCKET_ADDRESS=127.0.0.1"
+Environment="ROCKET_PORT=31900"
+Environment="ROCKET_LOG=critical"
+ExecStart=/srv/www/vhosts/krizevci.eu/subdomains/futurehub/backend/release/rest-api
+
+[Install]
+WantedBy=multi-user.target
