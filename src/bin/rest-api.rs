@@ -40,6 +40,7 @@ pub struct EventAttribs {
     pub title: String,
     pub datetime: NaiveDateTime,
     pub body: Option<String>,
+    pub place: Option<String>,
     pub audience: Option<String>,
 }
 
@@ -70,6 +71,7 @@ fn events_get() -> Json<JsonApiResponse> {
         let attribs = EventAttribs{
             title: event.title,
             body: event.body,
+            place: event.place,
             datetime: event.datetime,
             audience: event.audience };
         let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
