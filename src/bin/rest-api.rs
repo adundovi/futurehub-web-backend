@@ -2,7 +2,6 @@
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde;
@@ -14,8 +13,7 @@ use rocket::http::Header;
 
 use chrono::NaiveDateTime;
 
-use futurehub_web_backend::db::models::Event;
-use futurehub_web_backend::db::{query_event, establish_connection};
+use futurehub_web_backend::db;
 
 pub struct CORS();
 
@@ -27,7 +25,7 @@ impl Fairing for CORS {
         }
     }
 
-    fn on_response(&self, request: &Request, response: &mut Response) {
+    fn on_response(&self, _request: &Request, response: &mut Response) {
         response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
         response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
@@ -66,8 +64,8 @@ fn index_get() -> Json<JsonApiResponse> {
 fn events_get() -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let conn = establish_connection();
-    for event in query_event(&conn) {
+    let conn = db::establish_connection();
+    for event in db::event::query(&conn) {
         let attribs = EventAttribs{
             title: event.title,
             body: event.body,

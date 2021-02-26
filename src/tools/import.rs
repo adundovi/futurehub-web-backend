@@ -4,7 +4,7 @@ use std::error::Error;
 use serde::de::DeserializeOwned;
 
 pub mod date_serializer {
-    use serde::{de::Error, de::DeserializeOwned, Deserialize, Deserializer, Serialize, Serializer};
+    use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
     use chrono::{DateTime, NaiveDateTime, Utc};
 
     fn time_to_json(t: NaiveDateTime) -> String {

@@ -1,6 +1,5 @@
 use super::sqlite_schema::events;
 use chrono::NaiveDateTime;
-use diesel::sql_types::Timestamp;
 
 use super::super::tools::import;
 
@@ -16,7 +15,7 @@ pub struct NewEvent {
     pub audience: Option<String>,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Clone)]
 pub struct Event {
     pub id: i32,
     pub title: String,
