@@ -155,8 +155,9 @@ fn edit_event(id: i32) {
     let mut new_event = event.clone();
 
     new_event.title = edit_line(&new_event.title, "Title");
-    new_event.datetime = edit_line(&new_event.datetime.to_string(), "Date & time")
-        .parse::<chrono::NaiveDateTime>().unwrap_or(new_event.datetime);
+    new_event.datetime = NaiveDateTime::parse_from_str(
+        &edit_line(&new_event.datetime.to_string(), "Date & time"),
+        "%Y-%m-%d %H:%M:%S").unwrap_or(new_event.datetime);
     match event.place {
         Some(s) => new_event.place = Some(edit_line(&s, "Place")),
         None => new_event.place = Some(edit_line(&String::new(), "Place")), 
