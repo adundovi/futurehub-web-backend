@@ -84,7 +84,9 @@ fn newest_events_get() -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
     let conn = db::establish_connection();
-    for event in db::event::query_newest(&conn, 3) {
+    let mut events = db::event::query_newest(&conn, 3);
+    events.reverse();
+    for event in events {
         let attribs = EventAttribs{
             title: event.title,
             body: event.body,
