@@ -40,6 +40,14 @@ pub fn query(connection: &SqliteConnection) -> Vec<models::Event> {
         .expect("Error loading events")
 }
 
+pub fn query_newest(connection: &SqliteConnection, last: i64) -> Vec<models::Event> {
+    events::table
+        .order(events::datetime.desc())
+        .limit(last)
+        .load::<models::Event>(connection)
+        .expect("Error loading events")
+}
+
 pub fn get(connection: &SqliteConnection, id: i32) -> models::Event {
     events::table
         .filter(events::id.eq(id))

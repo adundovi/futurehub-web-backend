@@ -79,10 +79,31 @@ fn events_get() -> Json<JsonApiResponse> {
     Json(response)
 }
 
+#[get("/api/events/newest")]
+fn newest_events_get() -> Json<JsonApiResponse> {
+    let mut response = JsonApiResponse { data: vec![], };
+
+    let conn = db::establish_connection();
+    for event in db::event::query_newest(&conn, 3) {
+        let attribs = EventAttribs{
+            title: event.title,
+            body: event.body,
+            place: event.place,
+            datetime: event.datetime,
+            audience: event.audience };
+        let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
+        response.data.push(eventw);
+    }
+
+    Json(response)
+}
+
+
 fn main() {
     rocket::ignite()
         .mount("/", routes![index_get])
         .mount("/", routes![events_get])
+        .mount("/", routes![newest_events_get])
         .attach(CORS())
         .launch();
 }
