@@ -2,18 +2,23 @@
 
 #[macro_use]
 extern crate rocket;
+#[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde;
 
-use rocket_contrib::json::Json;
 use rocket::{Request, Response};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
+use rocket_contrib::json::Json;
+use rocket_contrib::databases::diesel;
 
 use chrono::NaiveDateTime;
 
 use futurehub_web_backend::db;
+
+#[database("sqlite_db")]
+struct MainDbConn(diesel::SqliteConnection);
 
 pub struct CORS();
 
@@ -61,10 +66,9 @@ fn index_get() -> Json<JsonApiResponse> {
 }
 
 #[get("/api/events")]
-fn events_get() -> Json<JsonApiResponse> {
+fn events_get(conn: MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let conn = db::establish_connection();
     for event in db::event::query(&conn) {
         let attribs = EventAttribs{
             title: event.title,
@@ -80,10 +84,9 @@ fn events_get() -> Json<JsonApiResponse> {
 }
 
 #[get("/api/events/newest")]
-fn newest_events_get() -> Json<JsonApiResponse> {
+fn newest_events_get(conn: MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let conn = db::establish_connection();
     let mut events = db::event::query_newest(&conn, 3);
     events.reverse();
     for event in events {
@@ -106,6 +109,7 @@ fn main() {
         .mount("/", routes![index_get])
         .mount("/", routes![events_get])
         .mount("/", routes![newest_events_get])
+        .attach(MainDbConn::fairing())
         .attach(CORS())
         .launch();
 }
