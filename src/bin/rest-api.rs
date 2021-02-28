@@ -2,7 +2,6 @@
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
 extern crate serde;
@@ -10,15 +9,16 @@ extern crate serde;
 use rocket::{Request, Response};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
+use rocket_contrib::database;
+use rocket_contrib::databases::diesel as dieseldb;
 use rocket_contrib::json::Json;
-use rocket_contrib::databases::diesel;
 
 use chrono::NaiveDateTime;
 
 use futurehub_web_backend::db;
 
 #[database("sqlite_db")]
-struct MainDbConn(diesel::SqliteConnection);
+pub struct MainDbConn(dieseldb::SqliteConnection);
 
 pub struct CORS();
 
