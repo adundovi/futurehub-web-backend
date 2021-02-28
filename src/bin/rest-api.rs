@@ -1,24 +1,14 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
 #[macro_use]
 extern crate rocket;
 extern crate rocket_contrib;
-#[macro_use]
 extern crate serde;
 
 use rocket::{Request, Response};
 use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::Header;
-use rocket_contrib::database;
-use rocket_contrib::databases::diesel as dieseldb;
-use rocket_contrib::json::Json;
-
-use chrono::NaiveDateTime;
 
 use futurehub_web_backend::db;
-
-#[database("sqlite_db")]
-pub struct MainDbConn(dieseldb::SqliteConnection);
+use futurehub_web_backend::rest::events;
 
 pub struct CORS();
 
@@ -38,78 +28,10 @@ impl Fairing for CORS {
     }
 }
 
-#[derive(Serialize)]
-pub struct EventAttribs {
-    pub title: String,
-    pub datetime: NaiveDateTime,
-    pub body: Option<String>,
-    pub place: Option<String>,
-    pub audience: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct EventWrapper {
-    pub id: i32,
-    pub r#type: String,
-    pub attributes: EventAttribs,
-}
-
-#[derive(Serialize)]
-struct JsonApiResponse {
-    data: Vec<EventWrapper>,
-}
-
-#[get("/api")]
-fn index_get() -> Json<JsonApiResponse> {
-    let response = JsonApiResponse { data: vec![], };
-    Json(response)
-}
-
-#[get("/api/events")]
-fn events_get(conn: MainDbConn) -> Json<JsonApiResponse> {
-    let mut response = JsonApiResponse { data: vec![], };
-
-    for event in db::event::query(&conn) {
-        let attribs = EventAttribs{
-            title: event.title,
-            body: event.body,
-            place: event.place,
-            datetime: event.datetime,
-            audience: event.audience };
-        let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
-        response.data.push(eventw);
-    }
-
-    Json(response)
-}
-
-#[get("/api/events/newest")]
-fn newest_events_get(conn: MainDbConn) -> Json<JsonApiResponse> {
-    let mut response = JsonApiResponse { data: vec![], };
-
-    let mut events = db::event::query_newest(&conn, 3);
-    events.reverse();
-    for event in events {
-        let attribs = EventAttribs{
-            title: event.title,
-            body: event.body,
-            place: event.place,
-            datetime: event.datetime,
-            audience: event.audience };
-        let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
-        response.data.push(eventw);
-    }
-
-    Json(response)
-}
-
-
 fn main() {
     rocket::ignite()
-        .mount("/", routes![index_get])
-        .mount("/", routes![events_get])
-        .mount("/", routes![newest_events_get])
-        .attach(MainDbConn::fairing())
+        .mount("/", routes![events::events_get, events::newest_events_get])
+        .attach(db::MainDbConn::fairing())
         .attach(CORS())
         .launch();
 }
