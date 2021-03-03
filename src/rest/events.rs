@@ -42,12 +42,11 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     Json(response)
 }
 
-#[get("/events/newest")]
-pub fn newest_get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
+#[get("/events/upcoming")]
+pub fn get_upcoming(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let mut events = db::event::query_newest(&conn, 3);
-    events.reverse();
+    let mut events = db::event::query_upcoming(&conn, 10);
     for event in events {
         let attribs = EventAttribs{
             title: event.title,

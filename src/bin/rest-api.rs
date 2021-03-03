@@ -30,7 +30,7 @@ impl Fairing for CORS {
 
 fn main() {
     rocket::ignite()
-        .mount("/api", routes![events::get, events::newest_get])
+        .mount("/api", routes![events::get, events::get_upcoming])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())
         .launch();
