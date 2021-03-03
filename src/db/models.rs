@@ -1,4 +1,4 @@
-use super::sqlite_schema::events;
+use super::sqlite_schema::{events, posts};
 use chrono::NaiveDateTime;
 
 use super::super::tools::import;
@@ -25,4 +25,24 @@ pub struct Event {
     pub datetime: NaiveDateTime, // UTC
 }
 
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "posts"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewPost {
+    #[serde(with= "import::date_serializer")]
+    pub datetime: NaiveDateTime,
+    pub title: String,
+    pub slug: String,
+    pub body: Option<String>,
+    pub published: bool,
+}
 
+#[derive(Queryable, Clone)]
+pub struct Post {
+    pub id: i32,
+    pub title: String,
+    pub slug: String,
+    pub body: Option<String>,
+    pub published: bool,
+    pub datetime: NaiveDateTime, // UTC
+}

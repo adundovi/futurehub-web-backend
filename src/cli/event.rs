@@ -57,7 +57,7 @@ pub fn menu<'a>() -> App<'a> {
                 )
 }
 
-pub fn process(args: clap::ArgMatches) -> () {
+pub fn process(args: &clap::ArgMatches) -> () {
     if let Some(ref args) = args.subcommand_matches("event") {
         if let Some(ref subcommand) = args.subcommand_matches("new") {
             let title = match subcommand.value_of("TITLE") {

@@ -24,8 +24,8 @@ pub struct JsonApiResponse {
 }
 
 
-#[get("/api/events")]
-pub fn events_get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
+#[get("/events")]
+pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
     for event in db::event::query(&conn) {
@@ -42,8 +42,8 @@ pub fn events_get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     Json(response)
 }
 
-#[get("/api/events/newest")]
-pub fn newest_events_get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
+#[get("/events/newest")]
+pub fn newest_get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
     let mut events = db::event::query_newest(&conn, 3);

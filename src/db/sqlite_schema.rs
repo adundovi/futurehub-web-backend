@@ -14,7 +14,7 @@ table! {
         id -> Integer,
         title -> Text,
         slug -> Text,
-        body -> Text,
+        body -> Nullable<Text>,
         published -> Bool,
         datetime -> Timestamp,
     }
