@@ -92,8 +92,20 @@ pub fn process(args: &clap::ArgMatches) -> () {
                 Some(f) => tools::import::load_csv(f).unwrap(),
                 None => Vec::new(),
             };
-            for e in new_events.iter() {
-                create_full_event(e);
+            let conn = db::establish_connection();
+            for e_new in new_events.iter() {
+                let mut insert = true;
+                for e_exist in db::event::query(&conn) {
+                    if e_new.datetime == e_exist.datetime && e_new.place == e_exist.place {
+                        insert = false;
+                    }
+                }
+                if insert {
+                    db::event::insert_full(&conn, e_new);
+                    println!("A new event added to the calendar");
+                } else {
+                    println!("An event with the same place and time already exists!"); 
+                }
             }
         }
         if let Some(ref subcommand) = args.subcommand_matches("dropall") {
@@ -108,11 +120,6 @@ fn create_event(title: String) {
     let conn = db::establish_connection();
     let utc_now = Utc::now();
     db::event::insert(&conn, title, &utc_now);
-}
-
-fn create_full_event(event: &db::models::NewEvent) {
-    let conn = db::establish_connection();
-    db::event::insert_full(&conn, event);
 }
 
 fn list_events() {
