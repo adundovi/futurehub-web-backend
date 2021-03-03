@@ -2,7 +2,7 @@ CREATE TABLE posts (
   id INTEGER NOT NULL,
   title VARCHAR NOT NULL,
   slug VARCHAR NOT NULL,
-  body TEXT NOT NULL,
+  body TEXT,
   published BOOLEAN NOT NULL DEFAULT 'f',
   datetime DATETIME NOT NULL,
   PRIMARY KEY (id)
