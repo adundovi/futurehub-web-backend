@@ -68,6 +68,12 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<models::Post, diese
         .first::<models::Post>(connection)
 }
 
+pub fn get_by_slug(connection: &SqliteConnection, slug: String) -> Result<models::Post, diesel::result::Error> {
+    posts::table
+        .filter(posts::slug.eq(slug))
+        .first::<models::Post>(connection)
+}
+
 pub fn update(connection: &SqliteConnection, post: &models::Post) {
     diesel::update(posts::table.filter(posts::id.eq(post.id)))
         .set((posts::title.eq(&post.title),

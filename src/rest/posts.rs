@@ -1,3 +1,4 @@
+use rocket::http::RawStr;
 use rocket_contrib::json::Json;
 use crate::db;
 use chrono::NaiveDateTime;
@@ -49,6 +50,25 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
 pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
 
     let p = db::post::get(&conn, id).ok()?;
+    let attribs = PostAttribs{
+         title: p.title,
+         slug: p.slug,
+         body: p.body,
+         datetime: p.datetime,
+    };
+
+    Some(Json(JsonSingleApiResponse{
+        data: PostWrapper{
+            id: p.id,
+            r#type: "post".to_string(),
+            attributes: attribs },
+    }))
+}
+
+#[get("/posts/<slug>", rank = 2)]
+pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
+
+    let p = db::post::get_by_slug(&conn, slug).ok()?;
     let attribs = PostAttribs{
          title: p.title,
          slug: p.slug,
