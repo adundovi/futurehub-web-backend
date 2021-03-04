@@ -34,6 +34,14 @@ pub fn query(connection: &SqliteConnection) -> Vec<models::Post> {
         .expect("Error loading posts")
 }
 
+pub fn query_published(connection: &SqliteConnection) -> Vec<models::Post> {
+    posts::table
+        .filter(posts::published.eq(true))
+        .order(posts::datetime.desc())
+        .load::<models::Post>(connection)
+        .expect("Error loading posts")
+}
+
 pub fn remove(connection: &SqliteConnection, id: i32) {
     diesel::delete(posts::table.filter(posts::id.eq(id)))
         .execute(connection)
@@ -64,6 +72,7 @@ pub fn get(connection: &SqliteConnection, id: i32) -> models::Post {
 pub fn update(connection: &SqliteConnection, post: &models::Post) {
     diesel::update(posts::table.filter(posts::id.eq(post.id)))
         .set((posts::title.eq(&post.title),
+              posts::slug.eq(&post.slug),
               posts::datetime.eq(&post.datetime),
               posts::published.eq(&post.published),
               posts::body.eq(&post.body),

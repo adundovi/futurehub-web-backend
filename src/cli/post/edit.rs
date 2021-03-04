@@ -80,6 +80,7 @@ fn edit_post(id: i32) {
     let mut new_post = post.clone();
 
     new_post.title = edit_line(&new_post.title, "Title");
+    new_post.slug = edit_line(&new_post.slug, "Slug");
     new_post.datetime = NaiveDateTime::parse_from_str(
         &edit_line(&new_post.datetime.to_string(), "Date & time"),
         "%Y-%m-%d %H:%M:%S").unwrap_or(new_post.datetime);
