@@ -46,7 +46,7 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
 pub fn get_upcoming(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let mut events = db::event::query_upcoming(&conn, 10);
+    let events = db::event::query_upcoming(&conn, 10);
     for event in events {
         let attribs = EventAttribs{
             title: event.title,

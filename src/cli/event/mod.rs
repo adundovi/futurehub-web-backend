@@ -1,5 +1,5 @@
-use super::super::db;
-use super::super::tools;
+use crate::db;
+use crate::tools;
 
 use std::io;
 

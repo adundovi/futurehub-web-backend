@@ -1,5 +1,8 @@
-use diesel::{prelude::*, sqlite::SqliteConnection};
-use diesel::sql_types::{Date, Time, Timestamp};
+use diesel::{
+        prelude::*,
+        sqlite::SqliteConnection,
+        sql_types::Timestamp,
+    };
 use chrono::prelude::*;
 
 use super::models;
@@ -37,12 +40,13 @@ pub fn drop_all(connection: &SqliteConnection) {
 
 pub fn query(connection: &SqliteConnection) -> Vec<models::Event> {
     events::table
+        .order(events::datetime.asc())
         .load::<models::Event>(connection)
         .expect("Error loading events")
 }
 
 pub fn query_upcoming(connection: &SqliteConnection, last: i64) -> Vec<models::Event> {
-    let local_time = Local::now().to_string().into_sql::<diesel::sql_types::Timestamp>();
+    let local_time = Local::now().to_string().into_sql::<Timestamp>();
     events::table
         .filter(events::datetime.ge(local_time))
         .order(events::datetime.asc())
