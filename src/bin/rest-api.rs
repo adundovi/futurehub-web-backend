@@ -37,6 +37,7 @@ fn main() {
                events::get,
                events::get_upcoming,
                posts::get,
+               posts::get_by_id,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

@@ -1,9 +1,9 @@
 use diesel::{prelude::*, sqlite::SqliteConnection};
 use chrono::prelude::*;
 
-use super::models;
-use super::sqlite_schema::posts as posts;
-use super::super::tools;
+use crate::db::models;
+use crate::db::sqlite_schema::posts as posts;
+use crate::tools;
 
 pub fn insert(connection: &SqliteConnection, title_: String, datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
@@ -62,11 +62,10 @@ pub fn query_newest(connection: &SqliteConnection, last: i64) -> Vec<models::Pos
         .expect("Error loading posts")
 }
 
-pub fn get(connection: &SqliteConnection, id: i32) -> models::Post {
+pub fn get(connection: &SqliteConnection, id: i32) -> Result<models::Post, diesel::result::Error> {
     posts::table
         .filter(posts::id.eq(id))
         .first::<models::Post>(connection)
-        .expect("Error loading post")
 }
 
 pub fn update(connection: &SqliteConnection, post: &models::Post) {

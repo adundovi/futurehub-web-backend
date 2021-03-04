@@ -22,6 +22,11 @@ pub struct JsonApiResponse {
     data: Vec<PostWrapper>,
 }
 
+#[derive(Serialize)]
+pub struct JsonSingleApiResponse {
+    data: PostWrapper,
+}
+
 #[get("/posts")]
 pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
@@ -38,4 +43,23 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     }
 
     Json(response)
+}
+
+#[get("/posts/<id>")]
+pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
+
+    let p = db::post::get(&conn, id).ok()?;
+    let attribs = PostAttribs{
+         title: p.title,
+         slug: p.slug,
+         body: p.body,
+         datetime: p.datetime,
+    };
+
+    Some(Json(JsonSingleApiResponse{
+        data: PostWrapper{
+            id: p.id,
+            r#type: "post".to_string(),
+            attributes: attribs },
+    }))
 }

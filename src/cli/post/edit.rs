@@ -76,7 +76,7 @@ fn edit_post(id: i32) {
     }
 
     let conn = db::establish_connection();
-    let post = db::post::get(&conn, id);
+    let post = db::post::get(&conn, id).expect("Id not found");
     let mut new_post = post.clone();
 
     new_post.title = edit_line(&new_post.title, "Title");
