@@ -11,4 +11,8 @@ Cargo.lock
 **/*.rs.bk
 
 # Ignore SQLite dbs:
+.env
 *.sqlite3
+
+# Ignore configs
+Rocket.toml

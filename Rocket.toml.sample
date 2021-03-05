@@ -1,6 +1,13 @@
 [global.databases]
 sqlite_db = { url = "./testdb.sqlite3" }
 
+[global.smtp]
+relay = 
+port = 
+username =
+password = 
+from = 
+
 [development]
 address = "localhost"
 port = 31900
