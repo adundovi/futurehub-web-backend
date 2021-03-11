@@ -20,7 +20,22 @@ table! {
     }
 }
 
+table! {
+    repo (id) {
+        id -> Integer,
+        title -> Text,
+        slug -> Text,
+        filepath -> Text,
+        description -> Nullable<Text>,
+        category -> Nullable<Text>,
+        filetype -> Nullable<Text>,
+        published -> Bool,
+        datetime -> Timestamp,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     events,
     posts,
+    repo,
 );

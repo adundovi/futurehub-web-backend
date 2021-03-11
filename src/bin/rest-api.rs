@@ -11,6 +11,7 @@ use futurehub_web_backend::db;
 use futurehub_web_backend::rest::{
     events,
     posts,
+    contact,
 };
 
 pub struct CORS();
@@ -39,6 +40,7 @@ fn main() {
                posts::get,
                posts::get_by_id,
                posts::get_by_slug,
+               contact::process_form,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

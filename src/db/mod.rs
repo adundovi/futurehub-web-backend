@@ -13,8 +13,8 @@ const DATABASE: &str = "sqlite_db";
 pub struct MainDbConn(dieseldb::SqliteConnection);
 
 pub fn establish_connection() -> SqliteConnection {
-    let c = rocket::config::RocketConfig::read().unwrap();
-    let d = c.active().get_extra("databases").unwrap();
+    let c = crate::active_config();
+    let d = c.get_extra("databases").unwrap();
     let db = d[DATABASE]["url"].as_str().unwrap();
     SqliteConnection::establish(&db)
         .unwrap_or_else(|_| panic!("Error connecting to {}", &db))

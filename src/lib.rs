@@ -14,3 +14,10 @@ pub mod db;
 pub mod cli;
 pub mod rest;
 pub mod tools;
+pub mod services;
+
+pub fn active_config() -> rocket::Config {
+    let c = rocket::config::RocketConfig::read().unwrap();
+    c.active().clone()
+}
+
