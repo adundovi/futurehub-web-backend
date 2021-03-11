@@ -6,7 +6,7 @@ use chrono::NaiveDateTime;
 
 #[derive(Deserialize, Debug)]
 pub struct ContactForm {
-    name_surname: String,
+    full_name: String,
     email: String,
     phone: Option<String>,
     message: String,
@@ -15,12 +15,12 @@ pub struct ContactForm {
 #[post("/contact", format = "json", data = "<form>")]
 pub fn process_form(form: Json<ContactForm>) {
     let m = mail::Mail{
-        to: "andrej@dundovic.com.hr",
-        subject: &format!("FutureHub-web - Kontakt - Poruka od {}", &form.name_surname),
+        to: "4ndY@krizevci.info",
+        subject: &format!("FutureHub-web - Kontakt - Poruka od {}", &form.full_name),
         body: format!("Od: {} <{}>\n\
                       Telefon: {}\n\
                       Poruka: {}",
-                      &form.name_surname,
+                      &form.full_name,
                       &form.email,
                       form.phone.as_ref().unwrap_or(&"Telefon nije unesen".to_string()),
                       &form.message).to_string(),
