@@ -9,8 +9,10 @@ use rocket::http::Header;
 
 use futurehub_web_backend::db;
 use futurehub_web_backend::rest::{
+    category,
     events,
     posts,
+    repo,
     contact,
 };
 
@@ -40,6 +42,12 @@ fn main() {
                posts::get,
                posts::get_by_id,
                posts::get_by_slug,
+               repo::get,
+               repo::get_by_id,
+               repo::get_by_slug,
+               category::get,
+               category::get_by_id,
+               category::get_by_slug,
                contact::process_form,
         ])
         .attach(db::MainDbConn::fairing())

@@ -1,4 +1,14 @@
 table! {
+    categories (id) {
+        id -> Integer,
+        title -> Text,
+        slug -> Text,
+        icon -> Nullable<Text>,
+        description -> Nullable<Text>,
+    }
+}
+
+table! {
     events (id) {
         id -> Integer,
         title -> Text,
@@ -27,14 +37,17 @@ table! {
         slug -> Text,
         filepath -> Text,
         description -> Nullable<Text>,
-        category -> Nullable<Text>,
+        category_id -> Integer,
         filetype -> Nullable<Text>,
         published -> Bool,
         datetime -> Timestamp,
     }
 }
 
+joinable!(repo_items -> categories (category_id));
+
 allow_tables_to_appear_in_same_query!(
+    categories,
     events,
     posts,
     repo_items,

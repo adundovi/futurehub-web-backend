@@ -1,6 +1,10 @@
 use crate::db;
-use std::io;
 use chrono::prelude::*;
+use crate::tools::cli_edit::{
+    edit_line,
+    edit_bool,
+    edit_text,
+};
 
 pub fn f(args: &clap::ArgMatches) {
         match args.value_of("ID") {
@@ -13,67 +17,6 @@ pub fn f(args: &clap::ArgMatches) {
     }
 
 fn edit_post(id: i32) {
-
-    fn edit_line(e: &String, n: &str) -> String {
-        println!("{}: {}", &n, &e);
-        let mut input = String::new();
-        
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if input.trim().is_empty() {
-                    println!("{}: {}", &n, e);
-                    e.clone()
-                } else {
-                    println!("{}: {}", &n, input);
-                    input.trim().to_string()
-                }
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e.clone()
-            }
-        }
-    }
-
-    fn edit_text(e: &String, n: &str) -> String {
-        let edited = edit::edit(e);
-        
-        match edited {
-            Ok(s) => {
-                println!("{}:\n{}", &n, s);
-                s
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e.clone()
-            }
-        }
-    }
-
-    fn edit_bool(e: bool, n: &str) -> bool {
-        println!("{}: {}", &n, &e);
-        let mut input = String::new();
-        
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if input.trim().is_empty() {
-                    println!("{}: {}", &n, e);
-                    e
-                } else {
-                    let t = input.trim();
-                    if t == "1" || t == "t" || t == "y" {
-                        true
-                    } else {
-                        false
-                    }
-                }
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e
-            }
-        }
-    }
 
     let conn = db::establish_connection();
     let post = db::post::get(&conn, id).expect("Id not found");

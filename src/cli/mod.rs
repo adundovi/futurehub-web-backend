@@ -1,3 +1,4 @@
+pub mod category;
 pub mod event;
 pub mod menu;
 pub mod post;

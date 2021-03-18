@@ -4,8 +4,9 @@ use futurehub_web_backend::cli::menu::Menu;
 fn main() {
     // Get all submenus...
     let submenus: Vec<Menu> = vec![
-        cli::post::menu(),
+        cli::category::menu(),
         cli::event::menu(),
+        cli::post::menu(),
         cli::repo::menu(),
     ];
     

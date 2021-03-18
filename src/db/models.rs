@@ -1,4 +1,9 @@
-use super::sqlite_schema::{events, posts, repo_items};
+use super::sqlite_schema::{
+    events,
+    posts,
+    repo_items,
+    categories,
+};
 use chrono::NaiveDateTime;
 
 use super::super::tools::import;
@@ -57,7 +62,7 @@ pub struct NewRepoItem {
     pub slug: String,
     pub filepath: String,
     pub description: Option<String>,
-    pub category: Option<String>,
+    pub category_id: i32,
     pub filetype: Option<String>,
     pub published: bool
 }
@@ -69,8 +74,27 @@ pub struct RepoItem {
     pub slug: String,
     pub filepath: String,
     pub description: Option<String>,
-    pub category: Option<String>,
+    pub category_id: i32,
     pub filetype: Option<String>,
     pub published: bool,
     pub datetime: NaiveDateTime, // UTC
+}
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "categories"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewCategory {
+    pub title: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub icon: Option<String>,
+}
+
+#[derive(Queryable, Clone)]
+pub struct Category {
+    pub id: i32,
+    pub title: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub icon: Option<String>,
 }

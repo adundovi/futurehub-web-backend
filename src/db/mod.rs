@@ -2,8 +2,9 @@ use diesel::{prelude::*, sqlite::SqliteConnection};
 use rocket_contrib::database;
 use rocket_contrib::databases::diesel as dieseldb;
 
-pub mod models;
 pub mod event;
+pub mod category;
+pub mod models;
 pub mod post;
 pub mod repo_items;
 pub mod sqlite_schema;

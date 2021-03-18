@@ -1,9 +1,9 @@
 use crate::db;
 
-// list posts
+// list repository items
 pub fn f(_args: &clap::ArgMatches) {
     let conn = db::establish_connection();
-    for p in db::post::query(&conn) {
-        println!("{}\t{}\t{}", p.id, p.title, p.datetime);
+    for p in db::repo_items::query(&conn) {
+        println!("{}\t{}\t{}\t{}", p.id, p.title, p.filepath, p.datetime);
     }
 }

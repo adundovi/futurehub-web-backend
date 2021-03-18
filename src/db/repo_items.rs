@@ -3,11 +3,12 @@ use chrono::prelude::*;
 
 use crate::db::models;
 use crate::db::sqlite_schema::repo_items as repo_items;
+use crate::db::sqlite_schema::categories as categories;
 use crate::tools;
 
 pub fn insert(connection: &SqliteConnection,
               title_: String,
-              filepath_ String,
+              filepath_: String,
               datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
     let other_slug = tools::text::slugify(&title_);
@@ -16,7 +17,7 @@ pub fn insert(connection: &SqliteConnection,
         title: title_,
         slug: other_slug,
         description: Some("".to_string()),
-        category: Some("".to_string()),
+        category_id: 0,
         filepath: filepath_,
         filetype: Some("".to_string()),
         published: false };
@@ -43,6 +44,23 @@ pub fn query(connection: &SqliteConnection) -> Vec<models::RepoItem> {
 pub fn query_published(connection: &SqliteConnection) -> Vec<models::RepoItem> {
     repo_items::table
         .filter(repo_items::published.eq(true))
+        .order(repo_items::datetime.desc())
+        .load::<models::RepoItem>(connection)
+        .expect("Error loading repo_items")
+}
+
+pub fn query_published_by_category(connection: &SqliteConnection,
+                                   slug: &str) -> Vec<models::RepoItem> {
+
+    let cat_id: i32 = categories::table
+        .select(categories::id)
+        .filter(categories::slug.like(slug))
+        .first::<i32>(connection).unwrap_or(0);
+
+    repo_items::table
+        .filter(repo_items::published.eq(true).and(
+                repo_items::category_id.eq(cat_id))
+            )
         .order(repo_items::datetime.desc())
         .load::<models::RepoItem>(connection)
         .expect("Error loading repo_items")
@@ -87,7 +105,7 @@ pub fn update(connection: &SqliteConnection, item: &models::RepoItem) {
               repo_items::datetime.eq(&item.datetime),
               repo_items::published.eq(&item.published),
               repo_items::description.eq(&item.description),
-              repo_items::category.eq(&item.category),
+              repo_items::category_id.eq(&item.category_id),
               repo_items::filepath.eq(&item.filepath),
               repo_items::filetype.eq(&item.filetype),
         ))

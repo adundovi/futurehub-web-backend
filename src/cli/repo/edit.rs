@@ -1,97 +1,41 @@
 use crate::db;
-use std::io;
 use chrono::prelude::*;
+use crate::tools::cli_edit::{
+    edit_line,
+    edit_number,
+    edit_bool,
+    edit_text,
+};
 
 pub fn f(args: &clap::ArgMatches) {
         match args.value_of("ID") {
             Some(i) => match i.parse::<i32>() {
-                Ok(i) => edit_post(i),
+                Ok(i) => edit_item(i),
                 Err(_) => print!("ID should be a number"),
             },
             None => print!("No ID given"),
             };
     }
 
-fn edit_post(id: i32) {
-
-    fn edit_line(e: &String, n: &str) -> String {
-        println!("{}: {}", &n, &e);
-        let mut input = String::new();
-        
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if input.trim().is_empty() {
-                    println!("{}: {}", &n, e);
-                    e.clone()
-                } else {
-                    println!("{}: {}", &n, input);
-                    input.trim().to_string()
-                }
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e.clone()
-            }
-        }
-    }
-
-    fn edit_text(e: &String, n: &str) -> String {
-        let edited = edit::edit(e);
-        
-        match edited {
-            Ok(s) => {
-                println!("{}:\n{}", &n, s);
-                s
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e.clone()
-            }
-        }
-    }
-
-    fn edit_bool(e: bool, n: &str) -> bool {
-        println!("{}: {}", &n, &e);
-        let mut input = String::new();
-        
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if input.trim().is_empty() {
-                    println!("{}: {}", &n, e);
-                    e
-                } else {
-                    let t = input.trim();
-                    if t == "1" || t == "t" || t == "y" {
-                        true
-                    } else {
-                        false
-                    }
-                }
-            },
-            Err(error) => {
-                println!("error: {}", error);
-                e
-            }
-        }
-    }
+fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
-    let post = db::post::get(&conn, id).expect("Id not found");
-    let mut new_post = post.clone();
+    let item = db::repo_items::get(&conn, id).expect("Id not found");
+    let mut new_item = item.clone();
 
-    new_post.title = edit_line(&new_post.title, "Title");
-    new_post.slug = edit_line(&new_post.slug, "Slug");
-    new_post.datetime = NaiveDateTime::parse_from_str(
-        &edit_line(&new_post.datetime.to_string(), "Date & time"),
-        "%Y-%m-%d %H:%M:%S").unwrap_or(new_post.datetime);
+    new_item.title = edit_line(&item.title, "Title");
+    new_item.slug = edit_line(&item.slug, "Slug");
+    new_item.datetime = NaiveDateTime::parse_from_str(
+        &edit_line(&new_item.datetime.to_string(), "Date & time"),
+        "%Y-%m-%d %H:%M:%S").unwrap_or(new_item.datetime);
     
-    match post.body {
-        Some(s) => new_post.body = Some(edit_text(&s, "Place")),
-        None => new_post.body = Some(edit_text(&String::new(), "Place")), 
+    match item.description {
+        Some(s) => new_item.description = Some(edit_text(&s, "Description")),
+        None => new_item.description = Some(edit_text(&String::new(), "Description")), 
     };
-    
-    new_post.published = edit_bool(post.published, "Published");
+    new_item.category_id = edit_number(&item.category_id, "CategoryId");
+    new_item.published = edit_bool(item.published, "Published");
     
     let conn = db::establish_connection();
-    db::post::update(&conn, &new_post);
+    db::repo_items::update(&conn, &new_item);
 }
