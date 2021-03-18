@@ -5,6 +5,7 @@ use rocket_contrib::databases::diesel as dieseldb;
 pub mod models;
 pub mod event;
 pub mod post;
+pub mod repo_items;
 pub mod sqlite_schema;
 
 const DATABASE: &str = "sqlite_db";

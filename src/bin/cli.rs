@@ -1,15 +1,28 @@
 use futurehub_web_backend::cli;
+use futurehub_web_backend::cli::menu::Menu;
 
 fn main() {
-
-    let post_menu = cli::post::menu();
-
+    // Get all submenus...
+    let submenus: Vec<Menu> = vec![
+        cli::post::menu(),
+        cli::event::menu(),
+        cli::repo::menu(),
+    ];
+    
+    // ...generate calp::App from them...
+    let menu_apps: Vec<clap::App> =
+        submenus.iter()
+                .map(|m| m.generate())
+                .collect();
+    
+    // ...build and parse...
     let cli_builder = 
         cli::menu::main()
-        .subcommand(cli::event::menu())
-        .subcommand(post_menu.generate())
+        .subcommands(menu_apps)
         .get_matches();
 
-    post_menu.process(&cli_builder);
-    cli::event::process(&cli_builder);
+    // ...and finally, run the command.
+    for m in submenus {
+        m.process(&cli_builder);
+    }
 }

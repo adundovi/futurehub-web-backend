@@ -1,8 +1,5 @@
-use rocket::http::RawStr;
 use rocket_contrib::json::Json;
-use crate::db;
 use crate::services::mail;
-use chrono::NaiveDateTime;
 
 #[derive(Deserialize, Debug)]
 pub struct ContactForm {
@@ -17,8 +14,8 @@ pub fn process_form(form: Json<ContactForm>) {
     let m = mail::Mail{
         to: "4ndY@krizevci.info",
         subject: &format!("FutureHub-web - Kontakt - Poruka od {}", &form.full_name),
-        body: format!("Od: {} <{}>\n\
-                      Telefon: {}\n\
+        body: format!("Od: {} <{}>\n
+                      Telefon: {}\n
                       Poruka: {}",
                       &form.full_name,
                       &form.email,

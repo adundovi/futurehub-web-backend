@@ -38,6 +38,12 @@ pub fn drop_all(connection: &SqliteConnection) {
         .expect(&format!("Error removing all events"));
 }
 
+pub fn get(connection: &SqliteConnection, id: i32) -> Result<models::Event, diesel::result::Error> {
+    events::table
+        .filter(events::id.eq(id))
+        .first::<models::Event>(connection)
+}
+
 pub fn query(connection: &SqliteConnection) -> Vec<models::Event> {
     events::table
         .order(events::datetime.asc())
@@ -53,13 +59,6 @@ pub fn query_upcoming(connection: &SqliteConnection, last: i64) -> Vec<models::E
         .limit(last)
         .load::<models::Event>(connection)
         .expect("Error loading events")
-}
-
-pub fn get(connection: &SqliteConnection, id: i32) -> models::Event {
-    events::table
-        .filter(events::id.eq(id))
-        .first::<models::Event>(connection)
-        .expect("Error loading event")
 }
 
 pub fn update(connection: &SqliteConnection, event: &models::Event) {

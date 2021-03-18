@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE repo (
+CREATE TABLE repo_items (
   id INTEGER NOT NULL,
   title VARCHAR NOT NULL,
   slug VARCHAR NOT NULL,

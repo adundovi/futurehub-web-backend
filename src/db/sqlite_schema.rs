@@ -21,7 +21,7 @@ table! {
 }
 
 table! {
-    repo (id) {
+    repo_items (id) {
         id -> Integer,
         title -> Text,
         slug -> Text,
@@ -37,5 +37,5 @@ table! {
 allow_tables_to_appear_in_same_query!(
     events,
     posts,
-    repo,
+    repo_items,
 );

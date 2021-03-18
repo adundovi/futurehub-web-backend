@@ -5,15 +5,14 @@ use crate::cli::menu::{Menu, Subcommand};
 
 mod create;
 mod list;
-mod import;
 mod remove;
 mod dropall;
 mod edit;
 
 pub fn menu<'a>() -> Menu<'a> {
     let mut m = Menu{
-        name: "event",
-        about: "Add, edit or list events",
+        name: "repo",
+        about: "Add, modify, remove and list repository items",
         author: "Andrej Dundović <andrej.dundovic@udruga-point.hr>",
         version: "0.1",
         subcommands: HashMap::new()
@@ -23,9 +22,14 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("new")
                 .about("Add new event")
                 .arg(Arg::new("TITLE")
-                     .about("Title of the event")
+                     .about("Title of the item")
                      .required(true)
                      .index(1)
+                     )
+                .arg(Arg::new("URL")
+                     .about("URL of the file")
+                     .required(true)
+                     .index(2)
                      ),
             f: &create::f
     };
@@ -33,7 +37,7 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_list = Subcommand {
         app: App::new("list")
-            .about("List all events"),
+            .about("List all repository items"),
         f: &list::f
     };
     m.push_subcommand("list", menu_list);
@@ -41,7 +45,7 @@ pub fn menu<'a>() -> Menu<'a> {
     let menu_remove = Subcommand {
             app: App::new("remove")
                 .alias("rm")
-                .about("Remove event given by ID")
+                .about("Remove post given by ID")
                 .arg(Arg::new("ID")
                      .about("ID of the event")
                      .required(true)
@@ -53,7 +57,7 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_dropall = Subcommand {
             app: App::new("dropall")
-                .about("Drop all events from the database")
+                .about("Drop all repository items from the database")
                 .arg(Arg::new("yes")
                      .short('y')
                      .long("yes")
@@ -66,27 +70,15 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_edit = Subcommand {
             app: App::new("edit")
-                .about("Edit event given by ID")
+                .about("Edit post given by ID")
                 .arg(Arg::new("ID")
-                     .about("event ID")
+                     .about("post ID")
                      .required(true)
                      .index(1)
                      ),
             f: &edit::f
     };
     m.push_subcommand("edit", menu_edit);
-        
-    let menu_import = Subcommand {
-            app: App::new("import")
-                .about("Import events from CSV")
-                .arg(Arg::new("FILE")
-                     .about("CSV file")
-                     .required(true)
-                     .index(1)
-                     ),
-            f: &import::f
-    };
-    m.push_subcommand("import", menu_import);
 
     m
 }
