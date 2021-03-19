@@ -23,6 +23,11 @@ fn edit_item(id: i32) {
     new_item.title = edit_line(&item.title, "Title");
     new_item.slug = edit_line(&item.slug, "Slug");
     
+    match item.icon {
+        Some(s) => new_item.icon = Some(edit_line(&s, "Icon")),
+        None => new_item.icon = Some(edit_line(&String::new(), "Icon")),
+    }
+
     match item.description {
         Some(s) => new_item.description = Some(edit_text(&s, "Description")),
         None => new_item.description = Some(edit_text(&String::new(), "Description")), 

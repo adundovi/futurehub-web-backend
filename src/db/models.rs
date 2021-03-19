@@ -86,8 +86,8 @@ pub struct RepoItem {
 pub struct NewCategory {
     pub title: String,
     pub slug: String,
-    pub description: Option<String>,
     pub icon: Option<String>,
+    pub description: Option<String>,
 }
 
 #[derive(Queryable, Clone)]
@@ -95,6 +95,6 @@ pub struct Category {
     pub id: i32,
     pub title: String,
     pub slug: String,
-    pub description: Option<String>,
     pub icon: Option<String>,
+    pub description: Option<String>,
 }
