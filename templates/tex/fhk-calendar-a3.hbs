@@ -1,0 +1,143 @@
+\documentclass[14pt, portrait]{tikzposter}
+\geometry{paperwidth=297mm,paperheight=420mm}
+\makeatletter
+\setlength{\TP@visibletextwidth}{\textwidth-2\TP@innermargin}
+\setlength{\TP@visibletextheight}{\textheight-2\TP@innermargin}
+\makeatother
+\tikzposterlatexaffectionproofoff
+
+\usepackage[T1]{fontenc}
+\usepackage[default]{comfortaa}
+\usepackage[utf8]{inputenc}
+
+\usetikzlibrary{positioning}
+\definecolor{bgspace}{rgb}{0.11,0.15,0.29}
+
+\usetheme{Board}
+
+\defineblockstyle{fhkblockstyle}{
+    titlewidthscale=1, bodywidthscale=1,titleleft,titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0mm, bodyoffsety=4mm, bodyverticalshift=1mm, roundedcorners=5, linewidth=2pt,titleinnersep=5mm, bodyinnersep=0.6cm
+}{
+    \draw[color=blockbodybgcolor, fill=blockbodybgcolor, fill opacity=0.6] (blockbody.south west)rectangle (blockbody.north east);
+}
+\useblockstyle{fhkblockstyle}
+
+\definecolorstyle{fhkcolours} {
+\definecolor{colorOne}{named}{blue}
+\definecolor{colorTwo}{named}{yellow}
+\definecolor{colorThree}{named}{white}
+}{
+% Background Colors
+\colorlet{backgroundcolor}{colorOne}
+\colorlet{framecolor}{black}
+% Title Colors
+\colorlet{titlefgcolor}{white}
+\colorlet{titlebgcolor}{colorOne}
+% Block Colors
+\colorlet{blocktitlebgcolor}{colorThree}
+\colorlet{blocktitlefgcolor}{white}
+\colorlet{blockbodybgcolor}{bgspace}
+\colorlet{blockbodyfgcolor}{white}
+% Innerblock Colors
+\colorlet{innerblocktitlebgcolor}{white}
+\colorlet{innerblocktitlefgcolor}{black}
+\colorlet{innerblockbodybgcolor}{colorThree!30!white}
+\colorlet{innerblockbodyfgcolor}{black}
+% Note colors
+\colorlet{notefgcolor}{black}
+\colorlet{notebgcolor}{colorTwo!50!white}
+\colorlet{noteframecolor}{colorTwo}
+}
+\usecolorstyle{fhkcolours}
+
+\definebackgroundstyle{fhkbackground}{
+    \node [anchor=north east, inner sep=0pt] at (15cm, 21cm) (stars) {\includegraphics[scale=1]{ {{resources}}/img/svemir_pozadina.png}};
+    \node [below=of stars] at (0, -16cm) (footer) {\includegraphics[scale=0.66]{ {{resources}}/img/lenta_eu_vlada_rh_nzzrcd_s_korisnicima.png}};
+    \node [above=of stars] at (7.5cm, 13.55cm) (qr) {\includegraphics[scale=0.34]{ {{resources}}/img/fhk-url-qr.png}};
+}
+\usebackgroundstyle{fhkbackground}
+
+\title{Kalendar događanja za {{month}}. {{year}}.}
+\author{Future Hub Križevci}
+\date{\today}
+\institute{
+\Large{https://futurehub.krizevci.eu}\\
+\vspace{1cm}
+\large{
+Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
+\vspace{-1.2cm}
+}
+
+\newcommand{\event}[2]{
+    \item \normalsize{#1 \textbf{#2}}
+}
+\newcommand{\dan}[2]{
+    \item \normalsize{#1}
+    \begin{description}
+     #2
+    \end{description}
+
+}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{columns}
+    \column{0.5}
+    \block{\vspace{-0.8cm}\Large U prostorijama Huba}{
+\begin{description}
+ {{#each events_in_hub_1 as |e|}}
+	\dan{ {{e.Date}} }{
+		{{#each e.Items as |i|}}
+			\event{ {{i.Time}} }{ {{{i.Name}}} }
+		{{/each}}
+	}
+ {{/each}}
+ {{#if events_in_hub_2}}
+  \item \(\Rightarrow\)
+ {{/if}}
+\end{description}
+}
+ {{#if events_in_hub_2}}
+    \column{0.5}
+    \block{%\phantom{whatever}%
+    }{
+\begin{description}
+ \item \(\Rightarrow\)
+ {{#each events_in_hub_2 as |e|}}
+	\dan{ {{e.Date}} }{
+		{{#each e.Items as |i|}}
+			\event{ {{i.Time}} }{ {{{i.Name}}} }
+		{{/each}}
+	}
+ {{/each}}
+\end{description}
+}
+ {{/if}}
+
+ {{#unless events_in_hub_2}}
+    \column{0.5}
+ {{/unless}}
+    \block{\vspace{-0.8cm}\Large Izvan prostorija Huba}{
+\begin{description}
+ {{#each events_outside_hub as |e|}}
+	\dan{ {{e.Date}} }{
+		{{#each e.Items as |i|}}
+			\event{ {{i.Time}} }{ {{{i.Name}}} }
+		{{/each}}
+	}
+ {{/each}}
+\end{description}
+    }
+ 
+ \block{}{
+ \footnotesize
+    Sadržaj kalendara isključiva je odgovornost udruge P.O.I.N.T.
+ }
+\end{columns}
+
+
+
+\end{document}
