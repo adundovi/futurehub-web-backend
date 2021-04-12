@@ -91,7 +91,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#each events_in_hub_1 as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.Name}}} }
+			\event{ {{i.Time}} }{ {{{i.title}}} }
 		{{/each}}
 	}
  {{/each}}
@@ -109,7 +109,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#each events_in_hub_2 as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.Name}}} }
+			\event{ {{i.Time}} }{ {{{i.title}}} }
 		{{/each}}
 	}
  {{/each}}
@@ -125,7 +125,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#each events_outside_hub as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.Name}}} }
+			\event{ {{i.Time}} }{ {{{i.title}}} }
 		{{/each}}
 	}
  {{/each}}

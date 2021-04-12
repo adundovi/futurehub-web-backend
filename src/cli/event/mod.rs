@@ -9,6 +9,7 @@ mod import;
 mod remove;
 mod dropall;
 mod edit;
+mod export_pdf;
 
 pub fn menu<'a>() -> Menu<'a> {
     let mut m = Menu{
@@ -33,7 +34,12 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_list = Subcommand {
         app: App::new("list")
-            .about("List all events"),
+            .about("List all events")
+            .arg(Arg::new("month")
+                 .short('m')
+                 .long("month")
+                 .about("List this month events only")
+                 ),
         f: &list::f
     };
     m.push_subcommand("list", menu_list);
@@ -87,6 +93,13 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &import::f
     };
     m.push_subcommand("import", menu_import);
+    
+    let menu_export_pdf = Subcommand {
+            app: App::new("export_pdf")
+                .about("Export calendar of events to PDF"),
+            f: &export_pdf::f
+    };
+    m.push_subcommand("export_pdf", menu_export_pdf);
 
     m
 }

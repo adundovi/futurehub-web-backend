@@ -3,7 +3,11 @@ use diesel::{
         sqlite::SqliteConnection,
         sql_types::Timestamp,
     };
-use chrono::prelude::*;
+use chrono::{
+        prelude::*,
+        NaiveTime,
+        NaiveDateTime
+    };
 
 use super::models;
 use super::sqlite_schema::events as events;
@@ -46,6 +50,30 @@ pub fn get(connection: &SqliteConnection, id: i32) -> Result<models::Event, dies
 
 pub fn query(connection: &SqliteConnection) -> Vec<models::Event> {
     events::table
+        .order(events::datetime.asc())
+        .load::<models::Event>(connection)
+        .expect("Error loading events")
+}
+
+fn beginning_of_month(datetime_utc: &DateTime<Utc>) -> NaiveDateTime {
+    let year = datetime_utc.year();
+    let month = datetime_utc.month();
+    NaiveDate::from_ymd(year, month, 1).and_time(NaiveTime::from_hms(0,0,0))
+}
+
+fn end_of_month(datetime_utc: &DateTime<Utc>) -> NaiveDateTime {
+    let year = datetime_utc.year();
+    let month = datetime_utc.month();
+    let (year, month) = if month == 12 { (year + 1, 1) } else { (year, month + 1) };
+    NaiveDate::from_ymd(year, month, 1).pred().and_time(NaiveTime::from_hms(23,59,59))
+}
+
+pub fn query_by_month(connection: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<models::Event> {
+    let start = beginning_of_month(datetime_utc);
+    let end = end_of_month(datetime_utc);
+    Local::now().to_string().into_sql::<Timestamp>();
+    events::table
+        .filter(events::datetime.ge(start).and(events::datetime.le(end)))
         .order(events::datetime.asc())
         .load::<models::Event>(connection)
         .expect("Error loading events")

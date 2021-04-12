@@ -20,7 +20,7 @@ pub struct NewEvent {
     pub audience: Option<String>,
 }
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct Event {
     pub id: i32,
     pub title: String,
