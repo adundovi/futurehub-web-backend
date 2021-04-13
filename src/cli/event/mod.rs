@@ -35,10 +35,16 @@ pub fn menu<'a>() -> Menu<'a> {
     let menu_list = Subcommand {
         app: App::new("list")
             .about("List all events")
-            .arg(Arg::new("month")
-                 .short('m')
-                 .long("month")
-                 .about("List this month events only")
+            .arg(Arg::new("date")
+                 .long("date")
+                 .value_name("YYYY-MM")
+                 .validator(|s: &str| -> Result<(), String> {
+                    match chrono::NaiveDate::parse_from_str(&format!("{}-01", s), "%Y-%m-%d") {
+                        Ok(_) => Ok(()),
+                        Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
+                    }
+                 })
+                 .about("List events of the given date only (YYYY-MM)")
                  ),
         f: &list::f
     };
@@ -96,7 +102,32 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_export_pdf = Subcommand {
             app: App::new("export_pdf")
-                .about("Export calendar of events to PDF"),
+                .about("Export calendar of events to PDF")
+                .arg(Arg::new("date")
+                     .required(true)
+                     .short('d')
+                     .long("date")
+                     .value_name("YYYY-MM")
+                     .validator(|s: &str| -> Result<(), String> {
+                        match chrono::NaiveDate::parse_from_str(&format!("{}-01", s), "%Y-%m-%d") {
+                            Ok(_) => Ok(()),
+                            Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
+                        }
+                      })
+                    .about("Calendar of the given month (YYYY-MM)")
+                 )
+                .arg(Arg::new("size")
+                     .short('s')
+                     .long("size")
+                     .value_name("FONTSIZE")
+                     .possible_values(&["smaller", "small", "normal", "large", "larger"])
+                     .about("Font size of the item text")
+                 )
+                .arg(Arg::new("split_at")
+                     .long("split_at")
+                     .value_name("INT")
+                     .about("Number of items in the first column")
+                 ),
             f: &export_pdf::f
     };
     m.push_subcommand("export_pdf", menu_export_pdf);

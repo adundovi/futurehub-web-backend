@@ -68,11 +68,13 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
 \vspace{-1.2cm}
 }
 
+\newcommand{\eventfontsize}{ {{fontsize}} }
+
 \newcommand{\event}[2]{
-    \item \normalsize{#1 \textbf{#2}}
+    \item \eventfontsize{#1 \textbf{#2}}
 }
 \newcommand{\dan}[2]{
-    \item \normalsize{#1}
+    \item \eventfontsize{#1}
     \begin{description}
      #2
     \end{description}
@@ -86,12 +88,12 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
 
 \begin{columns}
     \column{0.5}
-    \block{\vspace{-0.8cm}\Large U prostorijama Huba}{
+    \block{\vspace{-0.8cm}\large U prostorijama Huba}{
 \begin{description}
  {{#each events_in_hub_1 as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.title}}} }
+			\event{ {{datetime2shorttime i.datetime}} }{ {{{i.title}}} }
 		{{/each}}
 	}
  {{/each}}
@@ -109,7 +111,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#each events_in_hub_2 as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.title}}} }
+			\event{ {{datetime2shorttime i.datetime}} }{ {{{i.title}}} }
 		{{/each}}
 	}
  {{/each}}
@@ -120,12 +122,12 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#unless events_in_hub_2}}
     \column{0.5}
  {{/unless}}
-    \block{\vspace{-0.8cm}\Large Izvan prostorija Huba}{
+    \block{\vspace{-0.8cm}\large Izvan prostorija Huba}{
 \begin{description}
  {{#each events_outside_hub as |e|}}
 	\dan{ {{e.Date}} }{
 		{{#each e.Items as |i|}}
-			\event{ {{i.Time}} }{ {{{i.title}}} }
+			\event{ {{datetime2shorttime i.datetime}} }{ {{{i.title}}}, {{{i.place}}} }
 		{{/each}}
 	}
  {{/each}}

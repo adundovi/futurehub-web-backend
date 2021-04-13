@@ -1,11 +1,23 @@
 use crate::db;
 use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
+use std::path::Path;
 use chrono::prelude::*;
-use handlebars::to_json;
+use chrono::NaiveDateTime;
 use serde::{Serialize, Deserialize};
 use std::error::Error;
 use serde_json::value::{Map as JsonMap, Value as Json};
-use std::path::Path;
+
+use handlebars::{
+    Handlebars,
+    Helper,
+    Context,
+    RenderContext,
+    Output,
+    HelperResult,
+    to_json,
+};
+
+use std::str::FromStr;
 
 #[derive(Deserialize,Serialize,Clone)]
 #[serde(rename_all = "PascalCase")]
@@ -20,38 +32,93 @@ impl Events {
     }
 }
 
+enum TexFontSize {
+    Smaller,
+    Small,
+    Normal,
+    Large,
+    Larger,
+}
+
+impl FromStr for TexFontSize {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "smaller" => Ok(TexFontSize::Smaller),
+            "small" => Ok(TexFontSize::Small),
+            "normal" => Ok(TexFontSize::Normal),
+            "large" => Ok(TexFontSize::Large),
+            "larger" => Ok(TexFontSize::Larger),
+            _ => Err("no matched fontsize"),
+        }
+    }
+}
+
 // list events
 pub fn f(args: &clap::ArgMatches) {
-
+        
+    let date = Utc.datetime_from_str(
+                   &format!("{}-01 12:00:00", args.value_of("date").unwrap()),
+                   "%Y-%m-%d %H:%M:%S").unwrap().with_timezone(&Utc);
+    
     let template_path = Path::new("./templates/tex/fhk-calendar-a3.hbs");
     let resources_path = Path::new("./templates/tex");
-    let year = 2021;
-    let month = 04;
-    let mut data = make_data(year, month).unwrap();
+
+    let split_at: usize = args.value_of_t("split_at").unwrap_or(10);
+
+    let mut data = make_data(date, split_at).unwrap();
+    
+    let fontsize = match args.value_of_t("size").unwrap() {
+        TexFontSize::Smaller => "\\footnotesize",
+        TexFontSize::Small => "\\small",
+        TexFontSize::Normal => "\\normalsize",
+        TexFontSize::Large => "\\large",
+        TexFontSize::Larger => "\\Large",
+    };
     data.insert("resources".to_string(),
                 to_json(resources_path.canonicalize().unwrap().to_str().unwrap()));
-
+    data.insert("fontsize".to_string(), to_json(fontsize));
+    
     let output_path_str = format!("./tmp/calendar-{year}-{month}.tex",
-                           year = year,
-                           month = month);
+                           year = date.year(),
+                           month = date.month());
     let output_path = Path::new(&output_path_str);
 
     let t = TemplateRecipe {
         template_path: &template_path,
         output_path: &output_path,
         data: &data,
-        helpers: None
+        helpers: Some(vec![
+                      ("datetime2shorttime".to_string(), datetime2shorttime_helper)
+        ]),
     };
 
     render_pdf(&t).unwrap();
 }
 
-fn load_calendar() -> Result<Vec<db::models::Event>, Box<dyn Error>> {
+fn datetime2shorttime_helper(h: &Helper,
+                             _: &Handlebars,
+                             _: &Context,
+                             _: &mut RenderContext,
+                             out: &mut dyn Output) -> HelperResult {
+    let dt = h.param(0).unwrap().value();
+
+    if dt.is_string() {
+        let short_t = NaiveDateTime::parse_from_str(
+            dt.as_str().unwrap(),
+            "%Y-%m-%dT%H:%M:%S").unwrap()
+            .format("%H:%M").to_string();
+        out.write(&short_t)?;
+    }
+    Ok(())
+}
+
+fn load_calendar(dt: DateTime<Utc>) -> Result<Vec<db::models::Event>, Box<dyn Error>> {
     let mut events: Vec<db::models::Event> = Vec::new();
     
     let conn = db::establish_connection();
-    let utc_now = Utc::now();
-    for e in db::event::query_by_month(&conn, &utc_now) {
+    for e in db::event::query_by_month(&conn, &dt) {
         events.push(e);
     };
 
@@ -75,10 +142,25 @@ fn sort_events(events: Vec<db::models::Event>) ->
     let mut events_in_hub: Vec<Events> = Vec::new();
     let mut events_outside_hub: Vec<Events> = Vec::new();
 
+    fn weekday2hrweekday<'a>(wd: &'a Weekday) -> &'a str {
+        match wd {
+            Weekday::Mon => "ponedjeljak",
+            Weekday::Tue => "utorak",
+            Weekday::Wed => "srijeda",
+            Weekday::Thu => "četvrtak",
+            Weekday::Fri => "petak",
+            Weekday::Sat => "subota",
+            Weekday::Sun => "nedjelja",
+        }
+    }
+
     for e in events {
         let idx = String::from(format!("{} ({})",
-            &e.datetime.format("%d. %m."), &e.datetime.weekday()));
-        if e.place == Some("Prostori FHK-a".to_string()) {
+            &e.datetime.format("%d. %m."), weekday2hrweekday(
+                &e.datetime.weekday())
+            ));
+        if e.place == Some("Prostori FHK-a".to_string()) ||
+           e.place == Some("Online".to_string()) {
             let i = search_in_vec(&events_in_hub, &idx);
             match i {
                 Some(i) => events_in_hub[i].items.push(e),
@@ -102,20 +184,19 @@ fn sort_events(events: Vec<db::models::Event>) ->
     (events_in_hub, events_outside_hub)
 }
 
-pub fn make_data(year: u32, month: u32) -> Result<JsonMap<String, Json>, Box<dyn Error>> {
+pub fn make_data(dt: DateTime<Utc>, split_at: usize) -> Result<JsonMap<String, Json>, Box<dyn Error>> {
     let mut data = JsonMap::new();
 
-    data.insert("month".to_string(), to_json(month));
-    data.insert("year".to_string(), to_json(year));
+    data.insert("month".to_string(), to_json(dt.month()));
+    data.insert("year".to_string(), to_json(dt.year()));
 
-    let events = load_calendar()?;
+    let events = load_calendar(dt)?;
     let (events_in_hub, events_outside_hub) = sort_events(events);
 
-    let limiter = 8;
-    if events_in_hub.len() > limiter {
-        let events_in_hub_1: Vec<Events> = events_in_hub[0..(limiter+1)].to_vec();
+    if events_in_hub.len() > split_at {
+        let events_in_hub_1: Vec<Events> = events_in_hub[0..(split_at+1)].to_vec();
         data.insert("events_in_hub_1".to_string(), to_json(events_in_hub_1));
-        let events_in_hub_2: Vec<Events> = events_in_hub[(limiter+1)..].to_vec();
+        let events_in_hub_2: Vec<Events> = events_in_hub[(split_at+1)..].to_vec();
         data.insert("events_in_hub_2".to_string(), to_json(events_in_hub_2));
     } else {
         let events_in_hub_1: Vec<Events> = events_in_hub.to_vec();
