@@ -37,22 +37,12 @@ pub fn process_login(login: Json<db::models::LoginData>, conn: db::MainDbConn) -
     )
 }
 
-/*
-//#[derive(Insertable, Serialize, Deserialize)]
-//#[table_name = "users"]
-pub struct UserDTO {
-    pub username: String,
-    pub email: String,
-    pub password: String,
-}
-*/
-/*
-pub fn signup(user: UserDTO, conn: DbConn) -> ResponseWithStatus {
-    if User::signup(user, &conn) {
+pub fn signup(user: db::models::UserDTO, conn: db::MainDbConn) -> ResponseWithStatus {
+    if db::models::User::create_with_password(user, &conn) {
         ResponseWithStatus {
             status_code: Status::Ok.code,
             response: Response {
-                message: String::from(message_constants::MESSAGE_SIGNUP_SUCCESS),
+                message: String::from(messages::MESSAGE_SIGNUP_SUCCESS),
                 data: serde_json::to_value("").unwrap(),
             },
         }
@@ -60,7 +50,7 @@ pub fn signup(user: UserDTO, conn: DbConn) -> ResponseWithStatus {
         ResponseWithStatus {
             status_code: Status::BadRequest.code,
             response: Response {
-                message: String::from(message_constants::MESSAGE_SIGNUP_FAILED),
+                message: String::from(messages::MESSAGE_SIGNUP_FAILED),
                 data: serde_json::to_value("").unwrap(),
             },
         }
@@ -68,11 +58,10 @@ pub fn signup(user: UserDTO, conn: DbConn) -> ResponseWithStatus {
 }
 
 #[post("/signup", format = "json", data = "<user>")]
-pub fn signup(user: Json<UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
-    let response = account_service::signup(user.0, conn);
+pub fn process_signup(user: Json<db::models::UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
+    let response = signup(user.0, conn);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),
         Json(response.response),
     )
 }
-*/

@@ -51,6 +51,7 @@ fn main() {
                category::get_by_slug,
                contact::process_form,
                auth::process_login,
+               auth::process_signup,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

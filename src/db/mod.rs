@@ -4,6 +4,7 @@ use rocket_contrib::databases::diesel as dieseldb;
 
 pub mod event;
 pub mod category;
+pub mod login_history;
 pub mod models;
 pub mod post;
 pub mod repo_items;

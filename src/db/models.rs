@@ -148,3 +148,27 @@ pub struct User {
     pub birthday: Option<NaiveDateTime>,
     pub creation_date: NaiveDateTime,
 }
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "users"]
+pub struct UserDTO {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+//#[belongs_to(User)]
+#[table_name = "login_history"]
+pub struct LoginHistory {
+    pub id: i32,
+    pub user_id: i32,
+    pub login_timestamp: NaiveDateTime,
+}
+
+#[derive(Insertable)]
+#[table_name = "login_history"]
+pub struct LoginHistoryInsertable {
+    pub user_id: i32,
+    pub login_timestamp: NaiveDateTime,
+}

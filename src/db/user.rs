@@ -1,6 +1,7 @@
 use bcrypt::{hash, verify};
 use diesel::{prelude::*, sqlite::SqliteConnection};
 use chrono::prelude::*;
+use uuid::Uuid;
 
 use crate::rest::jwt::UserToken;
 use crate::db::models;
@@ -17,6 +18,31 @@ impl models::User {
             username: username,
             email: email,
             password: None,
+            login_session: None,
+            oib: None,
+            name: None,
+            surname: None,
+            address: None,
+            phone: None,
+            gender: None,
+            birthday: None,
+            creation_date: Utc::now().naive_utc(),
+        };
+        diesel::insert_into(users::table)
+            .values(&user)
+            .execute(conn)
+            .is_ok()
+    }
+    
+    pub fn create_with_password(user: models::UserDTO,
+                 conn: &SqliteConnection) -> bool {
+        
+        let hash_password = Some(hash(user.password, DEFAULT_COST).unwrap());
+
+        let user = models::NewUser {
+            username: user.username,
+            email: user.email,
+            password: hash_password,
             login_session: None,
             oib: None,
             name: None,
@@ -57,6 +83,12 @@ impl models::User {
     pub fn get(id: i32, conn: &SqliteConnection) -> Result<models::User, diesel::result::Error> {
         users::table
             .filter(users::id.eq(id))
+            .first::<models::User>(conn)
+    }
+    
+    pub fn get_user_by_username(username: &str, conn: &SqliteConnection) -> Result<models::User, diesel::result::Error> {
+        users::table
+            .filter(users::username.eq(username))
             .first::<models::User>(conn)
     }
 
@@ -103,26 +135,31 @@ impl models::User {
             None => None,
             Some(user_password) => {
                 if verify(&login.password, &user_password).unwrap() {
-            /*if let Some(login_history) = LoginHistory::create(&user_to_verify.username, conn) {
-                if !LoginHistory::save_login_history(login_history, conn) {
-                    return None;
-                }
-                let login_session_str = User::generate_login_session();
-                User::update_login_session_to_db(&user_to_verify.username, &login_session_str, conn);
-                Some(LoginInfo {
-                    username: user_to_verify.username,
-                    login_session: login_session_str,
-                })*/
-                let login_session_str = "bananko".to_string();
-                Some(models::LoginInfo {
-                    username: user_to_verify.username,
-                    login_session: login_session_str,
-                })
+                    if let Some(login_history) = models::LoginHistory::create(&user_to_verify.username, conn) {
+                        
+                        if !models::LoginHistory::save_login_history(login_history, conn) {
+                            return None;
+                        }
+
+                        let login_session_str = models::User::generate_login_session();
+                        models::User::update_login_session_to_db(&user_to_verify.username, &login_session_str, conn);
+                        
+                        Some(models::LoginInfo {
+                            username: user_to_verify.username,
+                            login_session: login_session_str,
+                        })
+                    } else {
+                        None
+                    }
                 } else {
                     None
                 }
             }
         }
+    }
+
+    pub fn generate_login_session() -> String {
+        Uuid::new_v4().to_simple().to_string()
     }
 
     pub fn is_valid_login_session(user_token: &UserToken, conn: &SqliteConnection) -> bool {
@@ -132,13 +169,16 @@ impl models::User {
             .get_result::<models::User>(conn)
             .is_ok()
     }
-}
-    
-/*
-pub fn get_by_slug(connection: &SqliteConnection, slug: String) -> Result<models::Category, diesel::result::Error> {
-    categories::table
-        .filter(categories::slug.eq(slug))
-        .first::<models::Category>(connection)
-}
 
-}*/
+    pub fn update_login_session_to_db(username: &str, login_session_str: &str,
+                                      conn: &SqliteConnection) -> bool {
+        if let Ok(user) = models::User::get_user_by_username(username, conn) {
+            diesel::update(users::table.find(user.id))
+            .set(users::login_session.eq(login_session_str.to_string()))
+            .execute(conn)
+            .is_ok()
+        } else {
+            false
+        }
+    }
+}
