@@ -14,6 +14,7 @@ use futurehub_web_backend::rest::{
     posts,
     repo,
     contact,
+    auth,
 };
 
 pub struct CORS();
@@ -49,6 +50,7 @@ fn main() {
                category::get_by_id,
                category::get_by_slug,
                contact::process_form,
+               auth::process_login,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

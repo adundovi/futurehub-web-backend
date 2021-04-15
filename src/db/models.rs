@@ -3,6 +3,8 @@ use super::sqlite_schema::{
     posts,
     repo_items,
     categories,
+    users,
+    login_history,
 };
 use chrono::NaiveDateTime;
 
@@ -97,4 +99,52 @@ pub struct Category {
     pub slug: String,
     pub icon: Option<String>,
     pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LoginData {
+    pub username_or_email: String,
+    pub password: String,
+}
+
+#[derive(Insertable)]
+#[table_name = "users"]
+pub struct LoginInfo {
+    pub username: String,
+    pub login_session: String,
+}
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "users"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewUser {
+    pub username: String,
+    pub email: String,
+    pub password: Option<String>,
+    pub login_session: Option<String>,
+    pub oib: Option<String>,
+    pub name: Option<String>,
+    pub surname: Option<String>,
+    pub address: Option<String>,
+    pub phone: Option<String>,
+    pub gender: Option<String>,
+    pub birthday: Option<NaiveDateTime>,
+    pub creation_date: NaiveDateTime,
+}
+
+#[derive(Queryable, Clone)]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub password: Option<String>,
+    pub login_session: Option<String>,
+    pub oib: Option<String>,
+    pub name: Option<String>,
+    pub surname: Option<String>,
+    pub address: Option<String>,
+    pub phone: Option<String>,
+    pub gender: Option<String>,
+    pub birthday: Option<NaiveDateTime>,
+    pub creation_date: NaiveDateTime,
 }

@@ -1,7 +1,8 @@
 use crate::db;
 use crate::tools::cli_edit::{
     edit_line,
-    edit_text,
+    edit_option_line,
+    edit_option_text,
 };
 
 pub fn f(args: &clap::ArgMatches) {
@@ -17,22 +18,14 @@ pub fn f(args: &clap::ArgMatches) {
 fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
+
     let item = db::category::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.title = edit_line(&item.title, "Title");
     new_item.slug = edit_line(&item.slug, "Slug");
+    new_item.icon = edit_option_line(&item.icon, "Icon");
+    new_item.description = edit_option_text(&item.description, "Description");
     
-    match item.icon {
-        Some(s) => new_item.icon = Some(edit_line(&s, "Icon")),
-        None => new_item.icon = Some(edit_line(&String::new(), "Icon")),
-    }
-
-    match item.description {
-        Some(s) => new_item.description = Some(edit_text(&s, "Description")),
-        None => new_item.description = Some(edit_text(&String::new(), "Description")), 
-    };
-    
-    let conn = db::establish_connection();
     db::category::update(&conn, &new_item);
 }

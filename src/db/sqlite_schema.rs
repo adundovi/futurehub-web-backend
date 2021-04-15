@@ -20,6 +20,14 @@ table! {
 }
 
 table! {
+    login_history (id) {
+        id -> Integer,
+        user_id -> Nullable<Integer>,
+        login_timestamp -> Timestamp,
+    }
+}
+
+table! {
     posts (id) {
         id -> Integer,
         title -> Text,
@@ -44,11 +52,32 @@ table! {
     }
 }
 
+table! {
+    users (id) {
+        id -> Integer,
+        username -> Text,
+        email -> Text,
+        password -> Nullable<Text>,
+        login_session -> Nullable<Text>,
+        oib -> Nullable<Text>,
+        name -> Nullable<Text>,
+        surname -> Nullable<Text>,
+        address -> Nullable<Text>,
+        phone -> Nullable<Text>,
+        gender -> Nullable<Text>,
+        birthday -> Nullable<Timestamp>,
+        creation_date -> Timestamp,
+    }
+}
+
+joinable!(login_history -> users (user_id));
 joinable!(repo_items -> categories (category_id));
 
 allow_tables_to_appear_in_same_query!(
     categories,
     events,
+    login_history,
     posts,
     repo_items,
+    users,
 );

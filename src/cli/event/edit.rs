@@ -17,6 +17,7 @@ pub fn f(args: &clap::ArgMatches) {
 fn edit_event(id: i32) {
 
     let conn = db::establish_connection();
+
     let event = db::event::get(&conn, id).expect("Id not found");
     let mut new_event = event.clone();
 
@@ -34,6 +35,5 @@ fn edit_event(id: i32) {
         None => new_event.audience = Some(edit_line(&String::new(), "Audience")), 
     }
     
-    let conn = db::establish_connection();
     db::event::update(&conn, &new_event);
 }

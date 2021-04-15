@@ -8,6 +8,7 @@ pub mod models;
 pub mod post;
 pub mod repo_items;
 pub mod sqlite_schema;
+pub mod user;
 
 const DATABASE: &str = "sqlite_db";
 

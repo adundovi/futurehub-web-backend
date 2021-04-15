@@ -8,6 +8,7 @@ fn main() {
         cli::event::menu(),
         cli::post::menu(),
         cli::repo::menu(),
+        cli::user::menu(),
     ];
     
     // ...generate calp::App from them...

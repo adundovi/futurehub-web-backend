@@ -19,3 +19,4 @@ Rocket.toml
 
 # Ignore temporary stuff
 tmp/*
+secret.key
