@@ -40,7 +40,7 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
-                        streampath: format!("/repo/stream/{}", &p.slug),
+                        streampath: format!("/api/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
                         category_id: p.category_id,
@@ -54,7 +54,7 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
-                        streampath: format!("/repo/stream/{}", &p.slug),
+                        streampath: format!("/api/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
                         category_id: p.category_id,
@@ -73,7 +73,7 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
-         streampath: format!("/repo/stream/{}", &p.slug),
+         streampath: format!("/api/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
          category_id: p.category_id,
@@ -94,7 +94,7 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
-         streampath: format!("/repo/stream/{}", &p.slug),
+         streampath: format!("/api/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
          category_id: p.category_id,
