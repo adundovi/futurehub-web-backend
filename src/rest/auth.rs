@@ -28,8 +28,8 @@ pub fn login_user(login: db::models::LoginData, conn: db::MainDbConn) -> Respons
     }
 }
 
-#[post("/login", format = "json", data = "<login>")]
-pub fn process_login(login: Json<db::models::LoginData>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
+#[post("/auth/login", format = "json", data = "<login>")]
+pub fn post_login(login: Json<db::models::LoginData>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
     let response = login_user(login.0, conn);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),
@@ -57,8 +57,8 @@ pub fn signup(user: db::models::UserDTO, conn: db::MainDbConn) -> ResponseWithSt
     }
 }
 
-#[post("/signup", format = "json", data = "<user>")]
-pub fn process_signup(user: Json<db::models::UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
+#[post("/auth/signup", format = "json", data = "<user>")]
+pub fn post_signup(user: Json<db::models::UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
     let response = signup(user.0, conn);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),

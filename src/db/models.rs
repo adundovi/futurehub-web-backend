@@ -66,6 +66,7 @@ pub struct NewRepoItem {
     pub description: Option<String>,
     pub category_id: i32,
     pub filetype: Option<String>,
+    pub filehash: Option<String>,
     pub published: bool
 }
 
@@ -78,6 +79,7 @@ pub struct RepoItem {
     pub description: Option<String>,
     pub category_id: i32,
     pub filetype: Option<String>,
+    pub filehash: Option<String>,
     pub published: bool,
     pub datetime: NaiveDateTime, // UTC
 }

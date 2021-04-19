@@ -15,6 +15,7 @@ CREATE TABLE repo_items (
   description TEXT,
   category_id INTEGER NOT NULL,
   filetype VARCHAR,
+  filehash VARCHAR,
   published BOOLEAN NOT NULL DEFAULT 'f',
   datetime DATETIME NOT NULL,
   PRIMARY KEY (id),

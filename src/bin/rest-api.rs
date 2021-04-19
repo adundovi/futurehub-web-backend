@@ -46,12 +46,13 @@ fn main() {
                repo::get,
                repo::get_by_id,
                repo::get_by_slug,
+               repo::get_stream_by_slug,
                category::get,
                category::get_by_id,
                category::get_by_slug,
                contact::process_form,
-               auth::process_login,
-               auth::process_signup,
+               auth::post_login,
+               auth::post_signup,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

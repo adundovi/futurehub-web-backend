@@ -128,8 +128,12 @@ impl models::User {
         let user_to_verify = users::table
             .filter(users::username.eq(&login.username_or_email))
             .or_filter(users::email.eq(&login.username_or_email))
-            .get_result::<models::User>(conn)
-            .unwrap();
+            .get_result::<models::User>(conn);
+
+        if user_to_verify.is_err() {
+            return None;
+        }
+        let user_to_verify = user_to_verify.unwrap();
 
         match user_to_verify.password {
             None => None,

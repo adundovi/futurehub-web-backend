@@ -1,5 +1,6 @@
 use diesel::{prelude::*, sqlite::SqliteConnection};
 use chrono::prelude::*;
+use std::path::Path;
 
 use crate::db::models;
 use crate::db::sqlite_schema::repo_items as repo_items;
@@ -11,6 +12,46 @@ pub fn insert(connection: &SqliteConnection,
               filepath_: String,
               datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
+    let filehash_ = match tools::filehash::get_hash(&filepath_) {
+        Ok(h) => Some(h),
+        Err(e) => {
+            println!("Couldn't obtain hash of file: {} due to {}", filepath_, e);
+            None
+        }
+    };
+    
+    let filepath = Path::new(&filepath_);
+    let c = crate::active_config();
+    let c_repo = c.get_extra("repository").unwrap();
+    let repopath = Path::new(
+            c_repo["path"].as_str().unwrap()
+        );
+
+    let newpath = match filepath.file_name() {
+        Some(f) => {
+            let prefix = match filehash_.as_ref() {
+                Some(h) => {
+                    let prefix_1 = Path::new(&h[0..1]);
+                    let prefix_2 = Path::new(&h[0..2]);
+                    repopath.join(prefix_1).join(prefix_2)
+                },
+                None => {
+                    repopath.join("nohash/")
+                }
+            };
+            match std::fs::create_dir_all(&prefix) {
+                Ok(()) => {},
+                Err(_) => {
+                    return println!("Cannot create directory.");
+                }
+            };
+            let new = prefix.join(f);
+            std::fs::copy(&filepath, &new).unwrap();
+            new.to_str().unwrap().to_string()
+        },
+        None => filepath_
+    };
+    
     let other_slug = tools::text::slugify(&title_);
     let item_ = models::NewRepoItem {
         datetime: datetime_,
@@ -18,8 +59,9 @@ pub fn insert(connection: &SqliteConnection,
         slug: other_slug,
         description: Some("".to_string()),
         category_id: 0,
-        filepath: filepath_,
+        filepath: newpath,
         filetype: Some("".to_string()),
+        filehash: filehash_,
         published: false };
 
     diesel::insert_into(repo_items::table)

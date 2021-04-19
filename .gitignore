@@ -20,3 +20,6 @@ Rocket.toml
 # Ignore temporary stuff
 tmp/*
 secret.key
+
+# Ignore repository files
+repo/*/

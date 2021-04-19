@@ -1,13 +1,14 @@
 use rocket_contrib::json::Json;
 use crate::db;
 use chrono::NaiveDateTime;
+use rocket::response::NamedFile;
 
 #[derive(Serialize)]
 pub struct RepoAttribs {
     pub title: String,
     pub slug: String,
+    pub streampath: String,
     pub datetime: NaiveDateTime,
-    pub filepath: String,
     pub description: Option<String>,
     pub category_id: i32,
 }
@@ -38,8 +39,8 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
             for p in db::repo_items::query_published(&conn) {
                     let attribs = RepoAttribs{
                         title: p.title,
-                        slug: p.slug,
-                        filepath: p.filepath,
+                        slug: p.slug.clone(),
+                        streampath: format!("/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
                         category_id: p.category_id,
@@ -52,8 +53,8 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
             for p in db::repo_items::query_published_by_category(&conn, &c) {
                     let attribs = RepoAttribs{
                         title: p.title,
-                        slug: p.slug,
-                        filepath: p.filepath,
+                        slug: p.slug.clone(),
+                        streampath: format!("/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
                         category_id: p.category_id,
@@ -65,14 +66,14 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
     Json(response)
 }
 
-#[get("/repo/<id>")]
+#[get("/repo/<id>", rank = 1)]
 pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
 
     let p = db::repo_items::get(&conn, id).ok()?;
     let attribs = RepoAttribs{
          title: p.title,
-         slug: p.slug,
-         filepath: p.filepath,
+         slug: p.slug.clone(),
+         streampath: format!("/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
          category_id: p.category_id,
@@ -92,8 +93,8 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
     let p = db::repo_items::get_by_slug(&conn, slug).ok()?;
     let attribs = RepoAttribs{
          title: p.title,
-         slug: p.slug,
-         filepath: p.filepath,
+         slug: p.slug.clone(),
+         streampath: format!("/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
          category_id: p.category_id,
@@ -105,4 +106,13 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
             r#type: "file".to_string(),
             attributes: attribs },
     }))
+}
+
+#[get("/repo/stream/<slug>")]
+pub fn get_stream_by_slug(conn: db::MainDbConn, slug: String) -> Option<NamedFile> {
+    let p = db::repo_items::get_by_slug(&conn, slug).ok()?;
+    match NamedFile::open(&p.filepath) {
+        Ok(f) => Some(f),
+        Err(_) => None
+    }
 }
