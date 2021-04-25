@@ -8,6 +8,7 @@ mod list;
 mod remove;
 mod dropall;
 mod edit;
+mod replace;
 
 pub fn menu<'a>() -> Menu<'a> {
     let mut m = Menu{
@@ -70,15 +71,33 @@ pub fn menu<'a>() -> Menu<'a> {
     
     let menu_edit = Subcommand {
             app: App::new("edit")
-                .about("Edit post given by ID")
+                .about("Edit repo item given by ID")
                 .arg(Arg::new("ID")
-                     .about("post ID")
+                     .about("repo item ID")
                      .required(true)
                      .index(1)
                      ),
             f: &edit::f
     };
     m.push_subcommand("edit", menu_edit);
+    
+    let menu_replace = Subcommand {
+            app: App::new("replace")
+                .about("Replace a repo item given by ID with a new path")
+                .arg(Arg::new("ID")
+                     .about("repo item ID")
+                     .required(true)
+                     .index(1)
+                )
+                .arg(Arg::new("URL")
+                     .about("URL of the file")
+                     .required(true)
+                     .index(2)
+                     ),
+            f: &replace::f
+    };
+    m.push_subcommand("replace", menu_replace);
+
 
     m
 }

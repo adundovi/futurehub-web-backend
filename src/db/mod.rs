@@ -1,4 +1,4 @@
-use diesel::{prelude::*, sqlite::SqliteConnection};
+use diesel::{prelude::Connection, sqlite::SqliteConnection};
 use rocket_contrib::database;
 use rocket_contrib::databases::diesel as dieseldb;
 

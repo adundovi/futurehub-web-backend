@@ -38,7 +38,7 @@ fn save2file(filepath: &Path, content: &str) -> std::io::Result<()> {
 }
 
 fn run_pdflatex(filepath: &Path) -> () {
-    let status = Command::new("/usr/bin/pdflatex")
+    let status = Command::new("pdflatex")
             .arg(format!("-aux-directory={}",
                          filepath.parent()
                          .unwrap().to_str().unwrap()))
