@@ -7,7 +7,7 @@ use crate::db::sqlite_schema::repo_items as repo_items;
 use crate::db::sqlite_schema::categories as categories;
 use crate::tools;
 
-fn get_repopath() -> std::path::PathBuf {
+fn get_repo_path() -> std::path::PathBuf {
     let c = crate::active_config();
     let c_repo = c.get_extra("repository").unwrap();
     let p = Path::new(
@@ -16,17 +16,22 @@ fn get_repopath() -> std::path::PathBuf {
     p.to_path_buf()
 }
 
-fn prepare_file(filepath_: &String) -> (String, Option<String>) {
-    let repopath = get_repopath();
-    let filepath = Path::new(&filepath_);
-    let filehash = match tools::filehash::get_hash(&filepath_) {
+fn get_hash(filepath: &String) -> Option<String> {
+    match tools::filehash::get_hash(&filepath) {
         Ok(h) => Some(h),
         Err(e) => {
-            println!("Couldn't obtain hash of file: {} due to {}", filepath_, e);
+            println!("Couldn't obtain hash of file: {} due to {}", filepath, e);
             None
         }
-    };
+    }
+}
 
+fn prepare_file(filepath_: &String) -> (String, Option<String>) {
+
+    let filehash = get_hash(&filepath_);
+    let filepath = Path::new(&filepath_);
+    let repopath = get_repo_path();
+    
     let newpath = match filepath.file_name() {
         Some(f) => {
             let prefix = match filehash.as_ref() {
@@ -46,7 +51,9 @@ fn prepare_file(filepath_: &String) -> (String, Option<String>) {
                 }
             };
             let new = prefix.join(f);
-            std::fs::copy(&filepath, &new).unwrap();
+            if !new.exists() {
+                std::fs::copy(&filepath, &new).unwrap();
+            }
             new.to_str().unwrap().to_string()
         },
         None => filepath_.clone()

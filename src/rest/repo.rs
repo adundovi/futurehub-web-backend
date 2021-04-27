@@ -108,11 +108,9 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
     }))
 }
 
+/* see also X-Sendfile */
 #[get("/repo/stream/<slug>")]
 pub fn get_stream_by_slug(conn: db::MainDbConn, slug: String) -> Option<NamedFile> {
     let p = db::repo_items::get_by_slug(&conn, slug).ok()?;
-    match NamedFile::open(&p.filepath) {
-        Ok(f) => Some(f),
-        Err(_) => None
-    }
+    NamedFile::open(&p.filepath).ok() 
 }
