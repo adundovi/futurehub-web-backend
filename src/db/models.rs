@@ -67,6 +67,7 @@ pub struct NewRepoItem {
     pub category_id: i32,
     pub filetype: Option<String>,
     pub filehash: Option<String>,
+    pub filesize: Option<i64>,
     pub published: bool
 }
 
@@ -80,6 +81,7 @@ pub struct RepoItem {
     pub category_id: i32,
     pub filetype: Option<String>,
     pub filehash: Option<String>,
+    pub filesize: Option<i64>,
     pub published: bool,
     pub datetime: NaiveDateTime, // UTC
 }
@@ -134,7 +136,7 @@ pub struct NewUser {
     pub creation_date: NaiveDateTime,
 }
 
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Serialize, Clone)]
 pub struct User {
     pub id: i32,
     pub username: String,

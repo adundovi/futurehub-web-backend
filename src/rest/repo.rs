@@ -10,6 +10,8 @@ pub struct RepoAttribs {
     pub streampath: String,
     pub datetime: NaiveDateTime,
     pub description: Option<String>,
+    pub filehash: Option<String>,
+    pub filesize: Option<i64>,
     pub category_id: i32,
 }
 
@@ -43,6 +45,8 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                         streampath: format!("/api/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
+                        filehash: p.filehash,
+                        filesize: p.filesize,
                         category_id: p.category_id,
                     };
                     let postw = RepoWrapper{ id: p.id, r#type: "file".to_string(), attributes: attribs };
@@ -57,6 +61,8 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                         streampath: format!("/api/repo/stream/{}", &p.slug),
                         description: p.description,
                         datetime: p.datetime,
+                        filehash: p.filehash,
+                        filesize: p.filesize,
                         category_id: p.category_id,
                     };
                     let postw = RepoWrapper{ id: p.id, r#type: "file".to_string(), attributes: attribs };
@@ -76,6 +82,8 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
          streampath: format!("/api/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
+         filehash: p.filehash,
+         filesize: p.filesize,
          category_id: p.category_id,
     };
 
@@ -97,6 +105,8 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
          streampath: format!("/api/repo/stream/{}", &p.slug),
          description: p.description,
          datetime: p.datetime,
+         filehash: p.filehash,
+         filesize: p.filesize,
          category_id: p.category_id,
     };
 

@@ -1,5 +1,5 @@
 use rocket_contrib::json::Json;
-use super::super::db;
+use crate::db;
 use chrono::NaiveDateTime;
 
 #[derive(Serialize)]

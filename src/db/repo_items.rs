@@ -26,9 +26,18 @@ fn get_hash(filepath: &String) -> Option<String> {
     }
 }
 
-fn prepare_file(filepath_: &String) -> (String, Option<String>) {
+fn get_filesize(filepath: &String) -> Option<i64> {
+    let metadata = std::fs::metadata(filepath);
+    match metadata {
+        Ok(m) => Some(m.len() as i64),
+        Err(_) => None,
+    }
+}
+
+fn prepare_file(filepath_: &String) -> (String, Option<String>, Option<i64>) {
 
     let filehash = get_hash(&filepath_);
+    let filesize = get_filesize(&filepath_);
     let filepath = Path::new(&filepath_);
     let repopath = get_repo_path();
     
@@ -59,7 +68,7 @@ fn prepare_file(filepath_: &String) -> (String, Option<String>) {
         None => filepath_.clone()
     };
     
-    (newpath, filehash)
+    (newpath, filehash, filesize)
 }
 
 pub fn insert(connection: &SqliteConnection,
@@ -68,7 +77,7 @@ pub fn insert(connection: &SqliteConnection,
               datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
     let slug_ = tools::text::slugify(&title_);
-    let (newpath_, filehash_) = prepare_file(&filepath_);
+    let (newpath_, filehash_, filesize_) = prepare_file(&filepath_);
 
     let item_ = models::NewRepoItem {
         datetime: datetime_,
@@ -79,6 +88,7 @@ pub fn insert(connection: &SqliteConnection,
         filepath: newpath_,
         filetype: Some("".to_string()),
         filehash: filehash_,
+        filesize: filesize_, 
         published: false };
 
     diesel::insert_into(repo_items::table)
@@ -158,7 +168,7 @@ pub fn get_by_slug(connection: &SqliteConnection, slug: String) -> Result<models
 }
 
 pub fn update(connection: &SqliteConnection, item: &models::RepoItem) {
-    let (newpath, filehash) = prepare_file(&item.filepath);
+    let (newpath, filehash, filesize) = prepare_file(&item.filepath);
     diesel::update(repo_items::table.filter(repo_items::id.eq(item.id)))
         .set((repo_items::title.eq(&item.title),
               repo_items::slug.eq(&item.slug),
@@ -168,6 +178,7 @@ pub fn update(connection: &SqliteConnection, item: &models::RepoItem) {
               repo_items::category_id.eq(&item.category_id),
               repo_items::filepath.eq(&newpath),
               repo_items::filehash.eq(&filehash),
+              repo_items::filesize.eq(&filesize),
               repo_items::filetype.eq(&item.filetype),
         ))
         .execute(connection)

@@ -48,6 +48,7 @@ table! {
         category_id -> Integer,
         filetype -> Nullable<Text>,
         filehash -> Nullable<Text>,
+        filesize -> Nullable<BigInt>,
         published -> Bool,
         datetime -> Timestamp,
     }

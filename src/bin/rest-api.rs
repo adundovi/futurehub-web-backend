@@ -12,11 +12,14 @@ use futurehub_web_backend::rest::{
     category,
     events,
     posts,
+    profile,
     repo,
     contact,
     auth,
 };
 
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+// https://javascript.info/fetch-crossorigin
 pub struct CORS();
 
 impl Fairing for CORS {
@@ -50,9 +53,11 @@ fn main() {
                category::get,
                category::get_by_id,
                category::get_by_slug,
-               contact::process_form,
+               contact::post_form,
                auth::post_login,
+               auth::option_login,
                auth::post_signup,
+               profile::get_info,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

@@ -14,7 +14,7 @@ pub struct ContactForm {
 }
 
 #[post("/contact", format = "json", data = "<form>")]
-pub fn process_form(form: Json<ContactForm>) -> status::Custom<Json<Response>> {
+pub fn post_form(form: Json<ContactForm>) -> status::Custom<Json<Response>> {
     let m = mail::Mail{
         to: "4ndY@krizevci.info",
         subject: &format!("FutureHub-web - Kontakt - Poruka od {}", &form.full_name),

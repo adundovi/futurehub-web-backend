@@ -4,5 +4,6 @@ pub mod contact;
 pub mod events;
 pub mod jwt;
 pub mod posts;
+pub mod profile;
 pub mod repo;
 pub mod response;

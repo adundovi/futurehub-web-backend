@@ -28,6 +28,13 @@ pub fn login_user(login: db::models::LoginData, conn: db::MainDbConn) -> Respons
     }
 }
 
+#[options("/auth/login")]
+pub fn option_login<'a>() -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
 #[post("/auth/login", format = "json", data = "<login>")]
 pub fn post_login(login: Json<db::models::LoginData>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
     let response = login_user(login.0, conn);
