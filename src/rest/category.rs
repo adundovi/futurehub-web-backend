@@ -30,7 +30,7 @@ pub struct JsonSingleApiResponse {
 pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    for p in db::category::query(&conn) {
+    for p in db::models::category::query(&conn) {
         let attribs = CategoryAttribs{
                         title: p.title,
                         slug: p.slug,
@@ -46,7 +46,7 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
 #[get("/category/<id>")]
 pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::category::get(&conn, id).ok()?;
+    let p = db::models::category::get(&conn, id).ok()?;
     let attribs = CategoryAttribs{
          title: p.title,
          slug: p.slug,
@@ -65,7 +65,7 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
 #[get("/category/<slug>", rank = 2)]
 pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::category::get_by_slug(&conn, slug).ok()?;
+    let p = db::models::category::get_by_slug(&conn, slug).ok()?;
     let attribs = CategoryAttribs{
          title: p.title,
          slug: p.slug,

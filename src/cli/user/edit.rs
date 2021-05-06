@@ -19,7 +19,7 @@ fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
     
-    let item = db::models::User::get(id, &conn).expect("Id not found");
+    let item = db::models::user::User::get(id, &conn).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.username = edit_line(&item.username, "Username");
@@ -32,5 +32,5 @@ fn edit_item(id: i32) {
     new_item.birthday = edit_option_datetime(&item.birthday, "Birthday");
     new_item.gender = edit_option_line(&item.gender, "Gender");
     
-    db::models::User::update(&new_item, &conn);
+    db::models::user::User::update(&new_item, &conn);
 }

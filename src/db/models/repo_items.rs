@@ -2,10 +2,42 @@ use diesel::{prelude::*, sqlite::SqliteConnection};
 use chrono::prelude::*;
 use std::path::Path;
 
-use crate::db::models;
 use crate::db::sqlite_schema::repo_items as repo_items;
 use crate::db::sqlite_schema::categories as categories;
-use crate::tools;
+use crate::tools::{filehash, import, text};
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "repo_items"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewRepoItem {
+    #[serde(with= "import::date_serializer")]
+    pub datetime: NaiveDateTime,
+    pub title: String,
+    pub slug: String,
+    pub filepath: String,
+    pub description: Option<String>,
+    pub category_id: i32,
+    pub filetype: Option<String>,
+    pub filehash: Option<String>,
+    pub filesize: Option<i64>,
+    pub published: bool,
+}
+
+#[derive(Queryable, Clone)]
+pub struct RepoItem {
+    pub id: i32,
+    pub title: String,
+    pub slug: String,
+    pub filepath: String,
+    pub description: Option<String>,
+    pub category_id: i32,
+    pub filetype: Option<String>,
+    pub published: bool,
+    pub datetime: NaiveDateTime, // UTC
+    pub filehash: Option<String>,
+    pub filesize: Option<i64>,
+}
+
 
 fn get_repo_path() -> std::path::PathBuf {
     let c = crate::active_config();
@@ -17,7 +49,7 @@ fn get_repo_path() -> std::path::PathBuf {
 }
 
 fn get_hash(filepath: &String) -> Option<String> {
-    match tools::filehash::get_hash(&filepath) {
+    match filehash::get_hash(&filepath) {
         Ok(h) => Some(h),
         Err(e) => {
             println!("Couldn't obtain hash of file: {} due to {}", filepath, e);
@@ -76,10 +108,10 @@ pub fn insert(connection: &SqliteConnection,
               filepath_: String,
               datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
-    let slug_ = tools::text::slugify(&title_);
+    let slug_ = text::slugify(&title_);
     let (newpath_, filehash_, filesize_) = prepare_file(&filepath_);
 
-    let item_ = models::NewRepoItem {
+    let item_ = NewRepoItem {
         datetime: datetime_,
         title: title_,
         slug: slug_,
@@ -97,29 +129,29 @@ pub fn insert(connection: &SqliteConnection,
         .expect("Error inserting new item");
 }
 
-pub fn insert_full(connection: &SqliteConnection, item_: &models::NewRepoItem) {
+pub fn insert_full(connection: &SqliteConnection, item_: &NewRepoItem) {
     diesel::insert_into(repo_items::table)
         .values(item_)
         .execute(connection)
         .expect("Error inserting new item");
 }
 
-pub fn query(connection: &SqliteConnection) -> Vec<models::RepoItem> {
+pub fn query(connection: &SqliteConnection) -> Vec<RepoItem> {
     repo_items::table
-        .load::<models::RepoItem>(connection)
+        .load::<RepoItem>(connection)
         .expect("Error loading repo_items")
 }
 
-pub fn query_published(connection: &SqliteConnection) -> Vec<models::RepoItem> {
+pub fn query_published(connection: &SqliteConnection) -> Vec<RepoItem> {
     repo_items::table
         .filter(repo_items::published.eq(true))
         .order(repo_items::datetime.desc())
-        .load::<models::RepoItem>(connection)
+        .load::<RepoItem>(connection)
         .expect("Error loading repo_items")
 }
 
 pub fn query_published_by_category(connection: &SqliteConnection,
-                                   slug: &str) -> Vec<models::RepoItem> {
+                                   slug: &str) -> Vec<RepoItem> {
 
     let cat_id: i32 = categories::table
         .select(categories::id)
@@ -131,7 +163,7 @@ pub fn query_published_by_category(connection: &SqliteConnection,
                 repo_items::category_id.eq(cat_id))
             )
         .order(repo_items::datetime.desc())
-        .load::<models::RepoItem>(connection)
+        .load::<RepoItem>(connection)
         .expect("Error loading repo_items")
 }
 
@@ -147,27 +179,27 @@ pub fn drop_all(connection: &SqliteConnection) {
         .expect(&format!("Error removing all repo_items"));
 }
 
-pub fn query_newest(connection: &SqliteConnection, last: i64) -> Vec<models::RepoItem> {
+pub fn query_newest(connection: &SqliteConnection, last: i64) -> Vec<RepoItem> {
     repo_items::table
         .order(repo_items::datetime.desc())
         .limit(last)
-        .load::<models::RepoItem>(connection)
+        .load::<RepoItem>(connection)
         .expect("Error loading repo_items")
 }
 
-pub fn get(connection: &SqliteConnection, id: i32) -> Result<models::RepoItem, diesel::result::Error> {
+pub fn get(connection: &SqliteConnection, id: i32) -> Result<RepoItem, diesel::result::Error> {
     repo_items::table
         .filter(repo_items::id.eq(id))
-        .first::<models::RepoItem>(connection)
+        .first::<RepoItem>(connection)
 }
 
-pub fn get_by_slug(connection: &SqliteConnection, slug: String) -> Result<models::RepoItem, diesel::result::Error> {
+pub fn get_by_slug(connection: &SqliteConnection, slug: String) -> Result<RepoItem, diesel::result::Error> {
     repo_items::table
         .filter(repo_items::slug.eq(slug))
-        .first::<models::RepoItem>(connection)
+        .first::<RepoItem>(connection)
 }
 
-pub fn update(connection: &SqliteConnection, item: &models::RepoItem) {
+pub fn update(connection: &SqliteConnection, item: &RepoItem) {
     let (newpath, filehash, filesize) = prepare_file(&item.filepath);
     diesel::update(repo_items::table.filter(repo_items::id.eq(item.id)))
         .set((repo_items::title.eq(&item.title),

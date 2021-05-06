@@ -58,6 +58,7 @@ fn main() {
                auth::option_login,
                auth::post_signup,
                profile::get_info,
+               profile::option_info,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

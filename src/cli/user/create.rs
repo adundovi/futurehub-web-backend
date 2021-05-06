@@ -10,5 +10,5 @@ pub fn f(args: &clap::ArgMatches) {
         None => String::from("no_email"),
     };
     let conn = db::establish_connection();
-    db::models::User::create(username, email, &conn);
+    db::models::user::User::create(username, email, &conn);
 }

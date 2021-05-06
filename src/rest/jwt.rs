@@ -6,7 +6,7 @@ use jsonwebtoken::TokenData;
 use jsonwebtoken::{Header, Validation};
 use jsonwebtoken::{EncodingKey, DecodingKey};
 use crate::rest::response::Response;
-use crate::db::models::LoginInfo;
+use crate::db::models::user::LoginInfo;
 use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::{self, FromRequest, Request};
@@ -76,5 +76,5 @@ fn decode_token(token: String) -> Result<TokenData<UserToken>> {
 }
 
 fn verify_token(token_data: &TokenData<UserToken>, conn: &db::MainDbConn) -> bool {
-    db::models::User::is_valid_login_session(&token_data.claims, conn)
+    db::models::user::User::is_valid_login_session(&token_data.claims, conn)
 }

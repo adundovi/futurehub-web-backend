@@ -2,14 +2,8 @@ use diesel::{prelude::Connection, sqlite::SqliteConnection};
 use rocket_contrib::database;
 use rocket_contrib::databases::diesel as dieseldb;
 
-pub mod event;
-pub mod category;
-pub mod login_history;
 pub mod models;
-pub mod post;
-pub mod repo_items;
 pub mod sqlite_schema;
-pub mod user;
 
 const DATABASE: &str = "sqlite_db";
 

@@ -31,20 +31,20 @@ pub fn f(args: &clap::ArgMatches) {
 fn set_password(id: i32) {
     let conn = db::establish_connection();
     let plaintext_password = edit_line(&"".to_string(), "New password");
-    db::models::User::update_password(id, plaintext_password, &conn);
+    db::models::user::User::update_password(id, plaintext_password, &conn);
 }
 
 fn check_password(id: i32) {
     let conn = db::establish_connection();
     
-    let user = db::models::User::get(id, &conn).expect("Id not found");
+    let user = db::models::user::User::get(id, &conn).expect("Id not found");
     let plaintext_password = edit_line(&"".to_string(), "Current password");
 
-    let l = db::models::LoginData {
+    let l = db::models::user::LoginData {
         username_or_email: user.username,
         password: plaintext_password,
     };
-    if db::models::User::login(l, &conn).is_some() {
+    if db::models::user::User::login(l, &conn).is_some() {
         print!("Password OK!");
     } else {
         print!("Passwords do not match!!");

@@ -7,5 +7,5 @@ pub fn f(args: &clap::ArgMatches) {
         None => String::from("Empty title"),
     };
     let conn = db::establish_connection();
-    db::category::insert(&conn, title);
+    db::models::category::insert(&conn, title);
 }

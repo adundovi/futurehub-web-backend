@@ -4,17 +4,77 @@ use chrono::prelude::*;
 use uuid::Uuid;
 
 use crate::rest::jwt::UserToken;
-use crate::db::models;
+use crate::db::models::login_history::LoginHistory;
 use crate::db::sqlite_schema::users as users;
+use crate::tools::import;
 
 const DEFAULT_COST: u32 = 10;
 
-impl models::User {
+#[derive(Serialize, Deserialize)]
+pub struct LoginData {
+    pub username_or_email: String,
+    pub password: String,
+}
+
+#[derive(Insertable)]
+#[table_name = "users"]
+pub struct LoginInfo {
+    pub username: String,
+    pub login_session: String,
+}
+
+#[derive(Queryable, Serialize, Clone)]
+pub struct User {
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub password: Option<String>,
+    pub login_session: Option<String>,
+    pub oib: Option<String>,
+    pub name: Option<String>,
+    pub surname: Option<String>,
+    pub address: Option<String>,
+    pub phone: Option<String>,
+    pub gender: Option<String>,
+    pub birthday: Option<NaiveDateTime>,
+    pub creation_date: NaiveDateTime,
+}
+
+#[derive(Insertable, Serialize, Deserialize)]
+#[table_name = "users"]
+pub struct UserDTO {
+    pub username: String,
+    pub email: String,
+    pub password: String,
+}
+
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "users"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewUser {
+    pub username: String,
+    pub email: String,
+    pub password: Option<String>,
+    pub login_session: Option<String>,
+    pub oib: Option<String>,
+    pub name: Option<String>,
+    pub surname: Option<String>,
+    pub address: Option<String>,
+    pub phone: Option<String>,
+    pub gender: Option<String>,
+    pub birthday: Option<NaiveDateTime>,
+    #[serde(with= "import::date_serializer")]
+    pub creation_date: NaiveDateTime,
+}
+
+
+impl User {
     pub fn create(username: String,
                  email: String,
                  conn: &SqliteConnection) -> bool {
 
-        let user = models::NewUser {
+        let user = NewUser {
             username: username,
             email: email,
             password: None,
@@ -34,12 +94,12 @@ impl models::User {
             .is_ok()
     }
     
-    pub fn create_with_password(user: models::UserDTO,
+    pub fn create_with_password(user: UserDTO,
                  conn: &SqliteConnection) -> bool {
         
         let hash_password = Some(hash(user.password, DEFAULT_COST).unwrap());
 
-        let user = models::NewUser {
+        let user = NewUser {
             username: user.username,
             email: user.email,
             password: hash_password,
@@ -59,12 +119,12 @@ impl models::User {
             .is_ok()
     }
     
-    pub fn create_full(user: models::NewUser,
+    pub fn create_full(user: NewUser,
                  conn: &SqliteConnection) -> bool {
         let hashed_pwd = match user.password {
             Some(pwd) => Some(hash(pwd, DEFAULT_COST).unwrap()),
             None => None };
-        let user = models::NewUser {
+        let user = NewUser {
             password: hashed_pwd,
             ..user
         };
@@ -74,22 +134,22 @@ impl models::User {
             .is_ok()
     }
 
-    pub fn query(conn: &SqliteConnection) -> Vec<models::User> {
+    pub fn query(conn: &SqliteConnection) -> Vec<User> {
         users::table
-            .load::<models::User>(conn)
+            .load::<User>(conn)
             .expect("Error loading user")
     }
 
-    pub fn get(id: i32, conn: &SqliteConnection) -> Result<models::User, diesel::result::Error> {
+    pub fn get(id: i32, conn: &SqliteConnection) -> Result<User, diesel::result::Error> {
         users::table
             .filter(users::id.eq(id))
-            .first::<models::User>(conn)
+            .first::<User>(conn)
     }
     
-    pub fn get_user_by_username(username: &str, conn: &SqliteConnection) -> Result<models::User, diesel::result::Error> {
+    pub fn get_user_by_username(username: &str, conn: &SqliteConnection) -> Result<User, diesel::result::Error> {
         users::table
             .filter(users::username.eq(username))
-            .first::<models::User>(conn)
+            .first::<User>(conn)
     }
 
     pub fn drop_all(conn: &SqliteConnection) {
@@ -104,7 +164,7 @@ impl models::User {
             .expect(&format!("Error removing user with id = {}", id));
     }
 
-    pub fn update(user: &models::User, conn: &SqliteConnection) {
+    pub fn update(user: &User, conn: &SqliteConnection) {
         diesel::update(users::table.filter(users::id.eq(user.id)))
         .set((users::username.eq(&user.username),
               users::email.eq(&user.email)
@@ -122,13 +182,13 @@ impl models::User {
         .expect(&format!("Error updating user password with user id = {}", id));
     }
 
-    pub fn login(login: models::LoginData,
-                 conn: &SqliteConnection) -> Option<models::LoginInfo> {
+    pub fn login(login: LoginData,
+                 conn: &SqliteConnection) -> Option<LoginInfo> {
         
         let user_to_verify = users::table
             .filter(users::username.eq(&login.username_or_email))
             .or_filter(users::email.eq(&login.username_or_email))
-            .get_result::<models::User>(conn);
+            .get_result::<User>(conn);
 
         if user_to_verify.is_err() {
             return None;
@@ -139,16 +199,16 @@ impl models::User {
             None => None,
             Some(user_password) => {
                 if verify(&login.password, &user_password).unwrap() {
-                    if let Some(login_history) = models::LoginHistory::create(&user_to_verify.username, conn) {
+                    if let Some(login_history) = LoginHistory::create(&user_to_verify.username, conn) {
                         
-                        if !models::LoginHistory::save_login_history(login_history, conn) {
+                        if !LoginHistory::save_login_history(login_history, conn) {
                             return None;
                         }
 
-                        let login_session_str = models::User::generate_login_session();
-                        models::User::update_login_session_to_db(&user_to_verify.username, &login_session_str, conn);
+                        let login_session_str = User::generate_login_session();
+                        User::update_login_session_to_db(&user_to_verify.username, &login_session_str, conn);
                         
-                        Some(models::LoginInfo {
+                        Some(LoginInfo {
                             username: user_to_verify.username,
                             login_session: login_session_str,
                         })
@@ -170,13 +230,13 @@ impl models::User {
         users::table
             .filter(users::username.eq(&user_token.user))
             .filter(users::login_session.eq(&user_token.login_session))
-            .get_result::<models::User>(conn)
+            .get_result::<User>(conn)
             .is_ok()
     }
 
     pub fn update_login_session_to_db(username: &str, login_session_str: &str,
                                       conn: &SqliteConnection) -> bool {
-        if let Ok(user) = models::User::get_user_by_username(username, conn) {
+        if let Ok(user) = User::get_user_by_username(username, conn) {
             diesel::update(users::table.find(user.id))
             .set(users::login_session.eq(login_session_str.to_string()))
             .execute(conn)

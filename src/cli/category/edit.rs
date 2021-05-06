@@ -19,7 +19,7 @@ fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
 
-    let item = db::category::get(&conn, id).expect("Id not found");
+    let item = db::models::category::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.title = edit_line(&item.title, "Title");
@@ -27,5 +27,5 @@ fn edit_item(id: i32) {
     new_item.icon = edit_option_line(&item.icon, "Icon");
     new_item.description = edit_option_text(&item.description, "Description");
     
-    db::category::update(&conn, &new_item);
+    db::models::category::update(&conn, &new_item);
 }

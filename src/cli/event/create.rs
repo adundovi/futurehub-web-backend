@@ -9,5 +9,5 @@ pub fn f(args: &clap::ArgMatches) {
     };
     let conn = db::establish_connection();
     let utc_now = Utc::now();
-    db::event::insert(&conn, title, &utc_now);
+    db::models::event::insert(&conn, title, &utc_now);
 }

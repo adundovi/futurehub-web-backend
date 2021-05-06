@@ -21,7 +21,7 @@ fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
     
-    let item = db::repo_items::get(&conn, id).expect("Id not found");
+    let item = db::models::repo_items::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.title = edit_line(&item.title, "Title");
@@ -31,5 +31,5 @@ fn edit_item(id: i32) {
     new_item.category_id = edit_number(&item.category_id, "CategoryId");
     new_item.published = edit_bool(item.published, "Published");
     
-    db::repo_items::update(&conn, &new_item);
+    db::models::repo_items::update(&conn, &new_item);
 }

@@ -17,9 +17,9 @@ pub fn f(args: &clap::ArgMatches) {
 fn replace_item(id: i32, filepath: String) {
 
     let conn = db::establish_connection();
-    let item = db::repo_items::get(&conn, id).expect("Id not found");
+    let item = db::models::repo_items::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
     new_item.filepath = filepath;
     
-    db::repo_items::update(&conn, &new_item);
+    db::models::repo_items::update(&conn, &new_item);
 }

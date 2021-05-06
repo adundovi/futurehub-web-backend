@@ -13,5 +13,5 @@ pub fn f(args: &clap::ArgMatches) {
     };
     let conn = db::establish_connection();
     let utc_now = Utc::now();
-    db::repo_items::insert(&conn, title, filepath, &utc_now);
+    db::models::repo_items::insert(&conn, title, filepath, &utc_now);
 }

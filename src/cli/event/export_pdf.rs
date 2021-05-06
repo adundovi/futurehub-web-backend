@@ -23,11 +23,11 @@ use std::str::FromStr;
 #[serde(rename_all = "PascalCase")]
 struct Events {
     date: String,
-    items: Vec<db::models::Event>,
+    items: Vec<db::models::event::Event>,
 }
 
 impl Events {
-    fn new(date: &str, e: db::models::Event) -> Events {
+    fn new(date: &str, e: db::models::event::Event) -> Events {
         Events { date: date.to_string(), items: vec![e] }
     }
 }
@@ -114,11 +114,11 @@ fn datetime2shorttime_helper(h: &Helper,
     Ok(())
 }
 
-fn load_calendar(dt: DateTime<Utc>) -> Result<Vec<db::models::Event>, Box<dyn Error>> {
-    let mut events: Vec<db::models::Event> = Vec::new();
+fn load_calendar(dt: DateTime<Utc>) -> Result<Vec<db::models::event::Event>, Box<dyn Error>> {
+    let mut events: Vec<db::models::event::Event> = Vec::new();
     
     let conn = db::establish_connection();
-    for e in db::event::query_by_month(&conn, &dt) {
+    for e in db::models::event::query_by_month(&conn, &dt) {
         events.push(e);
     };
 
@@ -137,7 +137,7 @@ fn search_in_vec(v: &Vec<Events>, needle: &str) -> Option<usize> {
     None
 }
 
-fn sort_events(events: Vec<db::models::Event>) ->
+fn sort_events(events: Vec<db::models::event::Event>) ->
     (Vec<Events>, Vec<Events>) {
     let mut events_in_hub: Vec<Events> = Vec::new();
     let mut events_outside_hub: Vec<Events> = Vec::new();

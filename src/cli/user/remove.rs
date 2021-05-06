@@ -6,7 +6,7 @@ pub fn f(args: &clap::ArgMatches) {
         Some(id) => match id.parse::<i32>() {
             Ok(id) => {
                 let conn = db::establish_connection();
-                db::models::User::remove(id, &conn);
+                db::models::user::User::remove(id, &conn);
             },
             Err(_) => print!("ID should be a number"),
         },

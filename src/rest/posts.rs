@@ -31,7 +31,7 @@ pub struct JsonSingleApiResponse {
 pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    for p in db::post::query_published(&conn) {
+    for p in db::models::post::query_published(&conn) {
         let attribs = PostAttribs{
             title: p.title,
             slug: p.slug,
@@ -48,7 +48,7 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
 #[get("/posts/<id>")]
 pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::post::get(&conn, id).ok()?;
+    let p = db::models::post::get(&conn, id).ok()?;
     let attribs = PostAttribs{
          title: p.title,
          slug: p.slug,
@@ -67,7 +67,7 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
 #[get("/posts/<slug>", rank = 2)]
 pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::post::get_by_slug(&conn, slug).ok()?;
+    let p = db::models::post::get_by_slug(&conn, slug).ok()?;
     let attribs = PostAttribs{
          title: p.title,
          slug: p.slug,

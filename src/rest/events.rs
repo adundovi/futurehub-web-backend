@@ -28,7 +28,7 @@ pub struct JsonApiResponse {
 pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    for event in db::event::query(&conn) {
+    for event in db::models::event::query(&conn) {
         let attribs = EventAttribs{
             title: event.title,
             body: event.body,
@@ -46,7 +46,7 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
 pub fn get_upcoming(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    let events = db::event::query_upcoming(&conn, 10);
+    let events = db::models::event::query_upcoming(&conn, 10);
     for event in events {
         let attribs = EventAttribs{
             title: event.title,

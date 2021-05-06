@@ -9,7 +9,7 @@ use crate::rest::jwt;
 use crate::consts::messages;
 
 fn get_profile(username: &str, conn: db::MainDbConn) -> ResponseWithStatus {
-    let user = db::models::User::get_user_by_username(username, &conn).unwrap();
+    let user = db::models::user::User::get_user_by_username(username, &conn).unwrap();
     ResponseWithStatus {
         status_code: Status::Ok.code,
         response: Response {
@@ -19,6 +19,13 @@ fn get_profile(username: &str, conn: db::MainDbConn) -> ResponseWithStatus {
                 ).unwrap(),
         },
     }
+}
+
+#[options("/profile")]
+pub fn option_info<'a>() -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
 }
 
 #[get("/profile")]

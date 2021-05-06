@@ -38,7 +38,7 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
 
     match category {
         None => {
-            for p in db::repo_items::query_published(&conn) {
+            for p in db::models::repo_items::query_published(&conn) {
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
@@ -54,7 +54,7 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
             }
         },
         Some(c) =>
-            for p in db::repo_items::query_published_by_category(&conn, &c) {
+            for p in db::models::repo_items::query_published_by_category(&conn, &c) {
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
@@ -75,7 +75,7 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
 #[get("/repo/<id>", rank = 1)]
 pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::repo_items::get(&conn, id).ok()?;
+    let p = db::models::repo_items::get(&conn, id).ok()?;
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
@@ -98,7 +98,7 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
 #[get("/repo/<slug>", rank = 2)]
 pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
 
-    let p = db::repo_items::get_by_slug(&conn, slug).ok()?;
+    let p = db::models::repo_items::get_by_slug(&conn, slug).ok()?;
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
@@ -121,6 +121,6 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
 /* see also X-Sendfile */
 #[get("/repo/stream/<slug>")]
 pub fn get_stream_by_slug(conn: db::MainDbConn, slug: String) -> Option<NamedFile> {
-    let p = db::repo_items::get_by_slug(&conn, slug).ok()?;
+    let p = db::models::repo_items::get_by_slug(&conn, slug).ok()?;
     NamedFile::open(&p.filepath).ok() 
 }

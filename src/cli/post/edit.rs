@@ -19,7 +19,7 @@ pub fn f(args: &clap::ArgMatches) {
 fn edit_post(id: i32) {
 
     let conn = db::establish_connection();
-    let post = db::post::get(&conn, id).expect("Id not found");
+    let post = db::models::post::get(&conn, id).expect("Id not found");
     let mut new_post = post.clone();
 
     new_post.title = edit_line(&new_post.title, "Title");
@@ -36,5 +36,5 @@ fn edit_post(id: i32) {
     new_post.published = edit_bool(post.published, "Published");
     
     let conn = db::establish_connection();
-    db::post::update(&conn, &new_post);
+    db::models::post::update(&conn, &new_post);
 }
