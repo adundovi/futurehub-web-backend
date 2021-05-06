@@ -17,8 +17,8 @@ CREATE TABLE courses (
 
 CREATE TABLE course_users (
     id INTEGER NOT NULL,
-    course_id INTEGER,
-    user_id INTEGER,
+    course_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
     join_date DATETIME NOT NULL,
     leave_date DATETIME,
     score INTEGER,
@@ -31,8 +31,8 @@ CREATE TABLE course_users (
 
 CREATE TABLE course_events (
     id INTEGER NOT NULL,
-    course_id INTEGER,
-    event_id INTEGER,
+    course_id INTEGER NOT NULL,
+    event_id INTEGER NOT NULL,
     PRIMARY KEY (id)
     FOREIGN KEY (event_id) REFERENCES events(id)
     FOREIGN KEY (course_id) REFERENCES courses(id)

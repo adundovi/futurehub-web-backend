@@ -8,6 +8,7 @@ mod list;
 mod remove;
 mod dropall;
 mod edit;
+mod participant;
 
 pub fn menu<'a>() -> Menu<'a> {
     let mut m = Menu{
@@ -79,6 +80,48 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &edit::f
     };
     m.push_subcommand("edit", menu_edit);
+    
+    let menu_participant = Subcommand {
+            app: App::new("participant")
+                .about("Participant options")
+                .subcommand(App::new("add")
+                    .about("Add new participant")
+                    .arg(Arg::new("CID")
+                         .about("Course ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("UID")
+                         .about("User ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                 )
+                 .subcommand(App::new("list")
+                      .about("List participants")
+                      .arg(
+                         Arg::new("ID")
+                         .about("User ID")
+                         .required(true)
+                         .index(1)
+                        )
+                )
+                .subcommand(App::new("remove")
+                    .about("Remove participant")
+                    .arg(Arg::new("CID")
+                         .about("Course ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("UID")
+                         .about("User ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                 ),
+            f: &participant::f
+    };
+    m.push_subcommand("participant", menu_participant);
     
     m
 }

@@ -11,16 +11,16 @@ table! {
 table! {
     course_events (id) {
         id -> Integer,
-        course_id -> Nullable<Integer>,
-        event_id -> Nullable<Integer>,
+        course_id -> Integer,
+        event_id -> Integer,
     }
 }
 
 table! {
     course_users (id) {
         id -> Integer,
-        course_id -> Nullable<Integer>,
-        user_id -> Nullable<Integer>,
+        course_id -> Integer,
+        user_id -> Integer,
         join_date -> Timestamp,
         leave_date -> Nullable<Timestamp>,
         score -> Nullable<Integer>,
