@@ -49,6 +49,6 @@ pub fn f(args: &clap::ArgMatches) {
 fn list_participants(id: i32) {
     let conn = db::establish_connection();
     for (i, p) in db::models::course::Course::list_participants(id, &conn).iter().enumerate() {
-                println!("{}.\t{}\t{}", i+1, p.0.username, p.1.join_date);
+                println!("{}.\t{}({})\t{}", i+1, p.0.username, p.0.id, p.1.join_date);
     }
 }
