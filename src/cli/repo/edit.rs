@@ -28,7 +28,7 @@ fn edit_item(id: i32) {
     new_item.slug = edit_line(&item.slug, "Slug");
     new_item.datetime = edit_datetime(&item.datetime, "Date & time");
     new_item.description = edit_option_text(&new_item.description, "Description");
-    new_item.category_id = edit_number(&item.category_id, "CategoryId");
+    new_item.category_id = edit_number(item.category_id, "CategoryId");
     new_item.published = edit_bool(item.published, "Published");
     
     db::models::repo_items::update(&conn, &new_item);

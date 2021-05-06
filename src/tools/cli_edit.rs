@@ -45,8 +45,8 @@ pub fn edit_option_datetime(e: &Option<NaiveDateTime>, n: &str) -> Option<NaiveD
     }
 }
 
-pub fn edit_number(e: &i32, n: &str) -> i32 {
-        println!("{}: {}", &n, &e);
+pub fn edit_number(e: i32, n: &str) -> i32 {
+        println!("{}: {}", &n, e);
         let mut input = String::new();
         
         match io::stdin().read_line(&mut input) {
@@ -68,6 +68,13 @@ pub fn edit_number(e: &i32, n: &str) -> i32 {
             }
         }
     }
+
+pub fn edit_option_number(e: Option<i32>, n: &str) -> Option<i32> {
+    match e {
+        Some(s) => Some(edit_number(s, n)),
+        None => Some(edit_number(0, n)), 
+    }
+}
 
 pub fn edit_text(e: &String, n: &str) -> String {
         let edited = edit::edit(e);

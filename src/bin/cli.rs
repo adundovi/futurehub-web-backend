@@ -5,6 +5,7 @@ fn main() {
     // Get all submenus...
     let submenus: Vec<Menu> = vec![
         cli::category::menu(),
+        cli::course::menu(),
         cli::event::menu(),
         cli::post::menu(),
         cli::repo::menu(),
