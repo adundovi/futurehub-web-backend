@@ -167,7 +167,14 @@ impl User {
     pub fn update(user: &User, conn: &SqliteConnection) {
         diesel::update(users::table.filter(users::id.eq(user.id)))
         .set((users::username.eq(&user.username),
-              users::email.eq(&user.email)
+              users::email.eq(&user.email),
+              users::oib.eq(&user.oib),
+              users::name.eq(&user.name),
+              users::surname.eq(&user.surname),
+              users::address.eq(&user.address),
+              users::phone.eq(&user.phone),
+              users::gender.eq(&user.gender),
+              users::birthday.eq(&user.birthday),
         ))
         .execute(conn)
         .expect(&format!("Error updating user with id = {}", user.id));
