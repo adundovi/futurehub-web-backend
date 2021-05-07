@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use crate::cli::menu::{Menu, Subcommand};
 
+mod certs;
 mod create;
 mod list;
 mod remove;
@@ -118,10 +119,22 @@ pub fn menu<'a>() -> Menu<'a> {
                          .required(true)
                          .index(2)
                          ),
-                 ),
+                ),
             f: &participant::f
     };
     m.push_subcommand("participant", menu_participant);
+    
+    let menu_certs = Subcommand {
+            app: App::new("certs")
+                .about("Generate certificates")
+                .arg(Arg::new("ID")
+                     .about("Course ID")
+                     .required(true)
+                     .index(1)
+                     ),
+            f: &certs::f
+    };
+    m.push_subcommand("certs", menu_certs);
     
     m
 }

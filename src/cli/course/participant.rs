@@ -26,7 +26,7 @@ pub fn f(args: &clap::ArgMatches) {
                 },
                 None => print!("No ID given"),
             };
-        },
+       },
        Some(("remove",  args)) => {
             let cid = match args.value_of("CID") {
                 Some(t) => t.parse::<i32>().ok(),
@@ -40,7 +40,7 @@ pub fn f(args: &clap::ArgMatches) {
             if cid.is_some() && uid.is_some() {
                 db::models::course::Course::remove_participant(cid.unwrap(), uid.unwrap(), &conn);
             }
-        },
+       },
         Some((&_, _)) => print!("No subcommand selected"),
         None => print!("No subcommand selected"),
     }

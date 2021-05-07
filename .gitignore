@@ -20,6 +20,7 @@ Rocket.toml
 # Ignore temporary stuff
 tmp/*
 secret.key
+*.csv
 
 # Ignore repository files
 repo/*/
