@@ -9,6 +9,7 @@ mod list;
 mod remove;
 mod dropall;
 mod edit;
+mod event;
 mod participant;
 
 pub fn menu<'a>() -> Menu<'a> {
@@ -102,7 +103,7 @@ pub fn menu<'a>() -> Menu<'a> {
                       .about("List participants")
                       .arg(
                          Arg::new("ID")
-                         .about("User ID")
+                         .about("Course ID")
                          .required(true)
                          .index(1)
                         )
@@ -123,6 +124,48 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &participant::f
     };
     m.push_subcommand("participant", menu_participant);
+    
+    let menu_event = Subcommand {
+            app: App::new("event")
+                .about("Event options")
+                .subcommand(App::new("add")
+                    .about("Add event to the course")
+                    .arg(Arg::new("CID")
+                         .about("Course ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("EID")
+                         .about("Event ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                 )
+                 .subcommand(App::new("list")
+                      .about("List events in the course")
+                      .arg(
+                         Arg::new("CID")
+                         .about("Course ID")
+                         .required(true)
+                         .index(1)
+                        )
+                )
+                .subcommand(App::new("remove")
+                    .about("Remove event from course")
+                    .arg(Arg::new("CID")
+                         .about("Course ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("EID")
+                         .about("Event ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                ),
+            f: &event::f
+    };
+    m.push_subcommand("event", menu_event);
     
     let menu_certs = Subcommand {
             app: App::new("certs")

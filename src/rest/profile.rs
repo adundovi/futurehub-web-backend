@@ -1,5 +1,4 @@
 use rocket_contrib::json::Json;
-use serde_json::json;
 use rocket::response::status;
 use rocket::http::Status;
 use super::response::{Response, ResponseWithStatus};

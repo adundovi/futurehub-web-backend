@@ -2,7 +2,9 @@ use crate::db::sqlite_schema::courses as courses;
 use crate::db::sqlite_schema::course_users as cusers;
 use crate::db::sqlite_schema::course_events as cevents;
 use crate::db::sqlite_schema::users as users;
+use crate::db::sqlite_schema::events as events;
 use crate::db::models::user::User;
+use crate::db::models::event::Event;
 use crate::tools::import;
 
 use chrono::NaiveDateTime;
@@ -71,6 +73,22 @@ pub struct CourseUser {
     pub score: Option<i32>,
     pub attendance: Option<i32>,
     pub note: Option<String>,
+}
+
+#[derive(Debug, Insertable, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "cevents"]
+#[serde(rename_all = "PascalCase")]
+#[derive(Queryable, Serialize, Clone)]
+pub struct NewCourseEvent {
+    pub course_id: i32,
+    pub event_id: i32,
+}
+
+#[derive(Queryable, Serialize, Clone)]
+pub struct CourseEvent {
+    pub id: i32,
+    pub course_id: i32,
+    pub event_id: i32,
 }
 
 impl Course {
@@ -175,7 +193,39 @@ impl Course {
         diesel::delete(cusers::table.filter(cusers::course_id.eq(course_id_)
                                             .and(cusers::user_id.eq(user_id_))))
             .execute(conn)
-            .expect(&format!("Error relation event-course course_id = {}, user_id = {}",
+            .expect(&format!("Error relation user-course course_id = {}, user_id = {}",
                              course_id_, user_id_));
+    }
+    
+    pub fn add_event(course_id_: i32,
+                     event_id_: i32,
+                     conn: &SqliteConnection) -> bool {
+        let relation = NewCourseEvent {
+            course_id: course_id_,
+            event_id: event_id_,
+        };
+        diesel::insert_into(cevents::table)
+            .values(&relation)
+            .execute(conn)
+            .is_ok()
+    }
+    
+    pub fn remove_event(course_id_: i32,
+                        event_id_: i32,
+                        conn: &SqliteConnection) {
+        
+        diesel::delete(cevents::table.filter(cevents::course_id.eq(course_id_)
+                                            .and(cevents::event_id.eq(event_id_))))
+            .execute(conn)
+            .expect(&format!("Error relation event-course course_id = {}, event_id = {}",
+                             course_id_, event_id_));
+    }
+    
+    pub fn list_events(id: i32, conn: &SqliteConnection) -> Vec<(Event, CourseEvent)> {
+        events::table
+            .inner_join(cevents::table)
+            .filter(cevents::course_id.eq(id))
+            .load::<(Event, CourseEvent)>(conn)
+            .expect("Error loading course users")
     }
 }

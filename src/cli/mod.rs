@@ -5,3 +5,4 @@ pub mod menu;
 pub mod post;
 pub mod repo;
 pub mod user;
+pub mod zns;

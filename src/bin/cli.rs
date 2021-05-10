@@ -10,6 +10,7 @@ fn main() {
         cli::post::menu(),
         cli::repo::menu(),
         cli::user::menu(),
+        cli::zns::menu(),
     ];
     
     // ...generate calp::App from them...

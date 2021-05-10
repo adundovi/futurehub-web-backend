@@ -1,10 +1,7 @@
 use crate::db;
 use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
 use std::path::Path;
-use chrono::prelude::*;
-use serde::{Serialize, Deserialize};
-use std::error::Error;
-use serde_json::value::{Map as JsonMap, Value as Json};
+use serde_json::value::{Map as JsonMap};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
