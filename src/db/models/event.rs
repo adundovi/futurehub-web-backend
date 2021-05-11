@@ -10,6 +10,9 @@ use chrono::{
     };
 
 use crate::db::sqlite_schema::events as events;
+use crate::db::sqlite_schema::courses as courses;
+use crate::db::sqlite_schema::course_events as cevents;
+use crate::db::models::course::{Course, CourseEvent};
 use crate::tools::import;
 
 
@@ -36,46 +39,46 @@ pub struct Event {
 }
 
 
-pub fn insert(connection: &SqliteConnection, title: String, datetime_utc: &DateTime<Utc>) {
+pub fn insert(conn: &SqliteConnection, title: String, datetime_utc: &DateTime<Utc>) {
     let datetime = datetime_utc.naive_utc();
     let event = NewEvent { datetime, title, body: None, place: None, audience: None };
 
     diesel::insert_into(events::table)
         .values(&event)
-        .execute(connection)
+        .execute(conn)
         .expect("Error inserting new event");
 }
 
-pub fn insert_full(connection: &SqliteConnection, event: &NewEvent) {
+pub fn insert_full(conn: &SqliteConnection, event: &NewEvent) {
     diesel::insert_into(events::table)
         .values(event)
-        .execute(connection)
+        .execute(conn)
         .expect("Error inserting new event");
 }
 
-pub fn remove(connection: &SqliteConnection, id: i32) {
+pub fn remove(conn: &SqliteConnection, id: i32) {
     diesel::delete(events::table.filter(events::id.eq(id)))
-        .execute(connection)
+        .execute(conn)
         .expect(&format!("Error removing event with id = {}", id));
 }
 
-pub fn drop_all(connection: &SqliteConnection) {
+pub fn drop_all(conn: &SqliteConnection) {
     print!("Removing all events");
     diesel::delete(events::table)
-        .execute(connection)
+        .execute(conn)
         .expect(&format!("Error removing all events"));
 }
 
-pub fn get(connection: &SqliteConnection, id: i32) -> Result<Event, diesel::result::Error> {
+pub fn get(conn: &SqliteConnection, id: i32) -> Result<Event, diesel::result::Error> {
     events::table
         .filter(events::id.eq(id))
-        .first::<Event>(connection)
+        .first::<Event>(conn)
 }
 
-pub fn query(connection: &SqliteConnection) -> Vec<Event> {
+pub fn query(conn: &SqliteConnection) -> Vec<Event> {
     events::table
         .order(events::datetime.asc())
-        .load::<Event>(connection)
+        .load::<Event>(conn)
         .expect("Error loading events")
 }
 
@@ -92,28 +95,41 @@ fn end_of_month(datetime_utc: &DateTime<Utc>) -> NaiveDateTime {
     NaiveDate::from_ymd(year, month, 1).pred().and_time(NaiveTime::from_hms(23,59,59))
 }
 
-pub fn query_by_month(connection: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<Event> {
+pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<Event> {
     let start = beginning_of_month(datetime_utc);
     let end = end_of_month(datetime_utc);
     Local::now().to_string().into_sql::<Timestamp>();
     events::table
         .filter(events::datetime.ge(start).and(events::datetime.le(end)))
         .order(events::datetime.asc())
-        .load::<Event>(connection)
+        .load::<Event>(conn)
         .expect("Error loading events")
 }
 
-pub fn query_upcoming(connection: &SqliteConnection, last: i64) -> Vec<Event> {
+pub fn query_with_course_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, (CourseEvent, Course))> {
+    let start = beginning_of_month(datetime_utc);
+    let end = end_of_month(datetime_utc);
+    Local::now().to_string().into_sql::<Timestamp>();
+    
+    events::table
+        .inner_join(cevents::table.inner_join(courses::table))
+        .filter(events::datetime.ge(start).and(events::datetime.le(end)))
+        .order(events::datetime.asc())
+        .load::<(Event, (CourseEvent, Course))>(conn)
+        .expect("Error loading data")
+}
+
+pub fn query_upcoming(conn: &SqliteConnection, last: i64) -> Vec<Event> {
     let local_time = Local::now().to_string().into_sql::<Timestamp>();
     events::table
         .filter(events::datetime.ge(local_time))
         .order(events::datetime.asc())
         .limit(last)
-        .load::<Event>(connection)
+        .load::<Event>(conn)
         .expect("Error loading events")
 }
 
-pub fn update(connection: &SqliteConnection, event: &Event) {
+pub fn update(conn: &SqliteConnection, event: &Event) {
     diesel::update(events::table.filter(events::id.eq(event.id)))
         .set((events::title.eq(&event.title),
               events::datetime.eq(&event.datetime),
@@ -121,7 +137,7 @@ pub fn update(connection: &SqliteConnection, event: &Event) {
               events::body.eq(&event.body),
               events::audience.eq(&event.audience),
         ))
-        .execute(connection)
+        .execute(conn)
         .expect(&format!("Error updating event with id = {}", event.id));
 }
 
