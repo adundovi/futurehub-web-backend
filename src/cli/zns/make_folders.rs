@@ -2,7 +2,6 @@ use crate::db;
 use std::path::Path;
 use std::fs::create_dir_all;
 use chrono::prelude::*;
-use chrono::NaiveDateTime;
 
 // create post
 pub fn f(args: &clap::ArgMatches) {

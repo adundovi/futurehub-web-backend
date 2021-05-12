@@ -228,4 +228,24 @@ impl Course {
             .load::<(Event, CourseEvent)>(conn)
             .expect("Error loading course users")
     }
+    
+    pub fn first_date(id: i32, conn: &SqliteConnection) -> NaiveDateTime {
+        let (e, _) = events::table
+            .inner_join(cevents::table)
+            .filter(cevents::course_id.eq(id))
+            .order(events::datetime.asc())
+            .first::<(Event, CourseEvent)>(conn)
+            .expect("Error loading course users");
+        e.datetime
+    }
+    
+    pub fn last_date(id: i32, conn: &SqliteConnection) -> NaiveDateTime {
+        let (e, _) = events::table
+            .inner_join(cevents::table)
+            .filter(cevents::course_id.eq(id))
+            .order(events::datetime.desc())
+            .first::<(Event, CourseEvent)>(conn)
+            .expect("Error loading course users");
+        e.datetime
+    }
 }

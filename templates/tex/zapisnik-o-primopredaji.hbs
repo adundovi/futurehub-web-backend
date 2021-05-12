@@ -1,0 +1,63 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage[a4paper,left=1.4cm,right=1.4cm,top=1cm,bottom=1cm,heightrounded]{geometry}
+\usepackage{array}
+
+%opening
+\title{}
+\author{Udruga P.O.I.N.T.}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\setlength\extrarowheight{10pt}
+
+\pagestyle{empty}
+
+
+\begin{document}
+
+\begin{flushleft}
+{\footnotesize
+ \textbf{Future Hub Križevci} / UP.04.2.1.07.0129 \\
+ Udruga P.O.I.N.T. \\
+ OIB: 75093177043 \\
+ Trg svetog Florijana 16, HR-48260 Križevci, Hrvatska
+}
+\end{flushleft}
+\vspace{0.2cm}
+
+\begin{center}
+{\Large Zapisnik o primopredaji potvrda za polaznike programa}
+\end{center}
+
+
+\noindent
+\begin{tabular}{r|l}
+Program & {{course_title}} ({{course_code}}) \\
+\hline
+Voditelj & {{course_lecturer}} \\
+\hline
+Datum održavanja & {{course_started}} -- {{course_ended}} \\
+\hline
+\end{tabular}
+
+\begin{center}
+\begin{tabular*}{\textwidth}{|M{0.5cm}|M{3.5cm}M{2.5cm}M{2.5cm}|M{2.6cm}|M{4cm}|}
+\hline
+\# & Prezime & Ime & OIB & Datum & Potpis\\
+\hline
+ {{#each participants as |p|}}
+{{inc @index}}. & {{p.surname}} & {{p.name}} & {{p.oib}} & & \\
+\hline
+ {{/each}}
+\end{tabular*}
+\end{center}
+
+\vfill
+
+\begin{center}
+ \includegraphics[scale=0.4]{ {{resources}}/img/lenta_eu_vlada_rh_nzzrcd_s_korisnicima.png}
+\end{center}
+
+\end{document}
