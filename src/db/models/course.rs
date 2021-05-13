@@ -3,6 +3,7 @@ use crate::db::sqlite_schema::course_users as cusers;
 use crate::db::sqlite_schema::course_events as cevents;
 use crate::db::sqlite_schema::users as users;
 use crate::db::sqlite_schema::events as events;
+use crate::db::model_traits::Queries;
 use crate::db::models::user::User;
 use crate::db::models::event::Event;
 use crate::tools::import;
@@ -91,6 +92,30 @@ pub struct CourseEvent {
     pub event_id: i32,
 }
 
+impl Queries for Course {
+    fn get_all(conn: &SqliteConnection) -> QueryResult<Vec<Course>> {
+        courses::table
+            .load::<Course>(conn)
+    }
+    
+    fn get(conn: &SqliteConnection, id: i32) -> QueryResult<Course> {
+        courses::table
+            .filter(courses::id.eq(id))
+            .first::<Course>(conn)
+    }
+    
+    fn remove(conn: &SqliteConnection, id: i32) -> QueryResult<usize> {
+        diesel::delete(courses::table.filter(courses::id.eq(id)))
+            .execute(conn)
+    }
+    
+    fn drop_all(conn: &SqliteConnection) -> QueryResult<usize> {
+        diesel::delete(courses::table)
+            .execute(conn)
+    }
+    
+}
+
 impl Course {
     pub fn create(title_: String,
                code_: String,
@@ -116,28 +141,29 @@ impl Course {
             .is_ok()
     }
     
-    pub fn query(conn: &SqliteConnection) -> Vec<Course> {
+    pub fn get_published(conn: &SqliteConnection, id: i32) -> QueryResult<Course> {
         courses::table
-            .load::<Course>(conn)
-            .expect("Error loading course")
-    }
-
-    pub fn get(id: i32, conn: &SqliteConnection) -> Result<Course, diesel::result::Error> {
-        courses::table
-            .filter(courses::id.eq(id))
+            .filter(courses::id.eq(id).and(courses::published.eq(true)))
             .first::<Course>(conn)
     }
     
-    pub fn remove(id: i32, conn: &SqliteConnection) {
-        diesel::delete(courses::table.filter(courses::id.eq(id)))
-            .execute(conn)
-            .expect(&format!("Error removing course with id = {}", id));
+    pub fn get_by_code(conn: &SqliteConnection, code: &str) -> QueryResult<Course> {
+        courses::table
+            .filter(courses::code.eq(code))
+            .first::<Course>(conn)
     }
     
-    pub fn drop_all(conn: &SqliteConnection) {
-        diesel::delete(courses::table)
-            .execute(conn)
-            .expect(&format!("Error removing all courses"));
+    pub fn get_published_by_code(conn: &SqliteConnection, code: &str) -> QueryResult<Course> {
+        courses::table
+            .filter(courses::code.eq(code).and(courses::published.eq(true)))
+            .first::<Course>(conn)
+    }
+
+    pub fn get_all_published(conn: &SqliteConnection) -> QueryResult<Vec<Course>> {
+        courses::table
+            .filter(courses::published.eq(true))
+            .order(courses::creation_date.desc())
+            .load::<Course>(conn)
     }
     
     pub fn update(course: &Course, conn: &SqliteConnection) {

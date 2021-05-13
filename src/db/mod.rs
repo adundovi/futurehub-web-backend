@@ -3,6 +3,7 @@ use rocket_contrib::database;
 use rocket_contrib::databases::diesel as dieseldb;
 
 pub mod models;
+pub mod model_traits;
 pub mod sqlite_schema;
 
 const DATABASE: &str = "sqlite_db";

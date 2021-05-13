@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod category;
 pub mod contact;
+pub mod courses;
 pub mod events;
 pub mod jwt;
 pub mod posts;

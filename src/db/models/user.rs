@@ -4,6 +4,7 @@ use chrono::prelude::*;
 use uuid::Uuid;
 
 use crate::rest::jwt::UserToken;
+use crate::db::model_traits::Queries;
 use crate::db::models::login_history::LoginHistory;
 use crate::db::sqlite_schema::users as users;
 use crate::tools::import;
@@ -68,6 +69,29 @@ pub struct NewUser {
     pub creation_date: NaiveDateTime,
 }
 
+impl Queries for User {
+    fn get_all(conn: &SqliteConnection) -> Result<Vec<User>, diesel::result::Error> {
+        users::table
+            .load::<User>(conn)
+    }
+    
+    fn get(conn: &SqliteConnection, id: i32) -> Result<User, diesel::result::Error> {
+        users::table
+            .filter(users::id.eq(id))
+            .first::<User>(conn)
+    }
+    
+    fn drop_all(conn: &SqliteConnection) -> Result<usize, diesel::result::Error>{
+        diesel::delete(users::table)
+            .execute(conn)
+    }
+
+    fn remove(conn: &SqliteConnection, id: i32) -> Result<usize, diesel::result::Error>{
+        diesel::delete(users::table.filter(users::id.eq(id)))
+            .execute(conn)
+    }
+
+}
 
 impl User {
     pub fn create(username: String,
@@ -134,34 +158,10 @@ impl User {
             .is_ok()
     }
 
-    pub fn query(conn: &SqliteConnection) -> Vec<User> {
-        users::table
-            .load::<User>(conn)
-            .expect("Error loading user")
-    }
-
-    pub fn get(id: i32, conn: &SqliteConnection) -> Result<User, diesel::result::Error> {
-        users::table
-            .filter(users::id.eq(id))
-            .first::<User>(conn)
-    }
-    
     pub fn get_user_by_username(username: &str, conn: &SqliteConnection) -> Result<User, diesel::result::Error> {
         users::table
             .filter(users::username.eq(username))
             .first::<User>(conn)
-    }
-
-    pub fn drop_all(conn: &SqliteConnection) {
-        diesel::delete(users::table)
-            .execute(conn)
-            .expect(&format!("Error removing all users"));
-    }
-
-    pub fn remove(id: i32, conn: &SqliteConnection) {
-        diesel::delete(users::table.filter(users::id.eq(id)))
-            .execute(conn)
-            .expect(&format!("Error removing user with id = {}", id));
     }
 
     pub fn update(user: &User, conn: &SqliteConnection) {

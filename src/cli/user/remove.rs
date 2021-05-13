@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 
 // rm repo item
 pub fn f(args: &clap::ArgMatches) {
@@ -6,7 +7,7 @@ pub fn f(args: &clap::ArgMatches) {
         Some(id) => match id.parse::<i32>() {
             Ok(id) => {
                 let conn = db::establish_connection();
-                db::models::user::User::remove(id, &conn);
+                db::models::user::User::remove(&conn, id).expect("Error");
             },
             Err(_) => print!("ID should be a number"),
         },

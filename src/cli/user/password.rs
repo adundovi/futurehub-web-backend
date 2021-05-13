@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 use crate::tools::cli_edit::{
     edit_line,
 };
@@ -37,7 +38,7 @@ fn set_password(id: i32) {
 fn check_password(id: i32) {
     let conn = db::establish_connection();
     
-    let user = db::models::user::User::get(id, &conn).expect("Id not found");
+    let user = db::models::user::User::get(&conn, id).expect("Id not found");
     let plaintext_password = edit_line(&"".to_string(), "Current password");
 
     let l = db::models::user::LoginData {

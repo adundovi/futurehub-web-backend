@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use serde_json::value::{Map as JsonMap};
@@ -33,7 +34,7 @@ pub fn f(args: &clap::ArgMatches) {
 
 fn generate_form(id: i32) {
     let conn = db::establish_connection();
-    let course = db::models::course::Course::get(id, &conn).expect("Id not found");
+    let course = db::models::course::Course::get(&conn, id).expect("Id not found");
     let first_date = db::models::course::Course::first_date(id, &conn);
     let last_date = db::models::course::Course::last_date(id, &conn);
     let db_participants = db::models::course::Course::list_participants(id, &conn);

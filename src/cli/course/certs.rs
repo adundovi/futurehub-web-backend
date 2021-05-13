@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use serde_json::value::{Map as JsonMap};
@@ -28,7 +29,7 @@ pub fn f(args: &clap::ArgMatches) {
 
 fn generate_certificates(id: i32) {
     let conn = db::establish_connection();
-    let course = db::models::course::Course::get(id, &conn).expect("Id not found");
+    let course = db::models::course::Course::get(&conn, id).expect("Id not found");
     let participants = db::models::course::Course::list_participants(id, &conn);
     
     let template_path = Path::new("./templates/tex/").join(&course.cert_template.unwrap());

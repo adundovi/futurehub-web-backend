@@ -9,6 +9,7 @@ use rocket::http::Header;
 
 use futurehub_web_backend::db;
 use futurehub_web_backend::rest::{
+    courses,
     category,
     events,
     posts,
@@ -50,6 +51,9 @@ fn main() {
                repo::get_by_id,
                repo::get_by_slug,
                repo::get_stream_by_slug,
+               courses::get,
+               courses::get_by_id,
+               courses::get_by_code,
                category::get,
                category::get_by_id,
                category::get_by_slug,

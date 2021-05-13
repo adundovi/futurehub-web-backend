@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 use crate::tools::cli_edit::{
     edit_bool,
     edit_line,
@@ -22,7 +23,7 @@ fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
     
-    let item = db::models::course::Course::get(id, &conn).expect("Id not found");
+    let item = db::models::course::Course::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.code = edit_line(&item.code, "Code");

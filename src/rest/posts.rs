@@ -31,7 +31,7 @@ pub struct JsonSingleApiResponse {
 pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
 
-    for p in db::models::post::query_published(&conn) {
+    for p in db::models::post::get_all_published(&conn) {
         let attribs = PostAttribs{
             title: p.title,
             slug: p.slug,

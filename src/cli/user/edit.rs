@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 use crate::tools::cli_edit::{
     edit_line,
     edit_option_line,
@@ -19,7 +20,7 @@ fn edit_item(id: i32) {
 
     let conn = db::establish_connection();
     
-    let item = db::models::user::User::get(id, &conn).expect("Id not found");
+    let item = db::models::user::User::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.username = edit_line(&item.username, "Username");

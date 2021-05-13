@@ -42,24 +42,24 @@ pub fn insert(connection: &SqliteConnection, title_: String, datetime_utc: &Date
         .expect("Error inserting new post");
 }
 
-pub fn insert_full(connection: &SqliteConnection, post_: &NewPost) {
+pub fn insert_full(conn: &SqliteConnection, post_: &NewPost) {
     diesel::insert_into(posts::table)
         .values(post_)
-        .execute(connection)
+        .execute(conn)
         .expect("Error inserting new post");
 }
 
-pub fn query(connection: &SqliteConnection) -> Vec<Post> {
+pub fn get_all(conn: &SqliteConnection) -> Vec<Post> {
     posts::table
-        .load::<Post>(connection)
+        .load::<Post>(conn)
         .expect("Error loading posts")
 }
 
-pub fn query_published(connection: &SqliteConnection) -> Vec<Post> {
+pub fn get_all_published(conn: &SqliteConnection) -> Vec<Post> {
     posts::table
         .filter(posts::published.eq(true))
         .order(posts::datetime.desc())
-        .load::<Post>(connection)
+        .load::<Post>(conn)
         .expect("Error loading posts")
 }
 
