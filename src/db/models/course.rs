@@ -165,7 +165,7 @@ impl Course {
     pub fn get_all_published(conn: &SqliteConnection) -> QueryResult<Vec<Course>> {
         courses::table
             .filter(courses::published.eq(true))
-            .order(courses::creation_date.desc())
+            .order(courses::creation_date.asc())
             .load::<Course>(conn)
     }
     
