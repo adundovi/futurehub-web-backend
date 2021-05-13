@@ -9,6 +9,7 @@ pub struct EventAttribs {
     pub body: Option<String>,
     pub place: Option<String>,
     pub audience: Option<String>,
+    pub status: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -34,7 +35,8 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
             body: event.body,
             place: event.place,
             datetime: event.datetime,
-            audience: event.audience };
+            audience: event.audience,
+            status: event.status };
         let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
         response.data.push(eventw);
     }
@@ -53,7 +55,8 @@ pub fn get_upcoming(conn: db::MainDbConn) -> Json<JsonApiResponse> {
             body: event.body,
             place: event.place,
             datetime: event.datetime,
-            audience: event.audience };
+            audience: event.audience,
+            status: event.status };
         let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
         response.data.push(eventw);
     }

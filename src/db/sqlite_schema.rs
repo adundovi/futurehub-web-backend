@@ -55,6 +55,7 @@ table! {
         place -> Nullable<Text>,
         audience -> Nullable<Text>,
         datetime -> Timestamp,
+        status -> Nullable<Text>,
     }
 }
 

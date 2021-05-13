@@ -5,5 +5,6 @@ CREATE TABLE events (
     place TEXT,
     audience TEXT,
     datetime DATETIME NOT NULL,
+    status TEXT,
     PRIMARY KEY (id)
 );

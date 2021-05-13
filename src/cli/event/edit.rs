@@ -1,7 +1,8 @@
 use crate::db;
-use chrono::prelude::*;
 use crate::tools::cli_edit::{
     edit_line,
+    edit_datetime,
+    edit_option_line,
 };
 
 pub fn f(args: &clap::ArgMatches) {
@@ -18,22 +19,14 @@ fn edit_event(id: i32) {
 
     let conn = db::establish_connection();
 
-    let event = db::models::event::get(&conn, id).expect("Id not found");
-    let mut new_event = event.clone();
+    let item = db::models::event::get(&conn, id).expect("Id not found");
+    let mut new_item = item.clone();
 
-    new_event.title = edit_line(&new_event.title, "Title");
-    new_event.datetime = NaiveDateTime::parse_from_str(
-        &edit_line(&new_event.datetime.to_string(), "Date & time"),
-        "%Y-%m-%d %H:%M:%S").unwrap_or(new_event.datetime);
+    new_item.title = edit_line(&new_item.title, "Title");
+    new_item.datetime = edit_datetime(&new_item.datetime, "Date & time");
+    new_item.place = edit_option_line(&new_item.place, "Place");
+    new_item.audience = edit_option_line(&new_item.audience, "Audience");
+    new_item.status = edit_option_line(&new_item.status, "Status");
     
-    match event.place {
-        Some(s) => new_event.place = Some(edit_line(&s, "Place")),
-        None => new_event.place = Some(edit_line(&String::new(), "Place")), 
-    };
-    match new_event.audience {
-        Some(s) => new_event.audience = Some(edit_line(&s, "Audience")),
-        None => new_event.audience = Some(edit_line(&String::new(), "Audience")), 
-    }
-    
-    db::models::event::update(&conn, &new_event);
+    db::models::event::update(&conn, &new_item);
 }

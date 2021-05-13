@@ -26,6 +26,7 @@ pub struct NewEvent {
     pub body: Option<String>,
     pub place: Option<String>,
     pub audience: Option<String>,
+    pub status: Option<String>,
 }
 
 #[derive(Queryable, Serialize, Deserialize, Clone)]
@@ -36,12 +37,13 @@ pub struct Event {
     pub place: Option<String>,
     pub audience: Option<String>,
     pub datetime: NaiveDateTime, // UTC
+    pub status: Option<String>,
 }
 
 
 pub fn insert(conn: &SqliteConnection, title: String, datetime_utc: &DateTime<Utc>) {
     let datetime = datetime_utc.naive_utc();
-    let event = NewEvent { datetime, title, body: None, place: None, audience: None };
+    let event = NewEvent { datetime, title, body: None, place: None, audience: None, status: None };
 
     diesel::insert_into(events::table)
         .values(&event)
@@ -136,6 +138,7 @@ pub fn update(conn: &SqliteConnection, event: &Event) {
               events::place.eq(&event.place),
               events::body.eq(&event.body),
               events::audience.eq(&event.audience),
+              events::status.eq(&event.status),
         ))
         .execute(conn)
         .expect(&format!("Error updating event with id = {}", event.id));

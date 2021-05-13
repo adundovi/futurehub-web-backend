@@ -40,8 +40,7 @@ fn generate_form(id: i32) {
     
     let template_path = Path::new("./templates/tex/zapisnik-o-primopredaji.hbs");
     let resources_path = Path::new("./templates/tex");
-        
-    let output_path_str = format!("./tmp/recordform-{course}.tex",
+    let output_path_str = format!("./tmp/certform-{course}.tex",
                                     course = course.code);
     let output_path = Path::new(&output_path_str);
         
