@@ -10,9 +10,12 @@ use chrono::{
     };
 
 use crate::db::sqlite_schema::events as events;
+use crate::db::sqlite_schema::event_attendees as event_attendees;
 use crate::db::sqlite_schema::courses as courses;
 use crate::db::sqlite_schema::course_events as cevents;
+use crate::db::sqlite_schema::users as users;
 use crate::db::models::course::{Course, CourseEvent};
+use crate::db::models::user::User;
 use crate::tools::import;
 
 
@@ -38,6 +41,29 @@ pub struct Event {
     pub audience: Option<String>,
     pub datetime: NaiveDateTime, // UTC
     pub status: Option<String>,
+}
+
+#[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
+#[table_name = "event_attendees"]
+#[serde(rename_all = "PascalCase")]
+pub struct NewEventAttendee {
+    pub event_id: i32,
+    pub user_id: i32,
+    pub join_datetime: Option<NaiveDateTime>,
+    pub leave_datetime: Option<NaiveDateTime>,
+    pub presence: Option<String>,
+    pub note: Option<String>,
+}
+
+#[derive(Queryable, Serialize, Deserialize, Clone)]
+pub struct EventAttendee {
+    pub id: i32,
+    pub event_id: i32,
+    pub user_id: i32,
+    pub join_datetime: Option<NaiveDateTime>,
+    pub leave_datetime: Option<NaiveDateTime>,
+    pub presence: Option<String>,
+    pub note: Option<String>,
 }
 
 
@@ -144,3 +170,39 @@ pub fn update(conn: &SqliteConnection, event: &Event) {
         .expect(&format!("Error updating event with id = {}", event.id));
 }
 
+pub fn add_attendee(event_id_: i32,
+                    user_id_: i32,
+                    conn: &SqliteConnection) -> bool {
+        
+        let relation = NewEventAttendee {
+            event_id: event_id_,
+            user_id: user_id_,
+            join_datetime: Some(Utc::now().naive_utc()),
+            leave_datetime: None,
+            presence: None,
+            note: None,
+        };
+        diesel::insert_into(event_attendees::table)
+            .values(&relation)
+            .execute(conn)
+            .is_ok()
+}
+   
+pub fn list_attendees(event_id_: i32, conn: &SqliteConnection) -> Vec<(User, EventAttendee)> {
+        users::table
+            .inner_join(event_attendees::table)
+            .filter(event_attendees::event_id.eq(event_id_))
+            .load::<(User, EventAttendee)>(conn)
+            .expect("Error loading users as attendees")
+}
+
+pub fn remove_attendee(event_id_: i32,
+                       user_id_: i32,
+                       conn: &SqliteConnection) {
+        
+        diesel::delete(event_attendees::table.filter(event_attendees::event_id.eq(event_id_)
+                                            .and(event_attendees::user_id.eq(user_id_))))
+            .execute(conn)
+            .expect(&format!("Error relation user-course event_id = {}, user_id = {}",
+                             event_id_, user_id_));
+}

@@ -48,6 +48,18 @@ table! {
 }
 
 table! {
+    event_attendees (id) {
+        id -> Integer,
+        event_id -> Integer,
+        user_id -> Integer,
+        join_datetime -> Nullable<Timestamp>,
+        leave_datetime -> Nullable<Timestamp>,
+        presence -> Nullable<Text>,
+        note -> Nullable<Text>,
+    }
+}
+
+table! {
     events (id) {
         id -> Integer,
         title -> Text,
@@ -116,6 +128,8 @@ joinable!(course_events -> courses (course_id));
 joinable!(course_events -> events (event_id));
 joinable!(course_users -> courses (course_id));
 joinable!(course_users -> users (user_id));
+joinable!(event_attendees -> courses (event_id));
+joinable!(event_attendees -> users (user_id));
 joinable!(login_history -> users (user_id));
 joinable!(repo_items -> categories (category_id));
 
@@ -124,6 +138,7 @@ allow_tables_to_appear_in_same_query!(
     course_events,
     course_users,
     courses,
+    event_attendees,
     events,
     login_history,
     posts,

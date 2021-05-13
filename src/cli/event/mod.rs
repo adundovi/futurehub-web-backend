@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use crate::cli::menu::{Menu, Subcommand};
 
+mod attendee;
 mod create;
 mod list;
 mod import;
@@ -99,6 +100,48 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &import::f
     };
     m.push_subcommand("import", menu_import);
+    
+    let menu_attendee = Subcommand {
+            app: App::new("attendee")
+                .about("Participant options")
+                .subcommand(App::new("add")
+                    .about("Add new attendee")
+                    .arg(Arg::new("EID")
+                         .about("Event ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("UID")
+                         .about("User ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                 )
+                 .subcommand(App::new("list")
+                      .about("List attendees")
+                      .arg(
+                         Arg::new("ID")
+                         .about("Event ID")
+                         .required(true)
+                         .index(1)
+                        )
+                )
+                .subcommand(App::new("remove")
+                    .about("Remove attendee")
+                    .arg(Arg::new("EID")
+                         .about("Event ID")
+                         .required(true)
+                         .index(1)
+                         )
+                    .arg(Arg::new("UID")
+                         .about("User ID")
+                         .required(true)
+                         .index(2)
+                         ),
+                ),
+            f: &attendee::f
+    };
+    m.push_subcommand("attendee", menu_attendee);
     
     let menu_export_pdf = Subcommand {
             app: App::new("export_pdf")
