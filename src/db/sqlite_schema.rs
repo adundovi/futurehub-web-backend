@@ -40,6 +40,7 @@ table! {
         lecturer -> Nullable<Text>,
         organizer -> Nullable<Text>,
         lectures -> Nullable<Integer>,
+        lecture_duration -> Nullable<Integer>,
         students -> Nullable<Integer>,
         max_students -> Nullable<Integer>,
         finished -> Bool,

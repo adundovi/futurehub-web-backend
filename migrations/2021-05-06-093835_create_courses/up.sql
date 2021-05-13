@@ -8,6 +8,7 @@ CREATE TABLE courses (
     lecturer TEXT,
     organizer TEXT,
     lectures INTEGER,
+    lecture_duration INTEGER,
     students INTEGER,
     max_students INTEGER,
     finished BOOLEAN NOT NULL DEFAULT 'f',

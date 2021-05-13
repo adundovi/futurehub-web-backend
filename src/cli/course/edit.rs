@@ -34,6 +34,7 @@ fn edit_item(id: i32) {
     new_item.lecturer = edit_option_line(&item.lecturer, "Lecturer");
     new_item.organizer = edit_option_line(&item.organizer, "Organizer");
     new_item.lectures = edit_option_number(item.lectures, "Lectures");
+    new_item.lecture_duration = edit_option_number(item.lecture_duration, "Lecture duration");
     new_item.students = edit_option_number(item.students, "Students");
     new_item.max_students = edit_option_number(item.max_students, "Max. students");
     new_item.finished = edit_bool(item.finished, "Finished");
