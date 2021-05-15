@@ -251,7 +251,7 @@ impl Course {
                              course_id_, event_id_));
     }
     
-    pub fn list_events(id: i32, conn: &SqliteConnection) -> Vec<(Event, CourseEvent)> {
+    pub fn list_events(conn: &SqliteConnection, id: i32) -> Vec<(Event, CourseEvent)> {
         events::table
             .inner_join(cevents::table)
             .filter(cevents::course_id.eq(id))
