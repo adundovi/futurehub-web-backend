@@ -15,7 +15,6 @@ use handlebars::{
 };
 
 #[derive(Deserialize,Serialize,Clone, Eq, Ord, PartialEq, PartialOrd)]
-// #[serde(rename_all = "PascalCase")]
 struct Participant {
     name: String,
     surname: String,

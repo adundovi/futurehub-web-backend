@@ -1,6 +1,5 @@
 use rocket_contrib::json::Json;
 use crate::db;
-use crate::db::model_traits::Queries;
 use crate::db::models::course::{Course, CourseEvent};
 use crate::db::models::event::Event;
 use super::events::{EventAttribs, EventWrapper};

@@ -187,13 +187,34 @@ pub fn add_attendee(event_id_: i32,
             .execute(conn)
             .is_ok()
 }
+
+pub fn get_course(conn: &SqliteConnection, id: i32) -> (Course, CourseEvent) {
+         courses::table
+            .inner_join(cevents::table)
+            .filter(cevents::event_id.eq(id))
+            .first::<(Course, CourseEvent)>(conn)
+            .expect("Error loading course users")
+    }
    
-pub fn list_attendees(event_id_: i32, conn: &SqliteConnection) -> Vec<(User, EventAttendee)> {
+pub fn list_attendees(conn: &SqliteConnection, event_id_: i32) -> Vec<(User, EventAttendee)> {
         users::table
             .inner_join(event_attendees::table)
             .filter(event_attendees::event_id.eq(event_id_))
             .load::<(User, EventAttendee)>(conn)
             .expect("Error loading users as attendees")
+}
+
+pub fn update_attendees(conn: &SqliteConnection, eas: &Vec<EventAttendee>) {
+    for ea in eas {
+        diesel::update(event_attendees::table.filter(event_attendees::id.eq(ea.id)))
+            .set((event_attendees::join_datetime.eq(&ea.join_datetime),
+                  event_attendees::leave_datetime.eq(&ea.leave_datetime),
+                  event_attendees::presence.eq(&ea.presence),
+                  event_attendees::note.eq(&ea.note),
+            ))
+            .execute(conn)
+            .expect(&format!("Error updating event_attendee with id = {}", ea.id));
+    }
 }
 
 pub fn remove_attendee(event_id_: i32,
