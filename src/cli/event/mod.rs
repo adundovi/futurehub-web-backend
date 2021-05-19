@@ -10,6 +10,7 @@ mod import;
 mod remove;
 mod dropall;
 mod edit;
+mod export_csv;
 mod export_pdf;
 
 pub fn menu<'a>() -> Menu<'a> {
@@ -160,6 +161,26 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &attendee::f
     };
     m.push_subcommand("attendee", menu_attendee);
+    
+    let menu_export_csv = Subcommand {
+            app: App::new("export_csv")
+                .about("Export calendar of events to CSV")
+                .arg(Arg::new("date")
+                     .required(true)
+                     .short('d')
+                     .long("date")
+                     .value_name("YYYY-MM")
+                     .validator(|s: &str| -> Result<(), String> {
+                        match chrono::NaiveDate::parse_from_str(&format!("{}-01", s), "%Y-%m-%d") {
+                            Ok(_) => Ok(()),
+                            Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
+                        }
+                      })
+                    .about("Calendar of the given month (YYYY-MM)")
+                 ),
+            f: &export_csv::f
+    };
+    m.push_subcommand("export_csv", menu_export_csv);
     
     let menu_export_pdf = Subcommand {
             app: App::new("export_pdf")
