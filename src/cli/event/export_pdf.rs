@@ -115,13 +115,9 @@ fn datetime2shorttime_helper(h: &Helper,
 }
 
 fn load_calendar(dt: DateTime<Utc>) -> Result<Vec<db::models::event::Event>, Box<dyn Error>> {
-    let mut events: Vec<db::models::event::Event> = Vec::new();
-    
     let conn = db::establish_connection();
-    for e in db::models::event::query_by_month(&conn, &dt) {
-        events.push(e);
-    };
-
+    let events = db::models::event::query_by_month(&conn, &dt)
+                    .into_iter().map(|i| i.0).collect();
     Ok(events)
 }
 

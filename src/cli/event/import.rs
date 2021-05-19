@@ -10,7 +10,7 @@ pub fn f(args: &clap::ArgMatches) {
     let conn = db::establish_connection();
     for e_new in new_events.iter() {
         let mut insert = true;
-        for e_exist in db::models::event::query(&conn) {
+        for (e_exist, _) in db::models::event::query(&conn) {
             if e_new.datetime == e_exist.datetime && e_new.place == e_exist.place {
                 insert = false;
             }

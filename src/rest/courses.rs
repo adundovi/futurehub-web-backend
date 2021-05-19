@@ -90,7 +90,7 @@ fn course2json(p: Course) -> Option<Json<JsonSingleApiResponse>> {
 fn course2json_with_events(p: Course, events: Vec<Event>) -> Option<Json<JsonSingleApiResponse>> {
     let attribs = CourseAttribs{
          title: p.title,
-         code: p.code,
+         code: p.code.clone(),
          description: p.description,
          creation_date: p.creation_date,
          lecturer: p.lecturer,
@@ -111,7 +111,8 @@ fn course2json_with_events(p: Course, events: Vec<Event>) -> Option<Json<JsonSin
             place: e.place,
             datetime: e.datetime,
             audience: e.audience,
-            status: e.status };
+            status: e.status,
+            course_code: Some(p.code.clone())};
         let eventw = EventWrapper{ id: e.id, r#type: "event".to_string(), attributes: attribs };
         includes.push(eventw);
     }

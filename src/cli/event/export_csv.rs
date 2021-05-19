@@ -24,6 +24,7 @@ pub fn f(args: &clap::ArgMatches) {
 
 fn load_calendar(dt: DateTime<Utc>) -> Result<Vec<db::models::event::Event>, Box<dyn Error>> {
     let conn = db::establish_connection();
-    let events: Vec<db::models::event::Event> = db::models::event::query_by_month(&conn, &dt);
+    let events_course: Vec<(db::models::event::Event, _)> = db::models::event::query_by_month(&conn, &dt);
+    let events = events_course.into_iter().map(|i| i.0).collect();
     Ok(events)
 }

@@ -104,10 +104,11 @@ pub fn get(conn: &SqliteConnection, id: i32) -> Result<Event, diesel::result::Er
         .first::<Event>(conn)
 }
 
-pub fn query(conn: &SqliteConnection) -> Vec<Event> {
+pub fn query(conn: &SqliteConnection) -> Vec<(Event, Course)> {
     events::table
+        .inner_join(courses::table)
         .order(events::datetime.asc())
-        .load::<Event>(conn)
+        .load::<(Event, Course)>(conn)
         .expect("Error loading events")
 }
 
@@ -124,14 +125,15 @@ fn end_of_month(datetime_utc: &DateTime<Utc>) -> NaiveDateTime {
     NaiveDate::from_ymd(year, month, 1).pred().and_time(NaiveTime::from_hms(23,59,59))
 }
 
-pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<Event> {
+pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, Course)> {
     let start = beginning_of_month(datetime_utc);
     let end = end_of_month(datetime_utc);
     Local::now().to_string().into_sql::<Timestamp>();
     events::table
+        .inner_join(courses::table)
         .filter(events::datetime.ge(start).and(events::datetime.le(end)))
         .order(events::datetime.asc())
-        .load::<Event>(conn)
+        .load::<(Event, Course)>(conn)
         .expect("Error loading events")
 }
 
@@ -148,13 +150,14 @@ pub fn query_with_course_by_month(conn: &SqliteConnection, datetime_utc: &DateTi
         .expect("Error loading data")
 }
 
-pub fn query_upcoming(conn: &SqliteConnection, last: i64) -> Vec<Event> {
+pub fn query_upcoming(conn: &SqliteConnection, last: i64) -> Vec<(Event, Course)> {
     let local_time = Local::now().to_string().into_sql::<Timestamp>();
     events::table
+        .inner_join(courses::table)
         .filter(events::datetime.ge(local_time))
         .order(events::datetime.asc())
         .limit(last)
-        .load::<Event>(conn)
+        .load::<(Event, Course)>(conn)
         .expect("Error loading events")
 }
 
