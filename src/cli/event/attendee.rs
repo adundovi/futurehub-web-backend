@@ -136,7 +136,7 @@ fn edit_attendees(id: i32) {
 fn export_list(id: i32) {
     let conn = db::establish_connection();
     let event = db::models::event::get(&conn, id).expect("Not found");
-    let (course, _) = db::models::event::get_course(&conn, id);
+    let course = db::models::event::get_course_by_event(&conn, id);
     let first_date = db::models::course::Course::first_date(course.id, &conn);
     let last_date = db::models::course::Course::last_date(course.id, &conn);
     let users_event_attendees = db::models::event::list_attendees(&conn, id);

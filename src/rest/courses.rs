@@ -1,6 +1,6 @@
 use rocket_contrib::json::Json;
 use crate::db;
-use crate::db::models::course::{Course, CourseEvent};
+use crate::db::models::course::Course;
 use crate::db::models::event::Event;
 use super::events::{EventAttribs, EventWrapper};
 
@@ -87,7 +87,7 @@ fn course2json(p: Course) -> Option<Json<JsonSingleApiResponse>> {
     }))
 }
 
-fn course2json_with_events(p: Course, events: Vec<(Event, CourseEvent)>) -> Option<Json<JsonSingleApiResponse>> {
+fn course2json_with_events(p: Course, events: Vec<Event>) -> Option<Json<JsonSingleApiResponse>> {
     let attribs = CourseAttribs{
          title: p.title,
          code: p.code,
@@ -104,7 +104,7 @@ fn course2json_with_events(p: Course, events: Vec<(Event, CourseEvent)>) -> Opti
 
     let mut includes: Vec<EventWrapper> = vec![];
 
-    for (e, _) in events {
+    for e in events {
         let attribs = EventAttribs{
             title: e.title,
             body: e.body,

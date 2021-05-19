@@ -12,9 +12,8 @@ use chrono::{
 use crate::db::sqlite_schema::events as events;
 use crate::db::sqlite_schema::event_attendees as event_attendees;
 use crate::db::sqlite_schema::courses as courses;
-use crate::db::sqlite_schema::course_events as cevents;
 use crate::db::sqlite_schema::users as users;
-use crate::db::models::course::{Course, CourseEvent};
+use crate::db::models::course::Course;
 use crate::db::models::user::User;
 use crate::tools::import;
 
@@ -30,6 +29,7 @@ pub struct NewEvent {
     pub place: Option<String>,
     pub audience: Option<String>,
     pub status: Option<String>,
+    pub course_id: Option<i32>,
 }
 
 #[derive(Queryable, Serialize, Deserialize, Clone)]
@@ -41,6 +41,7 @@ pub struct Event {
     pub audience: Option<String>,
     pub datetime: NaiveDateTime, // UTC
     pub status: Option<String>,
+    pub course_id: Option<i32>,
 }
 
 #[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
@@ -69,7 +70,7 @@ pub struct EventAttendee {
 
 pub fn insert(conn: &SqliteConnection, title: String, datetime_utc: &DateTime<Utc>) {
     let datetime = datetime_utc.naive_utc();
-    let event = NewEvent { datetime, title, body: None, place: None, audience: None, status: None };
+    let event = NewEvent { datetime, title, body: None, place: None, audience: None, status: None, course_id: None };
 
     diesel::insert_into(events::table)
         .values(&event)
@@ -134,16 +135,16 @@ pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> 
         .expect("Error loading events")
 }
 
-pub fn query_with_course_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, (CourseEvent, Course))> {
+pub fn query_with_course_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, Course)> {
     let start = beginning_of_month(datetime_utc);
     let end = end_of_month(datetime_utc);
     Local::now().to_string().into_sql::<Timestamp>();
     
     events::table
-        .inner_join(cevents::table.inner_join(courses::table))
+        .inner_join(courses::table)
         .filter(events::datetime.ge(start).and(events::datetime.le(end)))
         .order(events::datetime.asc())
-        .load::<(Event, (CourseEvent, Course))>(conn)
+        .load::<(Event, Course)>(conn)
         .expect("Error loading data")
 }
 
@@ -188,12 +189,13 @@ pub fn add_attendee(event_id_: i32,
             .is_ok()
 }
 
-pub fn get_course(conn: &SqliteConnection, id: i32) -> (Course, CourseEvent) {
-         courses::table
-            .inner_join(cevents::table)
-            .filter(cevents::event_id.eq(id))
-            .first::<(Course, CourseEvent)>(conn)
-            .expect("Error loading course users")
+pub fn get_course_by_event(conn: &SqliteConnection, event_id: i32) -> Course {
+         let (c, _) = courses::table
+            .inner_join(events::table)
+            .filter(events::id.eq(event_id))
+            .first::<(Course, Event)>(conn)
+            .expect("Error loading course users");
+         c
     }
    
 pub fn list_attendees(conn: &SqliteConnection, event_id_: i32) -> Vec<(User, EventAttendee)> {

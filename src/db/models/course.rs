@@ -1,6 +1,5 @@
 use crate::db::sqlite_schema::courses as courses;
 use crate::db::sqlite_schema::course_users as cusers;
-use crate::db::sqlite_schema::course_events as cevents;
 use crate::db::sqlite_schema::users as users;
 use crate::db::sqlite_schema::events as events;
 use crate::db::model_traits::Queries;
@@ -76,22 +75,6 @@ pub struct CourseUser {
     pub score: Option<i32>,
     pub attendance: Option<i32>,
     pub note: Option<String>,
-}
-
-#[derive(Debug, Insertable, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
-#[table_name = "cevents"]
-#[serde(rename_all = "PascalCase")]
-#[derive(Queryable, Serialize, Clone)]
-pub struct NewCourseEvent {
-    pub course_id: i32,
-    pub event_id: i32,
-}
-
-#[derive(Queryable, Serialize, Clone)]
-pub struct CourseEvent {
-    pub id: i32,
-    pub course_id: i32,
-    pub event_id: i32,
 }
 
 impl Queries for Course {
@@ -230,12 +213,9 @@ impl Course {
     pub fn add_event(course_id_: i32,
                      event_id_: i32,
                      conn: &SqliteConnection) -> bool {
-        let relation = NewCourseEvent {
-            course_id: course_id_,
-            event_id: event_id_,
-        };
-        diesel::insert_into(cevents::table)
-            .values(&relation)
+        diesel::update(events::table)
+            .filter(events::id.eq(event_id_))
+            .set(events::course_id.eq(course_id_))
             .execute(conn)
             .is_ok()
     }
@@ -244,37 +224,34 @@ impl Course {
                         event_id_: i32,
                         conn: &SqliteConnection) {
         
-        diesel::delete(cevents::table.filter(cevents::course_id.eq(course_id_)
-                                            .and(cevents::event_id.eq(event_id_))))
+        diesel::delete(events::table.filter(events::course_id.eq(course_id_)
+                                            .and(events::id.eq(event_id_))))
             .execute(conn)
             .expect(&format!("Error relation event-course course_id = {}, event_id = {}",
                              course_id_, event_id_));
     }
     
-    pub fn list_events(conn: &SqliteConnection, id: i32) -> Vec<(Event, CourseEvent)> {
+    pub fn list_events(conn: &SqliteConnection, id: i32) -> Vec<Event> {
         events::table
-            .inner_join(cevents::table)
-            .filter(cevents::course_id.eq(id))
-            .load::<(Event, CourseEvent)>(conn)
+            .filter(events::course_id.eq(id))
+            .load::<Event>(conn)
             .expect("Error loading course users")
     }
     
     pub fn first_date(id: i32, conn: &SqliteConnection) -> NaiveDateTime {
-        let (e, _) = events::table
-            .inner_join(cevents::table)
-            .filter(cevents::course_id.eq(id))
+        let e = events::table
+            .filter(events::course_id.eq(id))
             .order(events::datetime.asc())
-            .first::<(Event, CourseEvent)>(conn)
+            .first::<Event>(conn)
             .expect("Error loading course users");
         e.datetime
     }
     
     pub fn last_date(id: i32, conn: &SqliteConnection) -> NaiveDateTime {
-        let (e, _) = events::table
-            .inner_join(cevents::table)
-            .filter(cevents::course_id.eq(id))
+        let e = events::table
+            .filter(events::course_id.eq(id))
             .order(events::datetime.desc())
-            .first::<(Event, CourseEvent)>(conn)
+            .first::<Event>(conn)
             .expect("Error loading course users");
         e.datetime
     }

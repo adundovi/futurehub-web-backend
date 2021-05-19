@@ -9,14 +9,6 @@ table! {
 }
 
 table! {
-    course_events (id) {
-        id -> Integer,
-        course_id -> Integer,
-        event_id -> Integer,
-    }
-}
-
-table! {
     course_users (id) {
         id -> Integer,
         course_id -> Integer,
@@ -69,6 +61,7 @@ table! {
         audience -> Nullable<Text>,
         datetime -> Timestamp,
         status -> Nullable<Text>,
+        course_id -> Nullable<Integer>,
     }
 }
 
@@ -125,8 +118,7 @@ table! {
     }
 }
 
-joinable!(course_events -> courses (course_id));
-joinable!(course_events -> events (event_id));
+joinable!(events -> courses (course_id));
 joinable!(course_users -> courses (course_id));
 joinable!(course_users -> users (user_id));
 joinable!(event_attendees -> courses (event_id));
@@ -136,7 +128,6 @@ joinable!(repo_items -> categories (category_id));
 
 allow_tables_to_appear_in_same_query!(
     categories,
-    course_events,
     course_users,
     courses,
     event_attendees,

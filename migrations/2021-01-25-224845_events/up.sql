@@ -6,5 +6,7 @@ CREATE TABLE events (
     audience TEXT,
     datetime DATETIME NOT NULL,
     status TEXT,
+    course_id INTEGER;
     PRIMARY KEY (id)
+    FOREIGN KEY (course_id) REFERENCES courses(id)
 );

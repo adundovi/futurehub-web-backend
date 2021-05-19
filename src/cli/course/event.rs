@@ -49,6 +49,6 @@ pub fn f(args: &clap::ArgMatches) {
 fn list_events(id: i32) {
     let conn = db::establish_connection();
     for (i, p) in db::models::course::Course::list_events(&conn, id).iter().enumerate() {
-                println!("{}.\t{}({})\t{}", i+1, p.0.title, p.0.id, p.0.datetime);
+                println!("{}.\t{}({})\t{}", i+1, p.title, p.id, p.datetime);
     }
 }
