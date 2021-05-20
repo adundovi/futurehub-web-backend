@@ -65,7 +65,7 @@ fn lvl4_aktivnost(basepath: &Path) -> () {
 
 fn lvl3_aktivnosti(basepath: &Path, dt: DateTime<Utc>) -> () {
     let conn = db::establish_connection();
-    for (e, c) in db::models::event::query_with_course_by_month(&conn, &dt) {
+    for (e, c) in db::models::event::Event::query_with_course_by_month(&conn, &dt) {
         let activity = format!("{}-{}",
                                c.code,
                                e.datetime.date());

@@ -19,7 +19,7 @@ fn edit_event(id: i32) {
 
     let conn = db::establish_connection();
 
-    let item = db::models::event::get(&conn, id).expect("Id not found");
+    let item = db::models::event::Event::get(&conn, id).expect("Id not found");
     let mut new_item = item.clone();
 
     new_item.title = edit_line(&new_item.title, "Title");
@@ -28,5 +28,5 @@ fn edit_event(id: i32) {
     new_item.audience = edit_option_line(&new_item.audience, "Audience");
     new_item.status = edit_option_line(&new_item.status, "Status");
     
-    db::models::event::update(&conn, &new_item);
+    db::models::event::Event::update(&conn, &new_item);
 }

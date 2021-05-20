@@ -51,7 +51,7 @@ pub fn f(args: &clap::ArgMatches) {
             };
 
             if eid.is_some() && uid.is_some() {
-                db::models::event::add_attendee(eid.unwrap(), uid.unwrap(), &conn);
+                db::models::event::Event::add_attendee(eid.unwrap(), uid.unwrap(), &conn);
             }
        },
        Some(("list",  args)) => {
@@ -92,7 +92,7 @@ pub fn f(args: &clap::ArgMatches) {
             };
 
             if eid.is_some() && uid.is_some() {
-                db::models::event::remove_attendee(eid.unwrap(), uid.unwrap(), &conn);
+                db::models::event::Event::remove_attendee(eid.unwrap(), uid.unwrap(), &conn);
             }
        },
         Some((&_, _)) => print!("No subcommand selected"),
@@ -102,7 +102,7 @@ pub fn f(args: &clap::ArgMatches) {
 
 fn list_attendees(id: i32) {
     let conn = db::establish_connection();
-    for (i, p) in db::models::event::list_attendees(&conn, id).iter().enumerate() {
+    for (i, p) in db::models::event::Event::list_attendees(&conn, id).iter().enumerate() {
                 let presence = match p.1.presence.as_ref() {
                     Some(p) => p,
                     None => "",
@@ -113,7 +113,7 @@ fn list_attendees(id: i32) {
 
 fn edit_attendees(id: i32) {
     let conn = db::establish_connection();
-    let item = db::models::event::list_attendees(&conn, id);
+    let item = db::models::event::Event::list_attendees(&conn, id);
     let mut new_item: Vec<EventAttendee> = vec![];
 
     for (u, i) in item {
@@ -130,16 +130,16 @@ fn edit_attendees(id: i32) {
         new_item.push(ea);
     }
     
-    db::models::event::update_attendees(&conn, &new_item);
+    db::models::event::Event::update_attendees(&conn, &new_item);
 }
 
 fn export_list(id: i32) {
     let conn = db::establish_connection();
-    let event = db::models::event::get(&conn, id).expect("Not found");
-    let course = db::models::event::get_course_by_event(&conn, id);
+    let event = db::models::event::Event::get(&conn, id).expect("Not found");
+    let course = db::models::event::Event::get_course_by_event(&conn, id);
     let first_date = db::models::course::Course::first_date(course.id, &conn);
     let last_date = db::models::course::Course::last_date(course.id, &conn);
-    let users_event_attendees = db::models::event::list_attendees(&conn, id);
+    let users_event_attendees = db::models::event::Event::list_attendees(&conn, id);
     let event_datetime = event.datetime;
     let event_id = event.id;
 

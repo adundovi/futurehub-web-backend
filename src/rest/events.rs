@@ -55,14 +55,14 @@ fn response_events(events_course: Vec<(Event, Option<Course>)>) -> Json<JsonApiR
 
 #[get("/events")]
 pub fn get(conn: MainDbConn) -> Json<JsonApiResponse> {
-    let events_course = event::query(&conn);
+    let events_course = event::Event::query(&conn);
 //    let events = events_course.iter().map(|i| i.0).collect();
     response_events(events_course)
 }
 
 #[get("/events/upcoming")]
 pub fn get_upcoming(conn: MainDbConn) -> Json<JsonApiResponse> {
-    let events_course = event::query_upcoming(&conn, 10);
+    let events_course = event::Event::query_upcoming(&conn, 10);
 //    let events = events_course.iter().map(|i| i.0).collect();
     response_events(events_course)
 }
