@@ -29,7 +29,7 @@ pub struct JsonApiResponse {
     data: Vec<EventWrapper>,
 }
 
-fn response_events(events_course: Vec<(Event, Course)>) -> Json<JsonApiResponse> {
+fn response_events(events_course: Vec<(Event, Option<Course>)>) -> Json<JsonApiResponse> {
     let mut response = JsonApiResponse { data: vec![], };
     
     for (event, course) in events_course {
@@ -40,7 +40,13 @@ fn response_events(events_course: Vec<(Event, Course)>) -> Json<JsonApiResponse>
             datetime: event.datetime,
             audience: event.audience,
             status: event.status,
-            course_code: Some(course.code)};
+            course_code: {
+                match course {
+                    Some(c) => Some(c.code),
+                    None => None,
+                }
+            }
+        };
         let eventw = EventWrapper{ id: event.id, r#type: "event".to_string(), attributes: attribs };
         response.data.push(eventw);
     }

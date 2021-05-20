@@ -2,6 +2,7 @@ use bcrypt::{hash, verify};
 use diesel::{prelude::*, sqlite::SqliteConnection};
 use chrono::prelude::*;
 use uuid::Uuid;
+use diesel::query_builder::AsQuery;
 
 use crate::rest::jwt::UserToken;
 use crate::db::model_traits::Queries;

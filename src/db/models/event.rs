@@ -70,7 +70,14 @@ pub struct EventAttendee {
 
 pub fn insert(conn: &SqliteConnection, title: String, datetime_utc: &DateTime<Utc>) {
     let datetime = datetime_utc.naive_utc();
-    let event = NewEvent { datetime, title, body: None, place: None, audience: None, status: None, course_id: None };
+    let event = NewEvent {
+        datetime,
+        title,
+        body: None,
+        place: None,
+        audience: None,
+        status: None,
+        course_id: None };
 
     diesel::insert_into(events::table)
         .values(&event)
@@ -104,11 +111,11 @@ pub fn get(conn: &SqliteConnection, id: i32) -> Result<Event, diesel::result::Er
         .first::<Event>(conn)
 }
 
-pub fn query(conn: &SqliteConnection) -> Vec<(Event, Course)> {
+pub fn query(conn: &SqliteConnection) -> Vec<(Event, Option<Course>)> {
     events::table
-        .inner_join(courses::table)
+        .left_join(courses::table)
         .order(events::datetime.asc())
-        .load::<(Event, Course)>(conn)
+        .load::<(Event, Option<Course>)>(conn)
         .expect("Error loading events")
 }
 
@@ -125,15 +132,15 @@ fn end_of_month(datetime_utc: &DateTime<Utc>) -> NaiveDateTime {
     NaiveDate::from_ymd(year, month, 1).pred().and_time(NaiveTime::from_hms(23,59,59))
 }
 
-pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, Course)> {
+pub fn query_by_month(conn: &SqliteConnection, datetime_utc: &DateTime<Utc>) -> Vec<(Event, Option<Course>)> {
     let start = beginning_of_month(datetime_utc);
     let end = end_of_month(datetime_utc);
     Local::now().to_string().into_sql::<Timestamp>();
     events::table
-        .inner_join(courses::table)
+        .left_join(courses::table)
         .filter(events::datetime.ge(start).and(events::datetime.le(end)))
         .order(events::datetime.asc())
-        .load::<(Event, Course)>(conn)
+        .load::<(Event, Option<Course>)>(conn)
         .expect("Error loading events")
 }
 
@@ -150,14 +157,14 @@ pub fn query_with_course_by_month(conn: &SqliteConnection, datetime_utc: &DateTi
         .expect("Error loading data")
 }
 
-pub fn query_upcoming(conn: &SqliteConnection, last: i64) -> Vec<(Event, Course)> {
+pub fn query_upcoming(conn: &SqliteConnection, last: i64) -> Vec<(Event, Option<Course>)> {
     let local_time = Local::now().to_string().into_sql::<Timestamp>();
     events::table
-        .inner_join(courses::table)
+        .left_join(courses::table)
         .filter(events::datetime.ge(local_time))
         .order(events::datetime.asc())
         .limit(last)
-        .load::<(Event, Course)>(conn)
+        .load::<(Event, Option<Course>)>(conn)
         .expect("Error loading events")
 }
 
