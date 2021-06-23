@@ -1,10 +1,15 @@
 use rocket_contrib::json::Json;
+use rocket::response::status;
+use rocket::http::Status;
+use super::response::{Response, ResponseWithStatus};
+use crate::consts::messages;
 use crate::db::{
     MainDbConn,
     models::event,
     models::event::Event,
     models::course::Course};
 use chrono::NaiveDateTime;
+use super::jwt::UserToken;
 
 #[derive(Serialize)]
 pub struct EventAttribs {
@@ -65,4 +70,70 @@ pub fn get_upcoming(conn: MainDbConn) -> Json<JsonApiResponse> {
     let events_course = event::Event::query_upcoming(&conn, 10);
 //    let events = events_course.iter().map(|i| i.0).collect();
     response_events(events_course)
+}
+
+#[options("/events")]
+pub fn option_event<'a>() -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[post("/events", format = "json", data = "<event>")]
+pub fn post_event(
+    event: Json<event::NewEvent>,
+    token: Result<UserToken, status::Custom<Json<Response>>>,
+    conn: MainDbConn,
+) -> status::Custom<Json<Response>> {
+    if let Err(e) = token {
+        return e;
+    }
+    //let t = token.unwrap();
+    //TODO: group permission for this 
+    event::Event::insert_full(&conn, &event);
+
+    let response = ResponseWithStatus {
+            status_code: Status::Ok.code,
+            response: Response {
+                message: String::from(messages::MESSAGE_SENT_SUCCESS),
+                data: serde_json::to_value("").unwrap(),
+            },
+    };
+
+    status::Custom(
+        Status::from_code(response.status_code).unwrap(),
+        Json(response.response),
+    )
+}
+
+#[options("/events/<_id>")]
+pub fn option_event_id<'a>(_id: i32) -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[delete("/events/<id>")]
+pub fn delete_event(
+    conn: MainDbConn,
+    token: Result<UserToken, status::Custom<Json<Response>>>,
+    id: i32
+) -> status::Custom<Json<Response>> {
+    if let Err(e) = token {
+        return e;
+    }
+    event::Event::remove(&conn, id);
+
+    let response = ResponseWithStatus {
+            status_code: Status::Ok.code,
+            response: Response {
+                message: String::from(messages::MESSAGE_SENT_SUCCESS),
+                data: serde_json::to_value("").unwrap(),
+            },
+    };
+
+    status::Custom(
+        Status::from_code(response.status_code).unwrap(),
+        Json(response.response),
+    )
 }

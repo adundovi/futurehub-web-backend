@@ -33,7 +33,7 @@ impl Fairing for CORS {
 
     fn on_response(&self, _request: &Request, response: &mut Response) {
         response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS"));
+        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS, DELETE"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
     }
@@ -44,6 +44,10 @@ fn main() {
         .mount("/api", routes![
                events::get,
                events::get_upcoming,
+               events::post_event,
+               events::option_event,
+               events::delete_event,
+               events::option_event_id,
                posts::get,
                posts::get_by_id,
                posts::get_by_slug,
