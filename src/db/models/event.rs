@@ -198,6 +198,7 @@ impl Event {
                 events::body.eq(&event.body),
                 events::audience.eq(&event.audience),
                 events::status.eq(&event.status),
+                events::course_id.eq(&event.course_id),
             ))
             .execute(conn)
             .expect(&format!("Error updating event with id = {}", event.id));
