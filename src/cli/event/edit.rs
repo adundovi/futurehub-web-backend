@@ -3,6 +3,7 @@ use crate::tools::cli_edit::{
     edit_line,
     edit_datetime,
     edit_option_line,
+    edit_option_number,
 };
 
 pub fn f(args: &clap::ArgMatches) {
@@ -27,6 +28,7 @@ fn edit_event(id: i32) {
     new_item.place = edit_option_line(&new_item.place, "Place");
     new_item.audience = edit_option_line(&new_item.audience, "Audience");
     new_item.status = edit_option_line(&new_item.status, "Status");
+    new_item.course_id = edit_option_number(new_item.course_id, "Course ID");
     
     db::models::event::Event::update(&conn, &new_item);
 }
