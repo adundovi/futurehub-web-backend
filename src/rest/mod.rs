@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod category;
+pub mod common;
 pub mod contact;
 pub mod courses;
 pub mod events;
@@ -8,3 +9,4 @@ pub mod posts;
 pub mod profile;
 pub mod repo;
 pub mod response;
+pub mod users;

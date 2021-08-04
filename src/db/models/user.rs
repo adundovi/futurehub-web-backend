@@ -24,12 +24,27 @@ pub struct LoginInfo {
     pub login_session: String,
 }
 
-#[derive(Queryable, Serialize, Clone)]
+#[derive(Queryable, Serialize, Deserialize, Clone)]
 pub struct User {
     pub id: i32,
     pub username: String,
     pub email: String,
     pub password: Option<String>,
+    pub login_session: Option<String>,
+    pub oib: Option<String>,
+    pub name: Option<String>,
+    pub surname: Option<String>,
+    pub address: Option<String>,
+    pub phone: Option<String>,
+    pub gender: Option<String>,
+    pub birthday: Option<NaiveDateTime>,
+    pub creation_date: NaiveDateTime,
+}
+
+#[derive(Serialize)]
+pub struct UserAttribs {
+    pub username: String,
+    pub email: String,
     pub login_session: Option<String>,
     pub oib: Option<String>,
     pub name: Option<String>,

@@ -9,14 +9,15 @@ use rocket::http::Header;
 
 use futurehub_web_backend::db;
 use futurehub_web_backend::rest::{
+    auth,
     courses,
     category,
+    contact,
     events,
     posts,
     profile,
     repo,
-    contact,
-    auth,
+    users,
 };
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -67,6 +68,7 @@ fn main() {
                auth::post_signup,
                profile::get_info,
                profile::option_info,
+               users::get,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

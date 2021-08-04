@@ -4,10 +4,11 @@ use std::collections::HashMap;
 use crate::cli::menu::{Menu, Subcommand};
 
 mod create;
+mod edit;
+mod export_csv;
 mod list;
 mod remove;
 mod dropall;
-mod edit;
 mod password;
 
 pub fn menu<'a>() -> Menu<'a> {
@@ -105,6 +106,13 @@ pub fn menu<'a>() -> Menu<'a> {
             f: &password::f
     };
     m.push_subcommand("password", menu_password);
+    
+    let menu_export_csv = Subcommand {
+            app: App::new("export_csv")
+                .about("Export users to CSV"),
+            f: &export_csv::f
+    };
+    m.push_subcommand("export_csv", menu_export_csv);
 
     m
 }
