@@ -33,5 +33,5 @@ fn edit_item(id: i32) {
     new_item.birthday = edit_option_datetime(&item.birthday, "Birthday");
     new_item.gender = edit_option_line(&item.gender, "Gender");
     
-    db::models::user::User::update(&new_item, &conn);
+    db::models::user::User::update(&conn, &new_item);
 }

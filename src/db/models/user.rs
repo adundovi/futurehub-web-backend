@@ -41,7 +41,7 @@ pub struct User {
     pub creation_date: NaiveDateTime,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct UserAttribs {
     pub username: String,
     pub email: String,
@@ -53,6 +53,7 @@ pub struct UserAttribs {
     pub phone: Option<String>,
     pub gender: Option<String>,
     pub birthday: Option<NaiveDateTime>,
+    #[serde(with = "import::date_serializer")]
     pub creation_date: NaiveDateTime,
 }
 
@@ -109,9 +110,9 @@ impl Queries for User {
 }
 
 impl User {
-    pub fn create(username: String,
-                 email: String,
-                 conn: &SqliteConnection) -> bool {
+    pub fn create(conn: &SqliteConnection,
+                  username: String,
+                  email: String) -> bool {
 
         let user = NewUser {
             username: username,
@@ -133,8 +134,8 @@ impl User {
             .is_ok()
     }
     
-    pub fn create_with_password(user: UserDTO,
-                 conn: &SqliteConnection) -> bool {
+    pub fn create_with_password(conn: &SqliteConnection,
+                                user: UserDTO) -> bool {
         
         let hash_password = Some(hash(user.password, DEFAULT_COST).unwrap());
 
@@ -158,8 +159,8 @@ impl User {
             .is_ok()
     }
     
-    pub fn create_full(user: NewUser,
-                 conn: &SqliteConnection) -> bool {
+    pub fn create_full(conn: &SqliteConnection,
+                       user: NewUser) -> bool {
         let hashed_pwd = match user.password {
             Some(pwd) => Some(hash(pwd, DEFAULT_COST).unwrap()),
             None => None };
@@ -168,18 +169,19 @@ impl User {
             ..user
         };
         diesel::insert_into(users::table)
-            .values(&user)
+            .values(user)
             .execute(conn)
             .is_ok()
     }
 
-    pub fn get_user_by_username(username: &str, conn: &SqliteConnection) -> Result<User, diesel::result::Error> {
+    pub fn get_user_by_username(conn: &SqliteConnection,
+                                username: &str) -> Result<User, diesel::result::Error> {
         users::table
             .filter(users::username.eq(username))
             .first::<User>(conn)
     }
 
-    pub fn update(user: &User, conn: &SqliteConnection) {
+    pub fn update(conn: &SqliteConnection, user: &User) {
         diesel::update(users::table.filter(users::id.eq(user.id)))
         .set((users::username.eq(&user.username),
               users::email.eq(&user.email),
@@ -195,7 +197,7 @@ impl User {
         .expect(&format!("Error updating user with id = {}", user.id));
     }
 
-    pub fn update_password(id: i32, plaintext_password: String, conn: &SqliteConnection) {
+    pub fn update_password(conn: &SqliteConnection, id: i32, plaintext_password: String) {
         let hash_password = Some(hash(plaintext_password, DEFAULT_COST).unwrap());
         
         diesel::update(users::table.filter(users::id.eq(id)))
@@ -204,8 +206,8 @@ impl User {
         .expect(&format!("Error updating user password with user id = {}", id));
     }
 
-    pub fn login(login: LoginData,
-                 conn: &SqliteConnection) -> Option<LoginInfo> {
+    pub fn login(conn: &SqliteConnection,
+                 login: LoginData) -> Option<LoginInfo> {
         
         let user_to_verify = users::table
             .filter(users::username.eq(&login.username_or_email))
@@ -228,8 +230,7 @@ impl User {
                         }
 
                         let login_session_str = User::generate_login_session();
-                        User::update_login_session_to_db(&user_to_verify.username, &login_session_str, conn);
-                        
+                        User::update_login_session_to_db(conn, &user_to_verify.username, &login_session_str);  
                         Some(LoginInfo {
                             username: user_to_verify.username,
                             login_session: login_session_str,
@@ -248,7 +249,7 @@ impl User {
         Uuid::new_v4().to_simple().to_string()
     }
 
-    pub fn is_valid_login_session(user_token: &UserToken, conn: &SqliteConnection) -> bool {
+    pub fn is_valid_login_session(conn: &SqliteConnection, user_token: &UserToken) -> bool {
         users::table
             .filter(users::username.eq(&user_token.user))
             .filter(users::login_session.eq(&user_token.login_session))
@@ -256,9 +257,10 @@ impl User {
             .is_ok()
     }
 
-    pub fn update_login_session_to_db(username: &str, login_session_str: &str,
-                                      conn: &SqliteConnection) -> bool {
-        if let Ok(user) = User::get_user_by_username(username, conn) {
+    pub fn update_login_session_to_db(conn: &SqliteConnection,
+                                      username: &str,
+                                      login_session_str: &str) -> bool {
+        if let Ok(user) = User::get_user_by_username(conn, username) {
             diesel::update(users::table.find(user.id))
             .set(users::login_session.eq(login_session_str.to_string()))
             .execute(conn)

@@ -32,7 +32,7 @@ pub fn f(args: &clap::ArgMatches) {
 fn set_password(id: i32) {
     let conn = db::establish_connection();
     let plaintext_password = edit_line(&"".to_string(), "New password");
-    db::models::user::User::update_password(id, plaintext_password, &conn);
+    db::models::user::User::update_password(&conn, id, plaintext_password);
 }
 
 fn check_password(id: i32) {
@@ -45,7 +45,7 @@ fn check_password(id: i32) {
         username_or_email: user.username,
         password: plaintext_password,
     };
-    if db::models::user::User::login(l, &conn).is_some() {
+    if db::models::user::User::login(&conn, l).is_some() {
         print!("Password OK!");
     } else {
         print!("Passwords do not match!!");

@@ -7,8 +7,8 @@ use crate::db;
 use crate::rest::jwt;
 use crate::consts::messages;
 
-pub fn login_user(login: db::models::user::LoginData, conn: db::MainDbConn) -> ResponseWithStatus {
-    if let Some(result) = db::models::user::User::login(login, &conn) {
+pub fn login_user(conn: &db::MainDbConn, login: db::models::user::LoginData) -> ResponseWithStatus {
+    if let Some(result) = db::models::user::User::login(&conn, login) {
         ResponseWithStatus {
             status_code: Status::Ok.code,
             response: Response {
@@ -37,15 +37,15 @@ pub fn option_login<'a>() -> rocket::Response<'a> {
 
 #[post("/auth/login", format = "json", data = "<login>")]
 pub fn post_login(login: Json<db::models::user::LoginData>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
-    let response = login_user(login.0, conn);
+    let response = login_user(&conn, login.0);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),
         Json(response.response),
     )
 }
 
-pub fn signup(user: db::models::user::UserDTO, conn: db::MainDbConn) -> ResponseWithStatus {
-    if db::models::user::User::create_with_password(user, &conn) {
+pub fn signup(conn: &db::MainDbConn, user: db::models::user::UserDTO) -> ResponseWithStatus {
+    if db::models::user::User::create_with_password(conn, user) {
         ResponseWithStatus {
             status_code: Status::Ok.code,
             response: Response {
@@ -66,7 +66,7 @@ pub fn signup(user: db::models::user::UserDTO, conn: db::MainDbConn) -> Response
 
 #[post("/auth/signup", format = "json", data = "<user>")]
 pub fn post_signup(user: Json<db::models::user::UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
-    let response = signup(user.0, conn);
+    let response = signup(&conn, user.0);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),
         Json(response.response),

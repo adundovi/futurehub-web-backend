@@ -34,7 +34,7 @@ impl Fairing for CORS {
 
     fn on_response(&self, _request: &Request, response: &mut Response) {
         response.set_header(Header::new("Access-Control-Allow-Origin", "*"));
-        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, OPTIONS, DELETE"));
+        response.set_header(Header::new("Access-Control-Allow-Methods", "POST, GET, PATCH, PUT, OPTIONS, DELETE"));
         response.set_header(Header::new("Access-Control-Allow-Headers", "*"));
         response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
     }
@@ -69,6 +69,11 @@ fn main() {
                profile::get_info,
                profile::option_info,
                users::get,
+               users::option,
+               users::post,
+               users::option_by_id,
+               users::delete_by_id,
+               users::put_by_id,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

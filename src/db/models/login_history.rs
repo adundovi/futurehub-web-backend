@@ -24,7 +24,7 @@ pub struct LoginHistoryInsertable {
 
 impl LoginHistory {
     pub fn create(username: &str, conn: &SqliteConnection) -> Option<LoginHistoryInsertable> {
-        if let Ok(user) = User::get_user_by_username(username, conn) {
+        if let Ok(user) = User::get_user_by_username(conn, username) {
             Some(LoginHistoryInsertable {
                 user_id: user.id,
                 login_timestamp: Utc::now().naive_utc(),

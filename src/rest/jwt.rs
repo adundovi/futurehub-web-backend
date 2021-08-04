@@ -37,7 +37,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserToken {
             if authen_str.starts_with("Bearer") {
                 let token = authen_str[6..authen_str.len()].trim();
                 if let Ok(token_data) = decode_token(token.to_string()) {
-                    if verify_token(&token_data, &conn) {
+                    if verify_token(&conn, &token_data) {
                         return Outcome::Success(token_data.claims);
                     }
                 } 
@@ -75,6 +75,6 @@ fn decode_token(token: String) -> Result<TokenData<UserToken>> {
     jsonwebtoken::decode::<UserToken>(&token, &DecodingKey::from_secret(key), &Validation::default())
 }
 
-fn verify_token(token_data: &TokenData<UserToken>, conn: &db::MainDbConn) -> bool {
-    db::models::user::User::is_valid_login_session(&token_data.claims, conn)
+fn verify_token(conn: &db::MainDbConn, token_data: &TokenData<UserToken>) -> bool {
+    db::models::user::User::is_valid_login_session(conn, &token_data.claims)
 }

@@ -7,8 +7,8 @@ use crate::db;
 use crate::rest::jwt;
 use crate::consts::messages;
 
-fn get_profile(username: &str, conn: db::MainDbConn) -> ResponseWithStatus {
-    let user = db::models::user::User::get_user_by_username(username, &conn).unwrap();
+fn get_profile(conn: &db::MainDbConn, username: &str) -> ResponseWithStatus {
+    let user = db::models::user::User::get_user_by_username(&conn, username).unwrap();
     ResponseWithStatus {
         status_code: Status::Ok.code,
         response: Response {
@@ -36,7 +36,7 @@ pub fn get_info(
         return e;
     }
     let t = token.unwrap();
-    let response = get_profile(&t.user, conn);
+    let response = get_profile(&conn, &t.user);
     status::Custom(
         Status::from_code(response.status_code).unwrap(),
         Json(response.response),
