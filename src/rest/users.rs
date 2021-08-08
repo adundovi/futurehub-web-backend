@@ -36,7 +36,7 @@ fn response_users(users: Vec<User>) -> ResponseWithStatus {
         items.push(w);
     }
     
-    Data::Vector(items).get_response()
+    Data::Vector(items).to_response()
 }
 
 #[get("/users")]

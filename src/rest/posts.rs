@@ -21,7 +21,7 @@ pub fn get(conn: db::MainDbConn) -> ResponseWithStatus {
         items.push(w);
     }
     
-    Data::Vector(items).get_response()
+    Data::Vector(items).to_response()
 }
 
 #[get("/posts/<id>")]
@@ -42,7 +42,7 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> ResponseWithStatus {
         None
     );
 
-    Data::Single(item).get_response()
+    Data::Single(item).to_response()
 }
 
 #[get("/posts/<slug>", rank = 2)]
@@ -63,5 +63,5 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> ResponseWithStatus {
         None
     );
 
-    Data::Single(item).get_response()
+    Data::Single(item).to_response()
 }

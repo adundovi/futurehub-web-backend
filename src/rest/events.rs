@@ -31,7 +31,7 @@ fn response_events(events_course: Vec<(Event, Option<Course>)>) -> ResponseWithS
         items.push(w);
     }
     
-    Data::Vector(items).get_response()
+    Data::Vector(items).to_response()
 }
 
 #[get("/events")]
@@ -48,14 +48,14 @@ pub fn get_upcoming(conn: MainDbConn) -> ResponseWithStatus {
 }
 
 #[options("/events")]
-pub fn option_event<'a>() -> rocket::Response<'a> {
+pub fn option<'a>() -> rocket::Response<'a> {
     let mut res = rocket::Response::new();
     res.set_status(Status::new(200, "No Content"));
     res
 }
 
 #[post("/events", format = "json", data = "<event>")]
-pub fn post_event(
+pub fn post(
     event: Json<event::NewEvent>,
     token: Result<UserToken, ResponseWithStatus>,
     conn: MainDbConn,
@@ -76,14 +76,14 @@ pub fn post_event(
 }
 
 #[options("/events/<_id>")]
-pub fn option_event_id<'a>(_id: i32) -> rocket::Response<'a> {
+pub fn option_by_id<'a>(_id: i32) -> rocket::Response<'a> {
     let mut res = rocket::Response::new();
     res.set_status(Status::new(200, "No Content"));
     res
 }
 
 #[delete("/events/<id>")]
-pub fn delete_event(
+pub fn delete_by_id(
     conn: MainDbConn,
     token: Result<UserToken, ResponseWithStatus>,
     id: i32
@@ -92,6 +92,36 @@ pub fn delete_event(
         return e;
     }
     event::Event::remove(&conn, id);
+
+    ResponseWithStatus {
+            status: Status::Ok,
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
+    }
+}
+
+#[put("/events/<id>", format = "json", data = "<event>")]
+pub fn put_by_id(
+    conn: MainDbConn,
+    token: Result<UserToken, ResponseWithStatus>,
+    id: i32,
+    event: Json<EventAttribs>) -> ResponseWithStatus {
+    if let Err(e) = token {
+        return e;
+    }
+    
+    let item = Event::get(&conn, id).expect("Id not found");
+    let mut updated_item = item.clone();
+    
+    updated_item.title = event.title.clone();
+    updated_item.body = event.body.clone();
+    updated_item.place = event.place.clone();
+    updated_item.datetime = event.datetime.clone();
+    updated_item.audience = event.audience.clone();
+    updated_item.status = event.status.clone();
+    
+    Event::update(&conn, &updated_item);
 
     ResponseWithStatus {
             status: Status::Ok,

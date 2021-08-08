@@ -78,7 +78,7 @@ pub enum Data {
 }
 
 impl Data {
-    pub fn get_response(self) -> ResponseWithStatus {
+    pub fn to_response(self) -> ResponseWithStatus {
         ResponseWithStatus {
             status: Status::Ok,
             response: Response::Data(self)

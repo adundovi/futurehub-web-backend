@@ -40,5 +40,5 @@ fn edit_item(id: i32) {
     new_item.finished = edit_bool(item.finished, "Finished");
     new_item.published = edit_bool(item.published, "Published");
             
-    db::models::course::Course::update(&new_item, &conn);
+    db::models::course::Course::update(&conn, &new_item);
 }

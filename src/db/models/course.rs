@@ -63,6 +63,7 @@ pub struct CourseAttribs {
     pub students: Option<i32>,
     pub max_students: Option<i32>,
     pub finished: bool,
+    pub published: bool,
 }
 
 #[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
@@ -142,6 +143,14 @@ impl Course {
             .is_ok()
     }
     
+    pub fn create_full(conn: &SqliteConnection,
+                       course: NewCourse) -> bool {
+        diesel::insert_into(courses::table)
+            .values(course)
+            .execute(conn)
+            .is_ok()
+    }
+    
     pub fn get_published(conn: &SqliteConnection, id: i32) -> QueryResult<Course> {
         courses::table
             .filter(courses::id.eq(id).and(courses::published.eq(true)))
@@ -167,7 +176,7 @@ impl Course {
             .load::<Course>(conn)
     }
     
-    pub fn update(course: &Course, conn: &SqliteConnection) {
+    pub fn update(conn: &SqliteConnection, course: &Course) {
         diesel::update(courses::table.filter(courses::id.eq(course.id)))
         .set((courses::code.eq(&course.code),
               courses::title.eq(&course.title),

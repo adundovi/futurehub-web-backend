@@ -1,8 +1,25 @@
-use crate::db;
-use crate::db::models::course::{Course, CourseAttribs};
-use crate::db::models::event::{Event, EventAttribs};
-use super::response::{ResponseWithStatus};
-use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs};
+use crate::db::{
+    MainDbConn,
+    models::{
+        course::{NewCourse, Course, CourseAttribs},
+        event::{Event, EventAttribs},
+    },
+};
+use crate::db::model_traits::Queries;
+use crate::consts::messages;
+use super::response::{
+    Response,
+    Message,
+    ResponseWithStatus,
+    Data,
+    SingleItem,
+    VectorItems,
+    ItemWrapper,
+    Attribs
+};
+use rocket::http::Status;
+use super::jwt::UserToken;
+use rocket_contrib::json::Json;
 
 fn response_courses(courses: Vec<Course>) -> ResponseWithStatus {
     let mut items = VectorItems::new();
@@ -20,16 +37,17 @@ fn response_courses(courses: Vec<Course>) -> ResponseWithStatus {
                         students: c.students,
                         max_students: c.max_students,
                         finished: c.finished,
+                        published: c.published,
                     };
         let w = ItemWrapper::new(c.id, "course", Attribs::CourseAttribs(attribs));
         items.push(w);
     }
     
-    Data::Vector(items).get_response()
+    Data::Vector(items).to_response()
 }
 
 #[get("/courses")]
-pub fn get(conn: db::MainDbConn) -> ResponseWithStatus {
+pub fn get(conn: MainDbConn) -> ResponseWithStatus {
     let courses = Course::get_all_published(&conn).unwrap();
     response_courses(courses)
 }
@@ -48,17 +66,18 @@ fn response_course(c: Course) -> ResponseWithStatus {
          students: c.students,
          max_students: c.max_students,
          finished: c.finished,
+         published: c.published,
     };
     
     let item = SingleItem::new(
         ItemWrapper::new(c.id, "course", Attribs::CourseAttribs(attribs)),
         None);
     
-    Data::Single(item).get_response()
+    Data::Single(item).to_response()
 }
 
 #[get("/courses/<id>")]
-pub fn get_by_id(conn: db::MainDbConn, id: i32) -> ResponseWithStatus {
+pub fn get_by_id(conn: MainDbConn, id: i32) -> ResponseWithStatus {
     let p = Course::get_published(&conn, id).unwrap();
     response_course(p)
 }
@@ -77,6 +96,7 @@ fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithSta
          students: c.students,
          max_students: c.max_students,
          finished: c.finished,
+         published: c.published,
     };
     
     let mut includes: Vec<ItemWrapper> = vec![];
@@ -101,7 +121,7 @@ fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithSta
         Some(includes)
     );
 
-    Data::Single(item).get_response()
+    Data::Single(item).to_response()
 }
 
 #[derive(FromFormValue)]
@@ -110,7 +130,7 @@ pub enum CourseInclude {
 }
 
 #[get("/courses/<code>?<include>", rank = 2)]
-pub fn get_by_code(conn: db::MainDbConn, code: String,
+pub fn get_by_code(conn: MainDbConn, code: String,
                    include: Option<CourseInclude>) -> ResponseWithStatus {
     let p = Course::get_published_by_code(&conn, &code).unwrap();
     
@@ -126,68 +146,90 @@ pub fn get_by_code(conn: db::MainDbConn, code: String,
     response
 }
 
-/*
-fn course2json(p: Course) -> Option<Json<JsonSingleApiResponse>> {
-    let attribs = CourseAttribs{
-         title: p.title,
-         code: p.code,
-         description: p.description,
-         creation_date: p.creation_date,
-         lecturer: p.lecturer,
-         organizer: p.organizer,
-         lectures: p.lectures,
-         lecture_duration: p.lecture_duration,
-         students: p.students,
-         max_students: p.max_students,
-         finished: p.finished,
-    };
-
-    Some(Json(JsonSingleApiResponse{
-        data: CourseWrapper{
-            id: p.id,
-            r#type: "course".to_string(),
-            attributes: attribs },
-        included: None,
-    }))
+#[options("/courses")]
+pub fn option<'a>() -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
 }
 
-fn course2json_with_events(p: Course, events: Vec<Event>) -> Option<Json<JsonSingleApiResponse>> {
-    let attribs = CourseAttribs{
-         title: p.title,
-         code: p.code.clone(),
-         description: p.description,
-         creation_date: p.creation_date,
-         lecturer: p.lecturer,
-         organizer: p.organizer,
-         lectures: p.lectures,
-         lecture_duration: p.lecture_duration,
-         students: p.students,
-         max_students: p.max_students,
-         finished: p.finished,
-    };
-
-    let mut includes: Vec<EventWrapper> = vec![];
-
-    for e in events {
-        let attribs = EventAttribs{
-            title: e.title,
-            body: e.body,
-            place: e.place,
-            datetime: e.datetime,
-            audience: e.audience,
-            status: e.status,
-            course_code: Some(p.code.clone())};
-        let eventw = EventWrapper{ id: e.id, r#type: "event".to_string(), attributes: attribs };
-        includes.push(eventw);
+#[post("/courses", format = "json", data = "<course>")]
+pub fn post(
+    conn: MainDbConn,
+    course: Json<NewCourse>,
+    token: Result<UserToken, ResponseWithStatus>) -> ResponseWithStatus {
+    if let Err(e) = token {
+        return e;
     }
+    //let t = token.unwrap();
+    //TODO: group permission for this 
+    Course::create_full(&conn, course.into_inner());
 
-    Some(Json(JsonSingleApiResponse{
-        data: CourseWrapper{
-            id: p.id,
-            r#type: "course".to_string(),
-            attributes: attribs },
-        included: Some(includes),
-    }))
+    ResponseWithStatus {
+            status: Status::Ok,
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
+    }
 }
 
-*/
+#[options("/courses/<_id>")]
+pub fn option_by_id<'a>(_id: i32) -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[delete("/courses/<id>")]
+pub fn delete_by_id(
+    conn: MainDbConn,
+    token: Result<UserToken, ResponseWithStatus>,
+    id: i32) -> ResponseWithStatus {
+    if let Err(e) = token {
+        return e;
+    }
+    Course::remove(&conn, id);
+
+    ResponseWithStatus {
+            status: Status::Ok,
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
+    }
+}
+
+#[put("/courses/<id>", format = "json", data = "<course>")]
+pub fn put_by_id(
+    conn: MainDbConn,
+    token: Result<UserToken, ResponseWithStatus>,
+    id: i32,
+    course: Json<CourseAttribs>) -> ResponseWithStatus {
+    if let Err(e) = token {
+        return e;
+    }
+    
+    let item = Course::get(&conn, id).expect("Id not found");
+    let mut updated_item = item.clone();
+    
+    updated_item.title = course.title.clone();
+    updated_item.code = course.code.clone();
+    updated_item.description = course.description.clone();
+    updated_item.creation_date = course.creation_date.clone();
+    updated_item.lecturer = course.lecturer.clone();
+    updated_item.organizer = course.organizer.clone();
+    updated_item.lectures = course.lectures.clone();
+    updated_item.lecture_duration = course.lecture_duration.clone();
+    updated_item.students = course.students.clone();
+    updated_item.max_students = course.max_students.clone();
+    updated_item.finished = course.finished.clone();
+    updated_item.published = course.published.clone();
+    
+    Course::update(&conn, &updated_item);
+
+    ResponseWithStatus {
+            status: Status::Ok,
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
+    }
+}
