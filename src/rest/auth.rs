@@ -2,7 +2,8 @@ use rocket_contrib::json::Json;
 use serde_json::json;
 use rocket::response::status;
 use rocket::http::Status;
-use super::response::{Response, ResponseWithStatus};
+use super::response;
+use super::response::{Data, Response, ResponseWithStatus};
 use crate::db;
 use crate::rest::jwt;
 use crate::consts::messages;
@@ -11,19 +12,26 @@ pub fn login_user(conn: &db::MainDbConn, login: db::models::user::LoginData) -> 
     if let Some(result) = db::models::user::User::login(&conn, login) {
         ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_LOGIN_SUCCESS),
-                data: serde_json::to_value(json!({ "token": jwt::generate_token(result), "type": "Bearer" }))
-                    .unwrap(),
-            },
+            //message: String::from(messages::MESSAGE_LOGIN_SUCCESS),
+            response: Response::Data(
+                Data::Json(
+                        json!({
+                            "data": {
+                                "token": jwt::generate_token(result),
+                                "type": "Bearer"
+                            }
+                        })
+                    )
+                )
         }
     } else {
         ResponseWithStatus {
             status_code: Status::BadRequest.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_LOGIN_FAILED),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                    response::Message::new(
+                        String::from(messages::MESSAGE_LOGIN_FAILED)
+                        )
+                )
         }
     }
 }
@@ -48,18 +56,18 @@ pub fn signup(conn: &db::MainDbConn, user: db::models::user::UserDTO) -> Respons
     if db::models::user::User::create_with_password(conn, user) {
         ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SIGNUP_SUCCESS),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                response::Message::new(
+                    String::from(messages::MESSAGE_SIGNUP_SUCCESS)
+            )),
         }
     } else {
         ResponseWithStatus {
             status_code: Status::BadRequest.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SIGNUP_FAILED),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                response::Message::new(
+                    String::from(messages::MESSAGE_SIGNUP_FAILED)
+                )),
         }
     }
 }

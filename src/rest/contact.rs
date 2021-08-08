@@ -1,7 +1,7 @@
 use rocket_contrib::json::Json;
 use rocket::response::status;
 use rocket::http::Status;
-use super::response::{Response, ResponseWithStatus};
+use super::response::{Response, ResponseWithStatus, Message};
 use crate::services::mail;
 use crate::consts::messages;
 
@@ -31,10 +31,11 @@ pub fn post_form(form: Json<ContactForm>) -> status::Custom<Json<Response>> {
 
     let response = ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SENT_SUCCESS),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                Message::new(
+                    String::from(messages::MESSAGE_SENT_SUCCESS)
+                )
+            )
     };
 
     status::Custom(

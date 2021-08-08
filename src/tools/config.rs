@@ -7,7 +7,7 @@ use std::error::Error;
 
 use serde::de::DeserializeOwned;
 
-
+/// Loads TOML file into TOML object, returns either TOML object or Error
 pub fn load_toml<T: DeserializeOwned>(filename: &str) -> Result<T, Box<dyn Error>> {
     let filepath: &str = &format!("{}", filename);
 

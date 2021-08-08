@@ -1,35 +1,18 @@
 use rocket_contrib::json::Json;
-use crate::db;
+use rocket::response::status;
+use rocket::http::Status;
+use crate::{
+    db,
+    db::models::post::PostAttribs
+};
 use chrono::NaiveDateTime;
 
-#[derive(Serialize)]
-pub struct PostAttribs {
-    pub title: String,
-    pub slug: String,
-    pub datetime: NaiveDateTime,
-    pub body: Option<String>,
-}
-
-#[derive(Serialize)]
-pub struct PostWrapper {
-    pub id: i32,
-    pub r#type: String,
-    pub attributes: PostAttribs,
-}
-
-#[derive(Serialize)]
-pub struct JsonApiResponse {
-    data: Vec<PostWrapper>,
-}
-
-#[derive(Serialize)]
-pub struct JsonSingleApiResponse {
-    data: PostWrapper,
-}
+use super::response::{Message, Response, ResponseWithStatus};
+use super::response::{SingleItem, VectorItems, Data, ItemWrapper, Attribs};
 
 #[get("/posts")]
-pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
-    let mut response = JsonApiResponse { data: vec![], };
+pub fn get(conn: db::MainDbConn) -> status::Custom<Json<Response>> {
+    let mut items = VectorItems::new();
 
     for p in db::models::post::get_all_published(&conn) {
         let attribs = PostAttribs{
@@ -38,17 +21,22 @@ pub fn get(conn: db::MainDbConn) -> Json<JsonApiResponse> {
             body: p.body,
             datetime: p.datetime,
         };
-        let postw = PostWrapper{ id: p.id, r#type: "post".to_string(), attributes: attribs };
-        response.data.push(postw);
+        let w = ItemWrapper::new(p.id, "post", Attribs::PostAttribs(attribs));
+        items.push(w);
     }
+    
+    let r = Data::Vector(items).get_response();
 
-    Json(response)
+    status::Custom(
+        Status::from_code(r.status_code).unwrap(),
+        Json(r.response),
+    )
 }
 
 #[get("/posts/<id>")]
-pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
+pub fn get_by_id(conn: db::MainDbConn, id: i32) -> status::Custom<Json<Response>> {
 
-    let p = db::models::post::get(&conn, id).ok()?;
+    let p = db::models::post::get(&conn, id).unwrap();
     let attribs = PostAttribs{
          title: p.title,
          slug: p.slug,
@@ -56,18 +44,25 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
          datetime: p.datetime,
     };
 
-    Some(Json(JsonSingleApiResponse{
-        data: PostWrapper{
-            id: p.id,
-            r#type: "post".to_string(),
-            attributes: attribs },
-    }))
+    let item = SingleItem::new(
+        ItemWrapper::new(
+            p.id, "post", Attribs::PostAttribs(attribs)
+            ),
+        None
+    );
+
+    let r = Data::Single(item).get_response();
+    
+    status::Custom(
+        Status::from_code(r.status_code).unwrap(),
+        Json(r.response),
+    )
 }
 
 #[get("/posts/<slug>", rank = 2)]
-pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
+pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> status::Custom<Json<Response>> {
 
-    let p = db::models::post::get_by_slug(&conn, slug).ok()?;
+    let p = db::models::post::get_by_slug(&conn, slug).unwrap();
     let attribs = PostAttribs{
          title: p.title,
          slug: p.slug,
@@ -75,10 +70,17 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
          datetime: p.datetime,
     };
 
-    Some(Json(JsonSingleApiResponse{
-        data: PostWrapper{
-            id: p.id,
-            r#type: "post".to_string(),
-            attributes: attribs },
-    }))
+    let item = SingleItem::new(
+        ItemWrapper::new(
+            p.id, "post", Attribs::PostAttribs(attribs)
+            ),
+        None
+    );
+
+    let r = Data::Single(item).get_response();
+    
+    status::Custom(
+        Status::from_code(r.status_code).unwrap(),
+        Json(r.response),
+    )
 }

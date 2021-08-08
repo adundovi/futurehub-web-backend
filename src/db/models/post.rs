@@ -26,6 +26,15 @@ pub struct Post {
     pub datetime: NaiveDateTime, // UTC
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PostAttribs {
+    pub title: String,
+    pub slug: String,
+    pub datetime: NaiveDateTime,
+    pub body: Option<String>,
+}
+
+
 pub fn insert(connection: &SqliteConnection, title_: String, datetime_utc: &DateTime<Utc>) {
     let datetime_ = datetime_utc.naive_utc();
     let other_slug = text::slugify(&title_);

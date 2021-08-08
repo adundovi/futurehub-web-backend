@@ -1,7 +1,8 @@
 use rocket_contrib::json::Json;
+use serde_json::json;
 use rocket::response::status;
 use rocket::http::Status;
-use super::response::{Response, ResponseWithStatus};
+use super::response::{Data, Response, ResponseWithStatus};
 use jwt::UserToken;
 use crate::db;
 use crate::rest::jwt;
@@ -11,12 +12,13 @@ fn get_profile(conn: &db::MainDbConn, username: &str) -> ResponseWithStatus {
     let user = db::models::user::User::get_user_by_username(&conn, username).unwrap();
     ResponseWithStatus {
         status_code: Status::Ok.code,
-        response: Response {
-            message: String::from(messages::MESSAGE_OK),
-            data: serde_json::to_value(
-                user
-                ).unwrap(),
-        },
+        response: Response::Data(
+            Data::Json(
+                json!({
+                    "data": serde_json::to_value(user).unwrap()
+                }))
+            )
+            //message: String::from(messages::MESSAGE_OK),
     }
 }
 

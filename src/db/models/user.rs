@@ -41,7 +41,7 @@ pub struct User {
     pub creation_date: NaiveDateTime,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UserAttribs {
     pub username: String,
     pub email: String,

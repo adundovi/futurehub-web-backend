@@ -5,7 +5,7 @@ use jsonwebtoken::errors::Result;
 use jsonwebtoken::TokenData;
 use jsonwebtoken::{Header, Validation};
 use jsonwebtoken::{EncodingKey, DecodingKey};
-use crate::rest::response::Response;
+use crate::rest::response::{Message, Response};
 use crate::db::models::user::LoginInfo;
 use rocket::http::Status;
 use rocket::outcome::Outcome;
@@ -48,11 +48,10 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserToken {
             Status::BadRequest,
             status::Custom(
                 Status::Unauthorized,
-                Json(Response {
-                    message: String::from(messages::MESSAGE_INVALID_TOKEN),
-                    data: serde_json::to_value("").unwrap(),
-                }),
-            ),
+                Json(Response::Message(
+                        Message::new(String::from(messages::MESSAGE_INVALID_TOKEN))
+                        ))
+            )
         ))
     }
 }

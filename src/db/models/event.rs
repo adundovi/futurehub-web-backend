@@ -36,6 +36,17 @@ pub struct Event {
     pub course_id: Option<i32>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EventAttribs {
+    pub title: String,
+    pub datetime: NaiveDateTime,
+    pub body: Option<String>,
+    pub place: Option<String>,
+    pub audience: Option<String>,
+    pub status: Option<String>,
+    pub course_code: Option<String>,
+}
+
 #[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
 #[table_name = "event_attendees"]
 #[serde(rename_all = "PascalCase")]

@@ -50,6 +50,21 @@ pub struct Course {
     pub published: bool,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CourseAttribs {
+    pub title: String,
+    pub code: String,
+    pub description: Option<String>,
+    pub creation_date: NaiveDateTime,
+    pub lecturer: Option<String>,
+    pub organizer: Option<String>,
+    pub lectures: Option<i32>,
+    pub lecture_duration: Option<i32>,
+    pub students: Option<i32>,
+    pub max_students: Option<i32>,
+    pub finished: bool,
+}
+
 #[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
 #[table_name = "cusers"]
 #[serde(rename_all = "PascalCase")]

@@ -1,6 +1,5 @@
 pub mod auth;
 pub mod category;
-pub mod common;
 pub mod contact;
 pub mod courses;
 pub mod events;

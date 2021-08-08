@@ -1,7 +1,6 @@
 use rocket_contrib::json::Json;
 use rocket::response::status;
 use rocket::http::Status;
-use super::response::{Response, ResponseWithStatus};
 use crate::db::{
     MainDbConn,
     models::user::{
@@ -12,12 +11,13 @@ use crate::db::{
 };
 use crate::consts::messages;
 use super::jwt::UserToken;
-use super::common::{JsonApiResponse, ItemWrapper, Attribs};
+use super::response::{Message, ResponseWithStatus, Response};
+use super::response::{Data, VectorItems, ItemWrapper, Attribs};
 
 use crate::db::model_traits::Queries;
 
 fn response_users(users: Vec<User>) -> ResponseWithStatus {
-    let mut response = JsonApiResponse { data: vec![], };
+    let mut items = VectorItems::new();
     
     for u in users {
         let attribs = UserAttribs{
@@ -34,10 +34,10 @@ fn response_users(users: Vec<User>) -> ResponseWithStatus {
             creation_date: u.creation_date,
         };
         let w = ItemWrapper::new(u.id, "user", Attribs::UserAttribs(attribs));
-        response.data.push(w);
+        items.push(w);
     }
     
-    response.get_response()
+    Data::Vector(items).get_response()
 }
 
 #[get("/users")]
@@ -76,10 +76,9 @@ pub fn post(
 
     let response = ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SENT_SUCCESS),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
     };
 
     status::Custom(
@@ -107,10 +106,9 @@ pub fn delete_by_id(
 
     let response = ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SENT_SUCCESS),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
     };
 
     status::Custom(
@@ -146,10 +144,9 @@ pub fn put_by_id(
 
     let response = ResponseWithStatus {
             status_code: Status::Ok.code,
-            response: Response {
-                message: String::from(messages::MESSAGE_SENT_SUCCESS),
-                data: serde_json::to_value("").unwrap(),
-            },
+            response: Response::Message(
+                Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
+                )
     };
 
     status::Custom(
