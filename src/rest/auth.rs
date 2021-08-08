@@ -1,6 +1,5 @@
 use rocket_contrib::json::Json;
 use serde_json::json;
-use rocket::response::status;
 use rocket::http::Status;
 use super::response;
 use super::response::{Data, Response, ResponseWithStatus};
@@ -11,7 +10,7 @@ use crate::consts::messages;
 pub fn login_user(conn: &db::MainDbConn, login: db::models::user::LoginData) -> ResponseWithStatus {
     if let Some(result) = db::models::user::User::login(&conn, login) {
         ResponseWithStatus {
-            status_code: Status::Ok.code,
+            status: Status::Ok,
             //message: String::from(messages::MESSAGE_LOGIN_SUCCESS),
             response: Response::Data(
                 Data::Json(
@@ -26,7 +25,7 @@ pub fn login_user(conn: &db::MainDbConn, login: db::models::user::LoginData) -> 
         }
     } else {
         ResponseWithStatus {
-            status_code: Status::BadRequest.code,
+            status: Status::BadRequest,
             response: Response::Message(
                     response::Message::new(
                         String::from(messages::MESSAGE_LOGIN_FAILED)
@@ -44,18 +43,14 @@ pub fn option_login<'a>() -> rocket::Response<'a> {
 }
 
 #[post("/auth/login", format = "json", data = "<login>")]
-pub fn post_login(login: Json<db::models::user::LoginData>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
-    let response = login_user(&conn, login.0);
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+pub fn post_login(login: Json<db::models::user::LoginData>, conn: db::MainDbConn) -> ResponseWithStatus {
+    login_user(&conn, login.0)
 }
 
 pub fn signup(conn: &db::MainDbConn, user: db::models::user::UserDTO) -> ResponseWithStatus {
     if db::models::user::User::create_with_password(conn, user) {
         ResponseWithStatus {
-            status_code: Status::Ok.code,
+            status: Status::Ok,
             response: Response::Message(
                 response::Message::new(
                     String::from(messages::MESSAGE_SIGNUP_SUCCESS)
@@ -63,7 +58,7 @@ pub fn signup(conn: &db::MainDbConn, user: db::models::user::UserDTO) -> Respons
         }
     } else {
         ResponseWithStatus {
-            status_code: Status::BadRequest.code,
+            status: Status::BadRequest,
             response: Response::Message(
                 response::Message::new(
                     String::from(messages::MESSAGE_SIGNUP_FAILED)
@@ -73,10 +68,6 @@ pub fn signup(conn: &db::MainDbConn, user: db::models::user::UserDTO) -> Respons
 }
 
 #[post("/auth/signup", format = "json", data = "<user>")]
-pub fn post_signup(user: Json<db::models::user::UserDTO>, conn: db::MainDbConn) -> status::Custom<Json<Response>> {
-    let response = signup(&conn, user.0);
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+pub fn post_signup(user: Json<db::models::user::UserDTO>, conn: db::MainDbConn) -> ResponseWithStatus {
+    signup(&conn, user.0)
 }

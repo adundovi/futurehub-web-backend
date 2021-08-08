@@ -1,5 +1,4 @@
 use rocket_contrib::json::Json;
-use rocket::response::status;
 use rocket::http::Status;
 use crate::db::{
     MainDbConn,
@@ -42,17 +41,13 @@ fn response_users(users: Vec<User>) -> ResponseWithStatus {
 
 #[get("/users")]
 pub fn get(
-    token: Result<UserToken, status::Custom<Json<Response>>>,
-    conn: MainDbConn) -> status::Custom<Json<Response>> {
+    token: Result<UserToken, ResponseWithStatus>,
+    conn: MainDbConn) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
     let users = User::get_all(&conn).unwrap();
-    let response = response_users(users);
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    response_users(users)
 }
 
 #[options("/users")]
@@ -65,8 +60,8 @@ pub fn option<'a>() -> rocket::Response<'a> {
 #[post("/users", format = "json", data = "<user>")]
 pub fn post(
     user: Json<NewUser>,
-    token: Result<UserToken, status::Custom<Json<Response>>>,
-    conn: MainDbConn) -> status::Custom<Json<Response>> {
+    token: Result<UserToken, ResponseWithStatus>,
+    conn: MainDbConn) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
@@ -74,17 +69,12 @@ pub fn post(
     //TODO: group permission for this 
     User::create_full(&conn, user.into_inner());
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }
 
 #[options("/users/<_id>")]
@@ -97,32 +87,27 @@ pub fn option_by_id<'a>(_id: i32) -> rocket::Response<'a> {
 #[delete("/users/<id>")]
 pub fn delete_by_id(
     conn: MainDbConn,
-    token: Result<UserToken, status::Custom<Json<Response>>>,
-    id: i32) -> status::Custom<Json<Response>> {
+    token: Result<UserToken, ResponseWithStatus>,
+    id: i32) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
     User::remove(&conn, id);
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }
 
 #[put("/users/<id>", format = "json", data = "<user>")]
 pub fn put_by_id(
     conn: MainDbConn,
-    token: Result<UserToken, status::Custom<Json<Response>>>,
+    token: Result<UserToken, ResponseWithStatus>,
     id: i32,
-    user: Json<UserAttribs>) -> status::Custom<Json<Response>> {
+    user: Json<UserAttribs>) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
@@ -142,15 +127,10 @@ pub fn put_by_id(
     
     User::update(&conn, &updated_item);
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }

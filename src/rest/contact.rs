@@ -1,5 +1,4 @@
 use rocket_contrib::json::Json;
-use rocket::response::status;
 use rocket::http::Status;
 use super::response::{Response, ResponseWithStatus, Message};
 use crate::services::mail;
@@ -14,7 +13,7 @@ pub struct ContactForm {
 }
 
 #[post("/contact", format = "json", data = "<form>")]
-pub fn post_form(form: Json<ContactForm>) -> status::Custom<Json<Response>> {
+pub fn post_form(form: Json<ContactForm>) -> ResponseWithStatus {
     let m = mail::Mail{
         to: "4ndY@krizevci.info",
         subject: &format!("FutureHub-web - Kontakt - Poruka od {}", &form.full_name),
@@ -29,17 +28,12 @@ pub fn post_form(form: Json<ContactForm>) -> status::Custom<Json<Response>> {
     
     mail::send_mail(&m);
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(
                     String::from(messages::MESSAGE_SENT_SUCCESS)
                 )
             )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }

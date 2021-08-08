@@ -1,13 +1,8 @@
-use rocket_contrib::json::Json;
-use rocket::response::status;
-use rocket::http::Status;
 use crate::db;
 use crate::db::models::course::{Course, CourseAttribs};
 use crate::db::models::event::{Event, EventAttribs};
-use super::response::{ResponseWithStatus, Response};
+use super::response::{ResponseWithStatus};
 use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs};
-
-use chrono::NaiveDateTime;
 
 fn response_courses(courses: Vec<Course>) -> ResponseWithStatus {
     let mut items = VectorItems::new();
@@ -34,13 +29,9 @@ fn response_courses(courses: Vec<Course>) -> ResponseWithStatus {
 }
 
 #[get("/courses")]
-pub fn get(conn: db::MainDbConn) -> status::Custom<Json<Response>> {
+pub fn get(conn: db::MainDbConn) -> ResponseWithStatus {
     let courses = Course::get_all_published(&conn).unwrap();
-    let response = response_courses(courses);
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    response_courses(courses)
 }
 
 fn response_course(c: Course) -> ResponseWithStatus {
@@ -67,13 +58,9 @@ fn response_course(c: Course) -> ResponseWithStatus {
 }
 
 #[get("/courses/<id>")]
-pub fn get_by_id(conn: db::MainDbConn, id: i32) -> status::Custom<Json<Response>> {
+pub fn get_by_id(conn: db::MainDbConn, id: i32) -> ResponseWithStatus {
     let p = Course::get_published(&conn, id).unwrap();
-    let response = response_course(p);
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    response_course(p)
 }
 
 fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithStatus {
@@ -124,7 +111,7 @@ pub enum CourseInclude {
 
 #[get("/courses/<code>?<include>", rank = 2)]
 pub fn get_by_code(conn: db::MainDbConn, code: String,
-                   include: Option<CourseInclude>) -> status::Custom<Json<Response>> {
+                   include: Option<CourseInclude>) -> ResponseWithStatus {
     let p = Course::get_published_by_code(&conn, &code).unwrap();
     
     let response = match include {
@@ -136,11 +123,7 @@ pub fn get_by_code(conn: db::MainDbConn, code: String,
             }
         }
     };
-    
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    response
 }
 
 /*

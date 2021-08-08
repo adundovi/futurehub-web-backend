@@ -10,8 +10,7 @@ use crate::db::models::user::LoginInfo;
 use rocket::http::Status;
 use rocket::outcome::Outcome;
 use rocket::request::{self, FromRequest, Request};
-use rocket::response::status;
-use rocket_contrib::json::Json;
+use super::response::ResponseWithStatus;
 
 static ONE_WEEK: i64 = 60 * 60 * 24 * 7; // in seconds
 
@@ -27,10 +26,10 @@ pub struct UserToken {
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for UserToken {
-    type Error = status::Custom<Json<Response>>;
+    type Error = ResponseWithStatus;
     fn from_request(
         request: &'a Request<'r>,
-    ) -> request::Outcome<Self, status::Custom<Json<Response>>> {
+    ) -> request::Outcome<Self, ResponseWithStatus> {
         let conn = request.guard::<db::MainDbConn>().unwrap();
         if let Some(authen_header) = request.headers().get_one("Authorization") {
             let authen_str = authen_header.to_string();
@@ -46,12 +45,12 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserToken {
 
         Outcome::Failure((
             Status::BadRequest,
-            status::Custom(
-                Status::Unauthorized,
-                Json(Response::Message(
-                        Message::new(String::from(messages::MESSAGE_INVALID_TOKEN))
-                        ))
-            )
+            ResponseWithStatus {
+                status: Status::Unauthorized,
+                response: Response::Message(
+                            Message::new(String::from(messages::MESSAGE_INVALID_TOKEN))
+                        )
+            }
         ))
     }
 }

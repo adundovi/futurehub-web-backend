@@ -1,5 +1,4 @@
 use rocket_contrib::json::Json;
-use rocket::response::status;
 use rocket::http::Status;
 use super::response::{Data, VectorItems, ItemWrapper, Attribs, Message, Response, ResponseWithStatus};
 use crate::consts::messages;
@@ -8,7 +7,6 @@ use crate::db::{
     models::event,
     models::event::{Event, EventAttribs},
     models::course::Course};
-use chrono::NaiveDateTime;
 use super::jwt::UserToken;
 
 fn response_events(events_course: Vec<(Event, Option<Course>)>) -> ResponseWithStatus {
@@ -37,24 +35,16 @@ fn response_events(events_course: Vec<(Event, Option<Course>)>) -> ResponseWithS
 }
 
 #[get("/events")]
-pub fn get(conn: MainDbConn) -> status::Custom<Json<Response>> {
+pub fn get(conn: MainDbConn) -> ResponseWithStatus {
     let events_course = event::Event::query(&conn);
 //    let events = events_course.iter().map(|i| i.0).collect();
-    let r = response_events(events_course);
-    status::Custom(
-        Status::from_code(r.status_code).unwrap(),
-        Json(r.response),
-    )
+    response_events(events_course)
 }
 
 #[get("/events/upcoming")]
-pub fn get_upcoming(conn: MainDbConn) -> status::Custom<Json<Response>> {
+pub fn get_upcoming(conn: MainDbConn) -> ResponseWithStatus {
     let events_course = event::Event::query_upcoming(&conn, 10);
-    let r = response_events(events_course);
-    status::Custom(
-        Status::from_code(r.status_code).unwrap(),
-        Json(r.response),
-    )
+    response_events(events_course)
 }
 
 #[options("/events")]
@@ -67,9 +57,9 @@ pub fn option_event<'a>() -> rocket::Response<'a> {
 #[post("/events", format = "json", data = "<event>")]
 pub fn post_event(
     event: Json<event::NewEvent>,
-    token: Result<UserToken, status::Custom<Json<Response>>>,
+    token: Result<UserToken, ResponseWithStatus>,
     conn: MainDbConn,
-) -> status::Custom<Json<Response>> {
+) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
@@ -77,17 +67,12 @@ pub fn post_event(
     //TODO: group permission for this 
     event::Event::insert_full(&conn, &event);
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }
 
 #[options("/events/<_id>")]
@@ -100,23 +85,18 @@ pub fn option_event_id<'a>(_id: i32) -> rocket::Response<'a> {
 #[delete("/events/<id>")]
 pub fn delete_event(
     conn: MainDbConn,
-    token: Result<UserToken, status::Custom<Json<Response>>>,
+    token: Result<UserToken, ResponseWithStatus>,
     id: i32
-) -> status::Custom<Json<Response>> {
+) -> ResponseWithStatus {
     if let Err(e) = token {
         return e;
     }
     event::Event::remove(&conn, id);
 
-    let response = ResponseWithStatus {
-            status_code: Status::Ok.code,
+    ResponseWithStatus {
+            status: Status::Ok,
             response: Response::Message(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
-    };
-
-    status::Custom(
-        Status::from_code(response.status_code).unwrap(),
-        Json(response.response),
-    )
+    }
 }

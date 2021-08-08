@@ -4,9 +4,11 @@ use crate::db::models::{
     event::EventAttribs,
     post::PostAttribs,
 };
-use crate::consts::messages;
 use rocket::http::Status;
+use rocket::request::Request;
+use rocket::response::{Responder, Response as RocketResponse};
 use serde_json::Value as JsonValue;
+use rocket_contrib::json::Json;
 
 // Response Code
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
@@ -78,7 +80,7 @@ pub enum Data {
 impl Data {
     pub fn get_response(self) -> ResponseWithStatus {
         ResponseWithStatus {
-            status_code: Status::Ok.code,
+            status: Status::Ok,
             response: Response::Data(self)
         }
     }
@@ -116,6 +118,14 @@ pub enum Response {
 
 #[derive(Debug)]
 pub struct ResponseWithStatus {
-    pub status_code: u16,
+    pub status: Status,
     pub response: Response,
+}
+
+impl<'r> Responder<'r> for ResponseWithStatus {
+    fn respond_to(self, req: &Request) -> Result<RocketResponse<'r>, Status> {
+        RocketResponse::build_from(Json(self.response).respond_to(req)?)
+            .status(self.status)
+            .ok()
+    }
 }
