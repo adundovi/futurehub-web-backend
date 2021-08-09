@@ -215,7 +215,7 @@ impl Course {
             .is_ok()
     }
    
-    pub fn list_participants(id: i32, conn: &SqliteConnection) -> Vec<(User, CourseUser)> {
+    pub fn list_participants(conn: &SqliteConnection, id: i32) -> Vec<(User, CourseUser)> {
         users::table
             .inner_join(cusers::table)
             .filter(cusers::course_id.eq(id))

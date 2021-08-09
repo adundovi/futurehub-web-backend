@@ -3,6 +3,7 @@ use crate::db::models::{
     course::CourseAttribs,
     event::EventAttribs,
     post::PostAttribs,
+    repo_items::RepoAttribs,
 };
 use rocket::http::Status;
 use rocket::request::Request;
@@ -25,6 +26,7 @@ pub enum Attribs {
     CourseAttribs(CourseAttribs),
     EventAttribs(EventAttribs),
     PostAttribs(PostAttribs),
+    RepoAttribs(RepoAttribs),
 }
 
 #[derive(Debug, Serialize, Deserialize)]

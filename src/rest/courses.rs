@@ -1,8 +1,12 @@
 use crate::db::{
     MainDbConn,
     models::{
-        course::{NewCourse, Course, CourseAttribs},
+        course::{NewCourse,
+            Course,
+            CourseAttribs,
+            CourseUser},
         event::{Event, EventAttribs},
+        user::{User, UserAttribs},
     },
 };
 use crate::db::model_traits::Queries;
@@ -82,24 +86,15 @@ pub fn get_by_id(conn: MainDbConn, id: i32) -> ResponseWithStatus {
     response_course(p)
 }
 
+#[get("/courses/<code>", rank = 2)]
+pub fn get_by_code(conn: MainDbConn, code: String) -> ResponseWithStatus {
+    let p = Course::get_published_by_code(&conn, &code).unwrap();
+    response_course(p)
+}
+
 fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithStatus {
     
-    let attribs = CourseAttribs{
-         title: c.title,
-         code: c.code.clone(),
-         description: c.description,
-         creation_date: c.creation_date,
-         lecturer: c.lecturer,
-         organizer: c.organizer,
-         lectures: c.lectures,
-         lecture_duration: c.lecture_duration,
-         students: c.students,
-         max_students: c.max_students,
-         finished: c.finished,
-         published: c.published,
-    };
-    
-    let mut includes: Vec<ItemWrapper> = vec![];
+    let mut items = VectorItems::new();
 
     for e in events {
         let attribs = EventAttribs{
@@ -110,40 +105,72 @@ fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithSta
             audience: e.audience,
             status: e.status,
             course_code: Some(c.code.clone())};
-        let eventw = ItemWrapper::new(e.id, "event", Attribs::EventAttribs(attribs));
-        includes.push(eventw);
+        let item = ItemWrapper::new(e.id, "event", Attribs::EventAttribs(attribs));
+        items.push(item);
     }
     
-    let item = SingleItem::new(
-        ItemWrapper::new(
-            c.id, "course", Attribs::CourseAttribs(attribs)
-            ),
-        Some(includes)
-    );
-
-    Data::Single(item).to_response()
+    Data::Vector(items).to_response()
 }
 
-#[derive(FromFormValue)]
-pub enum CourseInclude {
-    Events,
-}
-
-#[get("/courses/<code>?<include>", rank = 2)]
-pub fn get_by_code(conn: MainDbConn, code: String,
-                   include: Option<CourseInclude>) -> ResponseWithStatus {
-    let p = Course::get_published_by_code(&conn, &code).unwrap();
+fn response_course_with_participants(
+    c: Course,
+    participants: Vec<(User, CourseUser)>
+    ) -> ResponseWithStatus {
     
-    let response = match include {
-        None => response_course(p),
-        Some(inc) => match inc {
-            CourseInclude::Events => {
-                let events = Course::list_events(&conn, p.id);
-                response_course_with_events(p, events)
-            }
-        }
-    };
-    response
+    let mut items = VectorItems::new();
+
+    for (u, cu) in participants {
+        let attribs = UserAttribs{
+            username: u.username,
+            email: u.email,
+            login_session: u.login_session,
+            oib: u.oib,
+            name: u.name,
+            surname: u.surname,
+            address: u.address,
+            phone: u.phone,
+            gender: u.gender,
+            birthday: u.birthday,
+            creation_date: u.creation_date,
+        };
+        let u = ItemWrapper::new(u.id, "user", Attribs::UserAttribs(attribs));
+        items.push(u);
+    }
+    
+    Data::Vector(items).to_response()
+}
+
+#[options("/courses/<_id>/events")]
+pub fn option_by_id_events<'a>(_id: i32) -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[get("/courses/<id>/events")]
+pub fn get_by_id_events(conn: MainDbConn, id: i32) -> ResponseWithStatus {
+    let p = Course::get_published(&conn, id).unwrap();
+    let events = Course::list_events(&conn, p.id);
+    response_course_with_events(p, events)
+}
+
+#[options("/courses/<_id>/participants")]
+pub fn option_by_id_participants<'a>(_id: i32) -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[get("/courses/<id>/participants")]
+pub fn get_by_id_participants(conn: MainDbConn, id: i32,
+                        token: Result<UserToken, ResponseWithStatus>) -> ResponseWithStatus {
+    if let Err(e) = token {
+        return e
+    }
+
+    let p = Course::get_published(&conn, id).unwrap();
+    let participants = Course::list_participants(&conn, p.id); 
+    response_course_with_participants(p, participants)
 }
 
 #[options("/courses")]

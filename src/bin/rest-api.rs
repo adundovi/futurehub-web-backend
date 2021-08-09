@@ -43,6 +43,11 @@ impl Fairing for CORS {
 fn main() {
     rocket::ignite()
         .mount("/api", routes![
+               auth::ping,
+               auth::option_ping,
+               auth::post_login,
+               auth::option_login,
+               auth::post_signup,
                events::get,
                events::get_upcoming,
                events::post,
@@ -60,7 +65,11 @@ fn main() {
                courses::get,
                courses::get_by_id,
                courses::get_by_code,
+               courses::get_by_id_events,
+               courses::get_by_id_participants,
                courses::option,
+               courses::option_by_id_events,
+               courses::option_by_id_participants,
                courses::post,
                courses::option_by_id,
                courses::delete_by_id,
@@ -69,9 +78,6 @@ fn main() {
                category::get_by_id,
                category::get_by_slug,
                contact::post_form,
-               auth::post_login,
-               auth::option_login,
-               auth::post_signup,
                profile::get_info,
                profile::option_info,
                users::get,

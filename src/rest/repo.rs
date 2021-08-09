@@ -1,44 +1,22 @@
-use rocket_contrib::json::Json;
-use crate::db;
+use crate::db::{
+    MainDbConn,
+    models::repo_items::{
+        self,
+        RepoItem,
+        RepoAttribs,
+    }
+};
+use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs, Message, Response, ResponseWithStatus};
 use chrono::NaiveDateTime;
 use rocket::response::NamedFile;
 
-#[derive(Serialize)]
-pub struct RepoAttribs {
-    pub title: String,
-    pub slug: String,
-    pub streampath: String,
-    pub datetime: NaiveDateTime,
-    pub description: Option<String>,
-    pub filehash: Option<String>,
-    pub filesize: Option<i64>,
-    pub category_id: i32,
-}
-
-#[derive(Serialize)]
-pub struct RepoWrapper {
-    pub id: i32,
-    pub r#type: String,
-    pub attributes: RepoAttribs,
-}
-
-#[derive(Serialize)]
-pub struct JsonApiResponse {
-    data: Vec<RepoWrapper>,
-}
-
-#[derive(Serialize)]
-pub struct JsonSingleApiResponse {
-    data: RepoWrapper,
-}
-
 #[get("/repo?<category>")]
-pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiResponse> {
-    let mut response = JsonApiResponse { data: vec![], };
+pub fn get(conn: MainDbConn, category: Option<String>) -> ResponseWithStatus {
+    let mut items = VectorItems::new();
 
     match category {
         None => {
-            for p in db::models::repo_items::query_published(&conn) {
+            for p in repo_items::query_published(&conn) {
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
@@ -49,12 +27,12 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                         filesize: p.filesize,
                         category_id: p.category_id,
                     };
-                    let postw = RepoWrapper{ id: p.id, r#type: "file".to_string(), attributes: attribs };
-                    response.data.push(postw);
+                    let item = ItemWrapper::new(p.id, "file", Attribs::RepoAttribs(attribs));
+                    items.push(item);
             }
         },
         Some(c) =>
-            for p in db::models::repo_items::query_published_by_category(&conn, &c) {
+            for p in repo_items::query_published_by_category(&conn, &c) {
                     let attribs = RepoAttribs{
                         title: p.title,
                         slug: p.slug.clone(),
@@ -65,17 +43,18 @@ pub fn get(conn: db::MainDbConn, category: Option<String>) -> Json<JsonApiRespon
                         filesize: p.filesize,
                         category_id: p.category_id,
                     };
-                    let postw = RepoWrapper{ id: p.id, r#type: "file".to_string(), attributes: attribs };
-                    response.data.push(postw);
+                    let item = ItemWrapper::new(p.id, "file", Attribs::RepoAttribs(attribs));
+                    items.push(item);
             }
     }
-    Json(response)
+    
+    Data::Vector(items).to_response()
 }
 
 #[get("/repo/<id>", rank = 1)]
-pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResponse>> {
+pub fn get_by_id(conn: MainDbConn, id: i32) -> ResponseWithStatus {
 
-    let p = db::models::repo_items::get(&conn, id).ok()?;
+    let p = repo_items::get(&conn, id).unwrap();
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
@@ -86,19 +65,18 @@ pub fn get_by_id(conn: db::MainDbConn, id: i32) -> Option<Json<JsonSingleApiResp
          filesize: p.filesize,
          category_id: p.category_id,
     };
-
-    Some(Json(JsonSingleApiResponse{
-        data: RepoWrapper{
-            id: p.id,
-            r#type: "file".to_string(),
-            attributes: attribs },
-    }))
+    
+    let item = SingleItem::new(
+        ItemWrapper::new(p.id, "file", Attribs::RepoAttribs(attribs)),
+        None);
+    
+    Data::Single(item).to_response()
 }
 
 #[get("/repo/<slug>", rank = 2)]
-pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingleApiResponse>> {
+pub fn get_by_slug(conn: MainDbConn, slug: String) -> ResponseWithStatus {
 
-    let p = db::models::repo_items::get_by_slug(&conn, slug).ok()?;
+    let p = repo_items::get_by_slug(&conn, slug).unwrap();
     let attribs = RepoAttribs{
          title: p.title,
          slug: p.slug.clone(),
@@ -109,18 +87,17 @@ pub fn get_by_slug(conn: db::MainDbConn, slug: String) -> Option<Json<JsonSingle
          filesize: p.filesize,
          category_id: p.category_id,
     };
-
-    Some(Json(JsonSingleApiResponse{
-        data: RepoWrapper{
-            id: p.id,
-            r#type: "file".to_string(),
-            attributes: attribs },
-    }))
+    
+    let item = SingleItem::new(
+        ItemWrapper::new(p.id, "file", Attribs::RepoAttribs(attribs)),
+        None);
+    
+    Data::Single(item).to_response()
 }
 
 /* see also X-Sendfile */
 #[get("/repo/stream/<slug>")]
-pub fn get_stream_by_slug(conn: db::MainDbConn, slug: String) -> Option<NamedFile> {
-    let p = db::models::repo_items::get_by_slug(&conn, slug).ok()?;
+pub fn get_stream_by_slug(conn: MainDbConn, slug: String) -> Option<NamedFile> {
+    let p = repo_items::get_by_slug(&conn, slug).ok()?;
     NamedFile::open(&p.filepath).ok() 
 }

@@ -36,7 +36,7 @@ fn generate_form(id: i32) {
     let course = db::models::course::Course::get(&conn, id).expect("Id not found");
     let first_date = db::models::course::Course::first_date(id, &conn);
     let last_date = db::models::course::Course::last_date(id, &conn);
-    let db_participants = db::models::course::Course::list_participants(id, &conn);
+    let db_participants = db::models::course::Course::list_participants(&conn, id);
     
     let template_path = Path::new("./templates/tex/zapisnik-o-primopredaji.hbs");
     let resources_path = Path::new("./templates/tex");

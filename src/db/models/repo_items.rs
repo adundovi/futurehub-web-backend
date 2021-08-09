@@ -38,6 +38,18 @@ pub struct RepoItem {
     pub filesize: Option<i64>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RepoAttribs {
+    pub title: String,
+    pub slug: String,
+    pub streampath: String,
+    pub datetime: NaiveDateTime,
+    pub description: Option<String>,
+    pub filehash: Option<String>,
+    pub filesize: Option<i64>,
+    pub category_id: i32,
+}
+
 
 fn get_repo_path() -> std::path::PathBuf {
     let c = crate::active_config();
