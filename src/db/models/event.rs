@@ -44,6 +44,7 @@ pub struct EventAttribs {
     pub place: Option<String>,
     pub audience: Option<String>,
     pub status: Option<String>,
+    pub course_id: Option<i32>,
     pub course_code: Option<String>,
 }
 

@@ -2,12 +2,10 @@ use crate::db::{
     MainDbConn,
     models::repo_items::{
         self,
-        RepoItem,
         RepoAttribs,
     }
 };
-use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs, Message, Response, ResponseWithStatus};
-use chrono::NaiveDateTime;
+use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs, ResponseWithStatus};
 use rocket::response::NamedFile;
 
 #[get("/repo?<category>")]

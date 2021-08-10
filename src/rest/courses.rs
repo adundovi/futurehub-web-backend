@@ -104,6 +104,7 @@ fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithSta
             datetime: e.datetime,
             audience: e.audience,
             status: e.status,
+            course_id: e.course_id,
             course_code: Some(c.code.clone())};
         let item = ItemWrapper::new(e.id, "event", Attribs::EventAttribs(attribs));
         items.push(item);
@@ -113,13 +114,13 @@ fn response_course_with_events(c: Course, events: Vec<Event>) -> ResponseWithSta
 }
 
 fn response_course_with_participants(
-    c: Course,
+    _c: Course,
     participants: Vec<(User, CourseUser)>
     ) -> ResponseWithStatus {
     
     let mut items = VectorItems::new();
 
-    for (u, cu) in participants {
+    for (u, _cu) in participants {
         let attribs = UserAttribs{
             username: u.username,
             email: u.email,

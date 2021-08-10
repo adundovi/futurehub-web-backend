@@ -17,7 +17,7 @@ pub fn option_ping<'a>() -> rocket::Response<'a> {
 
 #[get("/auth/ping")]
 pub fn ping(token: Result<UserToken, ResponseWithStatus>) -> ResponseWithStatus {
-    let message: &str = if let Err(e) = token { "unauthenticated" } else { "authenticated" };
+    let message: &str = if let Err(_e) = token { "unauthenticated" } else { "authenticated" };
         
     ResponseWithStatus {
         status: Status::Ok,

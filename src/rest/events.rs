@@ -20,6 +20,7 @@ fn response_events(events_course: Vec<(Event, Option<Course>)>) -> ResponseWithS
             datetime: event.datetime,
             audience: event.audience,
             status: event.status,
+            course_id: event.course_id,
             course_code: {
                 match course {
                     Some(c) => Some(c.code),
