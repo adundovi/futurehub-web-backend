@@ -17,7 +17,7 @@ pub mod date_serializer {
     
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<NaiveDateTime, D::Error> {
         let time: String = Deserialize::deserialize(deserializer)?;
-        Ok(NaiveDateTime::parse_from_str(&time, "%Y-%m-%d %H:%M:%S").map_err(D::Error::custom)?)
+        Ok(NaiveDateTime::parse_from_str(&time, "%Y-%m-%dT%H:%M:%S").map_err(D::Error::custom)?)
     }
 }
 
