@@ -18,7 +18,7 @@ pub struct SignupForm {
 #[post("/signup", format = "json", data = "<form>")]
 pub fn post(form: Json<SignupForm>) -> ResponseWithStatus {
     let m = mail::Mail{
-        to: "4ndY@krizevci.info",
+        to: "futurehub@udruga-point.hr",
         subject: &format!("FutureHub-web - Prijava - {}", &form.email),
         body: format!("Prijava na obrazovni program - Ljetna škola računarstva 2021\n
                 Ime: {}\n
