@@ -1,6 +1,7 @@
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::transport::smtp::extension::ClientId;
 use lettre::{Message, SmtpTransport, Transport};
+use lettre::message;
 
 pub struct Mail<'a> {
     pub to: &'a str,
@@ -17,7 +18,11 @@ pub fn send_mail(mail: &Mail) {
         .reply_to(c_smtp["from"].as_str().unwrap().parse().unwrap())
         .to(mail.to.parse().unwrap())
         .subject(mail.subject)
-        .body(mail.body.clone())
+        .singlepart(
+             message::SinglePart::builder()
+             .header(message::header::ContentType::TEXT_PLAIN)
+             .body(mail.body.clone())
+             )
         .unwrap();
 
     let creds = Credentials::new(

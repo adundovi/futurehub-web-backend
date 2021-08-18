@@ -2,3 +2,5 @@ Križevci > Križevaca
 Mali Banovac, Pakrac > Malog Banovca, Pakrac
 Stari Bošnjani, Križevci > Starih Bošnjana, Križevci
 Mičijevac, Križevci > Mičijevaca, Križevci
+Borje, Kalnik > Borja, Kalnika
+Zagreb > Zagreba

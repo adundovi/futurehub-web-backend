@@ -9,3 +9,4 @@ pub mod profile;
 pub mod repo;
 pub mod response;
 pub mod users;
+pub mod signup;

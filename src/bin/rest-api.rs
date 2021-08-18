@@ -17,6 +17,7 @@ use futurehub_web_backend::rest::{
     posts,
     profile,
     repo,
+    signup,
     users,
 };
 
@@ -86,6 +87,7 @@ fn main() {
                users::option_by_id,
                users::delete_by_id,
                users::put_by_id,
+               signup::post,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())
