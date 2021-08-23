@@ -88,6 +88,7 @@ fn main() {
                users::delete_by_id,
                users::put_by_id,
                signup::post,
+               signup::option,
         ])
         .attach(db::MainDbConn::fairing())
         .attach(CORS())

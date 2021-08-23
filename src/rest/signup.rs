@@ -15,8 +15,7 @@ pub struct SignupForm {
     message: Option<String>,
 }
 
-#[post("/signup", format = "json", data = "<form>")]
-pub fn post(form: Json<SignupForm>) -> ResponseWithStatus {
+fn mail_to_owners(form: &SignupForm) -> () {
     let m = mail::Mail{
         to: "futurehub@udruga-point.hr",
         subject: &format!("FutureHub-web - Prijava - {}", &form.email),
@@ -39,6 +38,35 @@ pub fn post(form: Json<SignupForm>) -> ResponseWithStatus {
     };
     
     mail::send_mail(&m);
+}
+
+fn mail_to_user(form: &SignupForm) -> () {
+    let m = mail::Mail{
+        to:  &form.email,
+        subject: "Future Hub Križevci - Uspješna prijava",
+        body: format!("Draga/dragi {},\n
+hvala Vam na prijavi na obrazovni program \"Ljetna škola računarstva 2021\". Vaša je prijava zabilježena.\n
+Iako je automatski generirana i poslana poruka, za sva pitanja vezana uz prijavu ili program, slobodno odgovorite na ovaj mail.\n
+Projekt Future Hub Križevci",
+                      &form.name,
+                ).to_string(),
+    };
+    
+    mail::send_mail(&m);
+}
+
+#[options("/signup")]
+pub fn option<'a>() -> rocket::Response<'a> {
+    let mut res = rocket::Response::new();
+    res.set_status(Status::new(200, "No Content"));
+    res
+}
+
+#[post("/signup", format = "json", data = "<form>")]
+pub fn post(form: Json<SignupForm>) -> ResponseWithStatus {
+
+    mail_to_owners(&form);
+    mail_to_user(&form);
 
     ResponseWithStatus {
             status: Status::Ok,
