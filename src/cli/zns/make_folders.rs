@@ -14,7 +14,7 @@ pub fn f(args: &clap::ArgMatches) {
     lvl2_provedba(&basepath
                   .join("1_PROVEDBA"));
    
-    let months = vec!["2021-05", "2021-06", "2021-07"];
+    let months = vec!["2021-08", "2021-09", "2021-10"];
     for m in months {
         let date = Utc.datetime_from_str(
                    &format!("{}-01 12:00:00", m),
