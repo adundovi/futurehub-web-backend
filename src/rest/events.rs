@@ -1,5 +1,8 @@
 use rocket_contrib::json::Json;
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status
+};
 use super::response::{Data, VectorItems, ItemWrapper, Attribs, Message, Response, ResponseWithStatus};
 use crate::consts::messages;
 use crate::db::{
@@ -8,6 +11,18 @@ use crate::db::{
     models::event::{Event, EventAttribs},
     models::course::Course};
 use super::jwt::UserToken;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        get_upcoming,
+        post,
+        option,
+        delete_by_id,
+        option_by_id,
+        put_by_id,
+    ]
+}
 
 fn response_events(events_course: Vec<(Event, Option<Course>)>) -> ResponseWithStatus {
     let mut items = VectorItems::new();
@@ -130,4 +145,11 @@ pub fn put_by_id(
                 Message::new(String::from(messages::MESSAGE_SENT_SUCCESS))
                 )
     }
+}
+
+#[get("/events/by-month/<year>/<month>/ics")]
+pub fn get_ics_by_month(conn: MainDbConn,
+                        month: i32, year: i32) -> ResponseWithStatus {
+    let events_course = event::Event::query_upcoming(&conn, 10);
+    response_events(events_course)
 }

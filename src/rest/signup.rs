@@ -1,8 +1,18 @@
 use rocket_contrib::json::Json;
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status
+};
 use super::response::{Response, ResponseWithStatus, Message};
 use crate::services::mail;
 use crate::consts::messages;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        post,
+        option,
+    ]
+}
 
 #[derive(Deserialize, Debug)]
 pub struct SignupForm {

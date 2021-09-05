@@ -2,9 +2,20 @@ use crate::{
     db,
     db::models::post::PostAttribs
 };
-
 use super::response::ResponseWithStatus;
 use super::response::{SingleItem, VectorItems, Data, ItemWrapper, Attribs};
+
+use rocket::{
+    Route,
+};
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        get_by_id,
+        get_by_slug,
+    ]
+}
 
 #[get("/posts")]
 pub fn get(conn: db::MainDbConn) -> ResponseWithStatus {

@@ -1,9 +1,19 @@
 use serde_json::json;
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status
+};
 use super::response::{Data, Response, ResponseWithStatus};
 use jwt::UserToken;
 use crate::db;
 use crate::rest::jwt;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get_info,
+        option_info,
+    ]
+}
 
 fn get_profile(conn: &db::MainDbConn, username: &str) -> ResponseWithStatus {
     let user = db::models::user::User::get_user_by_username(&conn, username).unwrap();

@@ -1,5 +1,16 @@
 use rocket_contrib::json::Json;
+use rocket::{
+    Route,
+};
 use crate::db;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        get_by_id,
+        get_by_slug,
+    ]
+}
 
 #[derive(Serialize)]
 pub struct CategoryAttribs {

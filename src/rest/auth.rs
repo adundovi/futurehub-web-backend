@@ -1,12 +1,25 @@
 use rocket_contrib::json::Json;
 use serde_json::json;
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status
+};
 use super::jwt::UserToken;
 use super::response;
 use super::response::{Data, Message, Response, ResponseWithStatus};
 use crate::db;
 use crate::rest::jwt;
 use crate::consts::messages;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        ping,
+        option_ping,
+        post_login,
+        option_login,
+        post_signup,
+    ]
+}
 
 #[options("/auth/ping")]
 pub fn option_ping<'a>() -> rocket::Response<'a> {

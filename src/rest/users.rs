@@ -1,5 +1,8 @@
 use rocket_contrib::json::Json;
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status
+};
 use crate::db::{
     MainDbConn,
     models::user::{
@@ -14,6 +17,17 @@ use super::response::{Message, ResponseWithStatus, Response};
 use super::response::{Data, VectorItems, ItemWrapper, Attribs};
 
 use crate::db::model_traits::Queries;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        option,
+        post,
+        option_by_id,
+        delete_by_id,
+        put_by_id,
+    ]
+}
 
 fn response_users(users: Vec<User>) -> ResponseWithStatus {
     let mut items = VectorItems::new();

@@ -6,7 +6,19 @@ use crate::db::{
     }
 };
 use super::response::{Data, SingleItem, VectorItems, ItemWrapper, Attribs, ResponseWithStatus};
-use rocket::response::NamedFile;
+use rocket::{
+    Route,
+    response::NamedFile
+};
+               
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        get_by_id,
+        get_by_slug,
+        get_stream_by_slug,
+    ]
+}
 
 #[get("/repo?<category>")]
 pub fn get(conn: MainDbConn, category: Option<String>) -> ResponseWithStatus {

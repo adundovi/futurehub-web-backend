@@ -21,9 +21,29 @@ use super::response::{
     ItemWrapper,
     Attribs
 };
-use rocket::http::Status;
+use rocket::{
+    Route,
+    http::Status,
+};
 use super::jwt::UserToken;
 use rocket_contrib::json::Json;
+
+pub fn get_routes() -> Vec<Route> {
+    routes![
+        get,
+        get_by_id,
+        get_by_code,
+        get_by_id_events,
+        get_by_id_participants,
+        option,
+        option_by_id_events,
+        option_by_id_participants,
+        post,
+        option_by_id,
+        delete_by_id,
+        put_by_id,
+    ]
+}
 
 fn response_courses(courses: Vec<Course>) -> ResponseWithStatus {
     let mut items = VectorItems::new();
