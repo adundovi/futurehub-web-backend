@@ -45,20 +45,20 @@ impl Fairing for CORS {
 }
 
 fn main() {
-    let routes =
-        auth::get_routes().into_iter()
-        .chain(category::get_routes().into_iter())
-        .chain(contact::get_routes().into_iter())
-        .chain(courses::get_routes().into_iter())
-        .chain(events::get_routes().into_iter())
-        .chain(posts::get_routes().into_iter())
-        .chain(profile::get_routes().into_iter())
-        .chain(repo::get_routes().into_iter())
-        .chain(users::get_routes().into_iter())
-        .chain(signup::get_routes().into_iter())
-        .collect::<Vec<Route>>();
+    let api_routes: Vec<Route> = [
+                auth::get_routes(),
+                category::get_routes(),
+                contact::get_routes(),
+                courses::get_routes(),
+                events::get_routes(),
+                posts::get_routes(),
+                profile::get_routes(),
+                repo::get_routes(),
+                users::get_routes(),
+                signup::get_routes(),
+    ].concat();
     rocket::ignite()
-        .mount("/api", routes)
+        .mount("/api", api_routes)
         .attach(db::MainDbConn::fairing())
         .attach(CORS())
         .launch();
