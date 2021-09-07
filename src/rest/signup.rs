@@ -23,13 +23,14 @@ pub struct SignupForm {
     oib: String,
     address: String,
     message: Option<String>,
+    course: String,
 }
 
 fn mail_to_owners(form: &SignupForm) -> () {
     let m = mail::Mail{
         to: "futurehub@udruga-point.hr",
-        subject: &format!("FutureHub-web - Prijava - {}", &form.email),
-        body: format!("Prijava na obrazovni program - Ljetna škola računarstva 2021\n
+        subject: &format!("[FHK] Prijava na {} - {}", &form.course, &form.email),
+        body: format!("Prijava na obrazovni program - {}\n
                 Ime: {}\n
                 Prezime: {}\n
                 Email: {}\n
@@ -37,6 +38,7 @@ fn mail_to_owners(form: &SignupForm) -> () {
                 OIB: {}\n
                 Adresa: {}\n
                 Napomena: {}",
+                      &form.course,
                       &form.name,
                       &form.surname,
                       &form.email,
@@ -55,10 +57,11 @@ fn mail_to_user(form: &SignupForm) -> () {
         to:  &form.email,
         subject: "Future Hub Križevci - Uspješna prijava",
         body: format!("Draga/dragi {},\n
-hvala Vam na prijavi na obrazovni program \"Ljetna škola računarstva 2021\". Vaša je prijava zabilježena.\n
+hvala Vam na prijavi na obrazovni program \"{}\". Vaša je prijava zabilježena.\n
 Iako je automatski generirana i poslana poruka, za sva pitanja vezana uz prijavu ili program, slobodno odgovorite na ovaj mail.\n
 Projekt Future Hub Križevci",
                       &form.name,
+                      &form.course,
                 ).to_string(),
     };
     
