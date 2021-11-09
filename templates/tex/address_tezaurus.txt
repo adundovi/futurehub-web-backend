@@ -2,10 +2,17 @@ Križevci > Križevaca
 Mali Banovac, Pakrac > Malog Banovca, Pakrac
 Stari Bošnjani, Križevci > Starih Bošnjana, Križevci
 Mičijevac, Križevci > Mičijevaca, Križevci
-Borje, Kalnik > Borja, Kalnika
+Borje, Kalnik > Borja, Kalnik
 Zagreb > Zagreba
 Koprivnica > Koprivnice
 Sveti Petar Orehovec > Svetog Petra Orehoveca
 Našice > Našica
 Dubrovnik > Dubrovnika
 Haganj > Hagnja
+Kalnik > Kalnika
+Međa, Sveti Petar Orehovec > Međe, Sveti Petar Orehovec
+Sveta Helena, Križevci > Svete Helene, Križevci
+Bojnikovec, Križevci > Bojnikovca, Križevci
+Donja Brckovčina, Križevci > Donje Brckovčine, Križevci
+Gračina, Križevci > Gračine, Križevci
+Vrbovec > Vrbovca
