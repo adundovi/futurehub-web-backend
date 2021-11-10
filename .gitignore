@@ -24,3 +24,5 @@ secret.key
 
 # Ignore repository files
 repo/*/
+
+.perseus/

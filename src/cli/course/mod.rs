@@ -121,7 +121,9 @@ pub fn menu<'a>() -> Menu<'a> {
                          .required(true)
                          .index(2)
                          ),
-                ),
+                )
+                .subcommand(App::new("recalculate")
+                    .about("Recalculate")),
             f: &participant::f
     };
     m.push_subcommand("participant", menu_participant);

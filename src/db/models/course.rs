@@ -195,6 +195,13 @@ impl Course {
         .execute(conn)
         .expect(&format!("Error updating course with id = {}", course.id));
     }
+    
+    pub fn set_students(conn: &SqliteConnection, id: i32, students: i32) {
+        diesel::update(courses::table.filter(courses::id.eq(id)))
+        .set((courses::students.eq(students),))
+        .execute(conn)
+        .expect(&format!("Error updating students in course with id = {}", id));
+    }
 
     pub fn add_participant(course_id_: i32,
                            user_id_: i32,

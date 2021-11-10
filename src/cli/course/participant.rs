@@ -1,4 +1,5 @@
 use crate::db;
+use crate::db::model_traits::Queries;
 
 pub fn f(args: &clap::ArgMatches) {
     let conn = db::establish_connection();
@@ -41,8 +42,16 @@ pub fn f(args: &clap::ArgMatches) {
                 db::models::course::Course::remove_participant(cid.unwrap(), uid.unwrap(), &conn);
             }
        },
-        Some((&_, _)) => print!("No subcommand selected"),
-        None => print!("No subcommand selected"),
+       Some(("recalculate", _)) => {
+            let conn = db::establish_connection();
+            for p in db::models::course::Course::get_all(&conn).expect("Not found") {
+                let n_participants = db::models::course::Course::list_participants(&conn, p.id).len() as i32;
+                println!("id = {}, N = {}", p.title, n_participants);
+                db::models::course::Course::set_students(&conn, p.id, n_participants); 
+            }
+       },
+       Some((&_, _)) => print!("No subcommand selected"),
+       None => print!("No subcommand selected"),
     }
 }
 
