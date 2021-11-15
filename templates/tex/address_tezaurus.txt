@@ -16,3 +16,6 @@ Bojnikovec, Križevci > Bojnikovca, Križevci
 Donja Brckovčina, Križevci > Donje Brckovčine, Križevci
 Gračina, Križevci > Gračine, Križevci
 Vrbovec > Vrbovca
+Mali Potočec, Križevci > Malog Potočca, Križevci
+Doljanec, Križevci > Doljanca, Križevci
+Pavlovec Ravenski, Križevci > Pavlovca Ravenskog, Križevci
