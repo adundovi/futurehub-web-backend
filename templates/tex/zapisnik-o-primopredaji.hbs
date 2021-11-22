@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage[a4paper,left=1.4cm,right=1.4cm,top=1cm,bottom=1cm,heightrounded]{geometry}
 \usepackage{array}
+\usepackage{longtable}
 
 %opening
 \title{}
@@ -12,8 +13,7 @@
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 \setlength\extrarowheight{10pt}
 
-\pagestyle{empty}
-
+%\pagestyle{empty}
 
 \begin{document}
 
@@ -43,7 +43,7 @@ Datum održavanja & {{course_started}} -- {{course_ended}} \\
 \end{tabular}
 
 \begin{center}
-\begin{tabular*}{\textwidth}{|M{0.5cm}|M{3.5cm}M{2.5cm}M{2.5cm}|M{2.6cm}|M{4cm}|}
+\begin{longtable}{|M{0.5cm}|M{3.5cm}M{2.5cm}M{2.5cm}|M{2.6cm}|M{4cm}|}
 \hline
 \# & Prezime & Ime & OIB & Datum & Potpis\\
 \hline
@@ -51,11 +51,10 @@ Datum održavanja & {{course_started}} -- {{course_ended}} \\
 {{inc @index}}. & {{p.surname}} & {{p.name}} & {{p.oib}} & & \\
 \hline
  {{/each}}
-\end{tabular*}
+\end{longtable}
 \end{center}
 
 \vfill
-
 \begin{center}
  \includegraphics[scale=0.4]{ {{resources}}/img/lenta_eu_vlada_rh_nzzrcd_s_korisnicima.png}
 \end{center}
