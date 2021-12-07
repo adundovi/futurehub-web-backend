@@ -1,0 +1,157 @@
+\documentclass[16pt]{scrartcl}
+\usepackage[a4paper,left=1.3cm,right=1.3cm,top=1cm,bottom=1.8cm,heightrounded]{geometry}
+%\usepackage{showframe}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{marvosym}
+\usepackage{setspace}
+\usepackage{libertine}
+\usepackage[overlay,absolute]{textpos}
+\hyphenpenalty100000
+\usepackage[all]{nowidow}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes}
+\usepackage{background}
+
+\backgroundsetup{
+scale=1,
+%color=black,
+opacity=0.5,
+angle=0,
+contents={%
+  \includegraphics[width=\paperwidth,height=\paperheight]{ {{resources}}/img/background-softs.png}
+  }%
+}
+
+\def\signature#1#2{%
+\parbox[b]{1in}{\smash{#1}\vskip12pt}
+\hfill%
+\parbox[t]{2.2in}{%
+\shortstack{\vrule width 2.42in height 0.4pt\\\small#2}
+}%
+}%
+\def\sigskip{\vskip0.4in plus 0.1in}
+\def\beginskip{\vskip0.5875in plus 0.1in}
+
+\begin{document}
+\sloppy
+\pagestyle{empty}
+\noindent{\singlespacing
+
+\begin{figure}[!t]
+    \noindent
+    %\fbox{
+	\begin{minipage}[lt]{0.40\textwidth}
+	    \begin{flushleft}
+	    \includegraphics[scale=0.33]{ {{resources}}/img/lenta-eu-strukturni-esf.png}\\%
+	    \vspace{0.2cm}
+	    {\linespread{1.3}
+	    {\small Projekt ``Future Hub Križevci''}\\
+	    {\color{black}{\scriptsize UP.04.2.1.07.0129\\
+	    Projekt su sufinancirali Europska unija iz Europskog socijalnog fonda i Ured za udruge Vlade Republike Hrvatske \\
+	    \Letter\ \ futurehub@udruga-point.hr\\
+	    \ComputerMouse\ \ https://futurehub.krizevci.eu \\ %
+	    }}}
+	    \end{flushleft}
+	\end{minipage}%
+	%
+	\hfill
+	%
+	\begin{minipage}[rt]{2.3in}
+	    \begin{flushright}
+	     %\vspace{1.8cm}
+	     \includegraphics[scale=1.3]{ {{resources}}/img/point-logo.pdf}\\%
+	     {\linespread{1.3}
+	     {\small Udruga P.O.I.N.T.}\\
+	     {\color{black}{\scriptsize
+	     OIB: 75093177043 \\
+	     Trg svetog Florijana 16\\
+	     HR-48260 Križevci, Hrvatska\\
+	     \Letter\ \ kontakt@udruga-point.hr\\
+	     \ComputerMouse\ \ https://www.udruga-point.hr \\ %
+         \vspace{0.6cm}%
+	     }}}
+	    \end{flushright}
+	\end{minipage}
+	%
+\end{figure}
+}
+\vspace{1cm}
+\begin{center}
+\noindent{\singlespacing
+	  {\Huge \uppercase{Potvrda}}
+	  \singlespacing
+	  \singlespacing
+	  {\huge\emph{\textbf{ {{name}} {{surname}} }}}
+	  \singlespacing
+	  \singlespacing
+	  iz {{genitiv_mjesta address}}, OIB {{oib}}, \\
+{{#if gender}}
+	  sudjelovala je i uspješno završila edukaciju
+{{else}}
+	  sudjelovao je i uspješno završio edukaciju
+{{/if}}
+	  \singlespacing
+	  {\Large \textsc{``Kakav dojam ostavljaš?\\%
+        Primjena pozitivne psihologije u komunikaciji''} }
+	  \singlespacing
+	  koja se održavala\\
+	  u Križevcima, 5. i 6. studenoga 2021. godine \\
+	  u trajanju od 6 školskih sati,\\
+	  u sklopu projekta\\
+      ``Future Hub Križevci''
+}
+\end{center}
+
+\noindent{\singlespacing
+    \vfill
+    \noindent%
+    \begin{minipage}[l]{0.33\textwidth}%
+		\begin{textblock}{5}(1.5,13.7) 
+		 \includegraphics[scale=0.8]{ {{resources}}/img/NikolinaMihic.png}
+		\end{textblock}
+		\sigskip \signature{}{%
+        \phantom{p}%
+        \small{Nikolina Mihić}, \scriptsize{mag. psych.}%
+        \phantom{g}\\%
+		\begin{scriptsize} Voditeljica edukacije \end{scriptsize}}
+	\end{minipage}%
+	%
+	\hfill
+	%
+    \begin{minipage}[c]{0.23\textwidth}
+		\begin{textblock}{5}(7.9,13.6) 
+		  \includegraphics[scale=0.069]{ {{resources}}/img/point-zig.png}
+		\end{textblock}
+		\begin{center}
+		    \begin{scriptsize}
+			Križevci, Hrvatska\\ 7. prosinca 2021.
+		    \end{scriptsize}	
+		\end{center}
+	\end{minipage}%
+	%
+	\hfill
+	%
+    \begin{minipage}[r]{0.33\textwidth}
+		\begin{textblock}{5}(11.7,13.75) 
+		  \includegraphics[scale=0.95]{ {{resources}}/img/NikolaOstojcic.png}
+		\end{textblock}
+        \sigskip \signature{}{%
+        \phantom{p}%
+        %\small{Nikola Matosović} \\%
+        \small{Nikola Ostojčić}, \scriptsize{univ. bacc. hist.}%
+        \phantom{g}\\%
+        \begin{scriptsize} Predsjednik udruge P.O.I.N.T.\end{scriptsize}}
+	\end{minipage}
+	%
+	%\vfill
+	\begin{textblock}{13}(0.5,15.7) 
+	\color{gray}{\scriptsize Sadržaj ovog certifikata isključiva je odgovornost Udruge P.O.I.N.T. Križevci}
+	\end{textblock}
+	\pagebreak
+}
+%
+\end{document}
+
