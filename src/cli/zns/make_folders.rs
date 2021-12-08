@@ -59,6 +59,7 @@ fn prepare_string(s: String) -> String {
      .replace("(", "")
      .replace(")", "")
      .replace(":", "")
+     .replace("?", "")
      .replace("č", "c")
      .replace("ć", "c")
      .replace("đ", "d")
