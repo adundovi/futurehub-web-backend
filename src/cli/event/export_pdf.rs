@@ -1,5 +1,5 @@
 use crate::db;
-use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
+use tex_tmpl_rs::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use chrono::prelude::*;
 use chrono::NaiveDateTime;
@@ -80,14 +80,14 @@ pub fn f(args: &clap::ArgMatches) {
                 to_json(resources_path.canonicalize().unwrap().to_str().unwrap()));
     data.insert("fontsize".to_string(), to_json(fontsize));
     
-    let output_path_str = format!("./tmp/calendar-{year}-{month}.tex",
+    let output_path_str = format!("./tmp/calendar-{year}-{month}.pdf",
                            year = date.year(),
                            month = date.month());
     let output_path = Path::new(&output_path_str);
 
     let t = TemplateRecipe {
-        template_path: &template_path,
-        output_path: &output_path,
+        template: &template_path,
+        output: &output_path,
         data: &data,
         helpers: Some(vec![
                       ("datetime2shorttime".to_string(), datetime2shorttime_helper)

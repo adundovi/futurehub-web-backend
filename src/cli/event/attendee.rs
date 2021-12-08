@@ -1,6 +1,6 @@
 use crate::db;
 use crate::db::models::event::EventAttendee;
-use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
+use tex_tmpl_rs::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use serde_json::value::{Map as JsonMap};
 use chrono::{
@@ -145,7 +145,7 @@ fn export_list(id: i32) {
 
     let template_path = Path::new("./templates/tex/fhk-potpisna-lista.hbs");
     let resources_path = Path::new("./templates/tex");
-    let output_path_str = format!("./tmp/potpisna-lista-{course}-{date}.tex",
+    let output_path_str = format!("./tmp/potpisna-lista-{course}-{date}.pdf",
                                     course = course.code, date = &event_datetime.date());
     let output_path = Path::new(&output_path_str);
         
@@ -189,8 +189,8 @@ fn export_list(id: i32) {
     data.insert("attendees".to_string(), to_json(&attendees));
 
     let t = TemplateRecipe {
-            template_path: &template_path,
-            output_path: &output_path,
+            template: &template_path,
+            output: &output_path,
             data: &data,
             helpers: Some(vec![
                 ("inc".to_string(), inc_helper)

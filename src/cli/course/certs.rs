@@ -1,6 +1,6 @@
 use crate::db;
 use crate::db::model_traits::Queries;
-use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
+use tex_tmpl_rs::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use serde_json::value::{Map as JsonMap};
 use std::collections::HashMap;
@@ -56,15 +56,15 @@ fn generate_certificates(id: i32) {
         data.insert("gender".to_string(), to_json(&gender));
         data.insert("address".to_string(), to_json(&address));
 
-        let output_path_str = format!("./tmp/cert-{course}-{surname}-{name}.tex",
+        let output_path_str = format!("./tmp/cert-{course}-{surname}-{name}.pdf",
                                       course = course.code,
                                       surname = &surname,
                                       name = &name);
         let output_path = Path::new(&output_path_str);
 
         let t = TemplateRecipe {
-            template_path: &template_path,
-            output_path: &output_path,
+            template: &template_path,
+            output: &output_path,
             data: &data,
             helpers: Some(vec![
                       ("genitiv_mjesta".to_string(), genitiv_mjesta_helper)

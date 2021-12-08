@@ -1,6 +1,6 @@
 use crate::db;
 use crate::db::model_traits::Queries;
-use crate::tools::pdflatex::{render_pdf, TemplateRecipe};
+use tex_tmpl_rs::{render_pdf, TemplateRecipe};
 use std::path::Path;
 use serde_json::value::{Map as JsonMap};
 
@@ -40,7 +40,7 @@ fn generate_form(id: i32) {
     
     let template_path = Path::new("./templates/tex/zapisnik-o-primopredaji.hbs");
     let resources_path = Path::new("./templates/tex");
-    let output_path_str = format!("./tmp/certform-{course}.tex",
+    let output_path_str = format!("./tmp/certform-{course}.pdf",
                                     course = course.code);
     let output_path = Path::new(&output_path_str);
         
@@ -68,8 +68,8 @@ fn generate_form(id: i32) {
     data.insert("participants".to_string(), to_json(&participants));
 
     let t = TemplateRecipe {
-            template_path: &template_path,
-            output_path: &output_path,
+            template: &template_path,
+            output: &output_path,
             data: &data,
             helpers: Some(vec![
                 ("inc".to_string(), inc_helper)
