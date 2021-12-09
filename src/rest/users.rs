@@ -106,7 +106,7 @@ pub fn delete_by_id(
     if let Err(e) = token {
         return e;
     }
-    User::remove(&conn, id);
+    let _ = User::remove(&conn, id);
 
     ResponseWithStatus {
             status: Status::Ok,

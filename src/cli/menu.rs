@@ -55,6 +55,6 @@ pub fn main<'a>() -> App<'a> {
             .takes_value(true))
         .arg(Arg::new("v")
             .short('v')
-            .multiple(true)
+            .multiple_occurrences(true)
             .about("Sets the level of verbosity"))
 }

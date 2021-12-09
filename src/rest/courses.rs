@@ -236,7 +236,7 @@ pub fn delete_by_id(
     if let Err(e) = token {
         return e;
     }
-    Course::remove(&conn, id);
+    let _ = Course::remove(&conn, id);
 
     ResponseWithStatus {
             status: Status::Ok,

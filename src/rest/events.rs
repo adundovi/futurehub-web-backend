@@ -147,6 +147,7 @@ pub fn put_by_id(
     }
 }
 
+#[allow(unused_variables)]
 #[get("/events/by-month/<year>/<month>/ics")]
 pub fn get_ics_by_month(conn: MainDbConn,
                         month: i32, year: i32) -> ResponseWithStatus {
