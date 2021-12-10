@@ -89,17 +89,23 @@ contents={%
 	  \singlespacing
 	  iz {{genitiv_mjesta address}},
 {{#if gender}}
-	  sudjelovala je i uspješno završila program predavanja i rasprava
+	  sudjelovala je na predavanjima i u raspravama
 {{else}}
-	  sudjelovao je i uspješno završio program predavanja i rasprava
+      sudjelovao je na predavanjima i u raspravama
 {{/if}}
 	  \singlespacing
 	  {\Large \textsc{``U potrazi za smislom znanosti''} }
 	  \singlespacing
-	  koji se održavao u Križevcima,\\
+{{#if gender}}
+      čime je dobila uvid u temeljne konceptualne probleme moderne fizike\\
+{{else}}
+      čime je dobio uvid u temeljne konceptualne probleme moderne fizike\\
+{{/if}}
+      te uvod u filozofiju prirode\\
+      \vspace{0.5cm}
+	  Program se održavao u Križevcima,\\
       od 23. siječnja do 19. lipnja 2021. godine\\
-	  u sklopu projekta\\
-      ``Future Hub Križevci''
+	  u sklopu projekta ``Future Hub Križevci''
 }
 \end{center}
 
@@ -107,9 +113,9 @@ contents={%
     \vfill
     \noindent%
     \begin{minipage}[l]{0.33\textwidth}%
-		\begin{textblock}{5}(1.9,14.0) 
-		    \includegraphics[scale=0.05]{ {{resources}}/img/PetarPavlovic.png}
-		\end{textblock}
+		%\begin{textblock}{5}(1.9,14.0) 
+		  %\includegraphics[scale=0.05]{ {{resources}}/img/PetarPavlovic.png}
+		%\end{textblock}
 		\sigskip \signature{}{%
         \phantom{p}%
         \scriptsize{dr. rer. nat.} \small{Petar Pavlović}%
@@ -146,7 +152,7 @@ contents={%
 	%
 	%\vfill
 	\begin{textblock}{13}(0.5,15.7) 
-	\color{gray}{\scriptsize Sadržaj ovog certifikata isključiva je odgovornost Udruge P.O.I.N.T. Križevci}
+	\color{gray}{\scriptsize Sadržaj ovog certifikata isključiva je odgovornost udruge P.O.I.N.T. Križevci}
 	\end{textblock}
 	\pagebreak
 }
