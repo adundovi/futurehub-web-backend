@@ -21,7 +21,7 @@ fn main() {
     
     // ...build and parse...
     let cli_builder = 
-        cli::menu::main()
+        cli::menu::main_menu()
         .subcommands(menu_apps)
         .get_matches();
 

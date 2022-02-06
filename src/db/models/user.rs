@@ -53,7 +53,7 @@ pub struct UserAttribs {
     pub phone: Option<String>,
     pub gender: Option<String>,
     pub birthday: Option<NaiveDateTime>,
-    #[serde(with = "import::date_serializer")]
+//    #[serde(with = "import::date_serializer")]
     pub creation_date: NaiveDateTime,
 }
 

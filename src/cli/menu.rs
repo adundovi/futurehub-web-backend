@@ -42,7 +42,7 @@ impl<'a> Menu<'a> {
     }
 }
 
-pub fn main<'a>() -> App<'a> {
+pub fn main_menu<'a>() -> App<'a> {
     App::new("CLI for FHK webapp")
         .version("0.1")
         .author("Andrej Dundović <andrej.dundovic@udruga-point.hr>")
