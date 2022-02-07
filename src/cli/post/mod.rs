@@ -22,7 +22,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("new")
                 .about("Add new event")
                 .arg(Arg::new("TITLE")
-                     .about("Title of the event")
+                     .help("Title of the event")
                      .required(true)
                      .index(1)
                      ),
@@ -42,7 +42,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .alias("rm")
                 .about("Remove post given by ID")
                 .arg(Arg::new("ID")
-                     .about("ID of the event")
+                     .help("ID of the event")
                      .required(true)
                      .index(1)
                      ),
@@ -56,7 +56,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .arg(Arg::new("yes")
                      .short('y')
                      .long("yes")
-                     .about("Confirmation")
+                     .help("Confirmation")
                      .required(true)
                      ),
             f: &dropall::f
@@ -67,7 +67,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("edit")
                 .about("Edit post given by ID")
                 .arg(Arg::new("ID")
-                     .about("post ID")
+                     .help("post ID")
                      .required(true)
                      .index(1)
                      ),

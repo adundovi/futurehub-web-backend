@@ -18,7 +18,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("make_folders")
                 .about("Make the folder structure")
                 .arg(Arg::new("PATH")
-                     .about("PATH to the directory")
+                     .help("PATH to the directory")
                      .required(true)
                      .index(1)
                      ),

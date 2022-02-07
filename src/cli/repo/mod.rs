@@ -23,12 +23,12 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("new")
                 .about("Add new event")
                 .arg(Arg::new("TITLE")
-                     .about("Title of the item")
+                     .help("Title of the item")
                      .required(true)
                      .index(1)
                      )
                 .arg(Arg::new("URL")
-                     .about("URL of the file")
+                     .help("URL of the file")
                      .required(true)
                      .index(2)
                      ),
@@ -48,7 +48,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .alias("rm")
                 .about("Remove post given by ID")
                 .arg(Arg::new("ID")
-                     .about("ID of the event")
+                     .help("ID of the event")
                      .required(true)
                      .index(1)
                      ),
@@ -62,7 +62,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .arg(Arg::new("yes")
                      .short('y')
                      .long("yes")
-                     .about("Confirmation")
+                     .help("Confirmation")
                      .required(true)
                      ),
             f: &dropall::f
@@ -73,7 +73,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("edit")
                 .about("Edit repo item given by ID")
                 .arg(Arg::new("ID")
-                     .about("repo item ID")
+                     .help("repo item ID")
                      .required(true)
                      .index(1)
                      ),
@@ -85,12 +85,12 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("replace")
                 .about("Replace a repo item given by ID with a new path")
                 .arg(Arg::new("ID")
-                     .about("repo item ID")
+                     .help("repo item ID")
                      .required(true)
                      .index(1)
                 )
                 .arg(Arg::new("URL")
-                     .about("URL of the file")
+                     .help("URL of the file")
                      .required(true)
                      .index(2)
                      ),

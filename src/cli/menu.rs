@@ -51,10 +51,10 @@ pub fn main_menu<'a>() -> App<'a> {
             .short('c')
             .long("config")
             .value_name("FILE")
-            .about("Sets a custom config file")
+            .help("Sets a custom config file")
             .takes_value(true))
         .arg(Arg::new("v")
             .short('v')
             .multiple_occurrences(true)
-            .about("Sets the level of verbosity"))
+            .help("Sets the level of verbosity"))
 }

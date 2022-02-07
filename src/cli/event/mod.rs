@@ -26,7 +26,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("new")
                 .about("Add new event")
                 .arg(Arg::new("TITLE")
-                     .about("Title of the event")
+                     .help("Title of the event")
                      .required(true)
                      .index(1)
                      ),
@@ -46,7 +46,7 @@ pub fn menu<'a>() -> Menu<'a> {
                         Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
                     }
                  })
-                 .about("List events of the given date only (YYYY-MM)")
+                 .help("List events of the given date only (YYYY-MM)")
                  ),
         f: &list::f
     };
@@ -57,7 +57,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .alias("rm")
                 .about("Remove event given by ID")
                 .arg(Arg::new("ID")
-                     .about("ID of the event")
+                     .help("ID of the event")
                      .required(true)
                      .index(1)
                      ),
@@ -71,7 +71,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .arg(Arg::new("yes")
                      .short('y')
                      .long("yes")
-                     .about("Confirmation")
+                     .help("Confirmation")
                      .required(true)
                      ),
             f: &dropall::f
@@ -82,7 +82,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("edit")
                 .about("Edit event given by ID")
                 .arg(Arg::new("ID")
-                     .about("event ID")
+                     .help("event ID")
                      .required(true)
                      .index(1)
                      ),
@@ -94,7 +94,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("import")
                 .about("Import events from CSV")
                 .arg(Arg::new("FILE")
-                     .about("CSV file")
+                     .help("CSV file")
                      .required(true)
                      .index(1)
                      ),
@@ -108,12 +108,12 @@ pub fn menu<'a>() -> Menu<'a> {
                 .subcommand(App::new("add")
                     .about("Add new attendee")
                     .arg(Arg::new("EID")
-                         .about("Event ID")
+                         .help("Event ID")
                          .required(true)
                          .index(1)
                          )
                     .arg(Arg::new("UID")
-                         .about("User ID")
+                         .help("User ID")
                          .required(true)
                          .index(2)
                          ),
@@ -122,7 +122,7 @@ pub fn menu<'a>() -> Menu<'a> {
                       .about("List attendees")
                       .arg(
                          Arg::new("ID")
-                         .about("Event ID")
+                         .help("Event ID")
                          .required(true)
                          .index(1)
                         )
@@ -131,7 +131,7 @@ pub fn menu<'a>() -> Menu<'a> {
                       .about("edit attendees")
                       .arg(
                          Arg::new("ID")
-                         .about("Event ID")
+                         .help("Event ID")
                          .required(true)
                          .index(1)
                         )
@@ -140,7 +140,7 @@ pub fn menu<'a>() -> Menu<'a> {
                       .about("Export attendees to PDF")
                       .arg(
                          Arg::new("ID")
-                         .about("Event ID")
+                         .help("Event ID")
                          .required(true)
                          .index(1)
                         )
@@ -148,12 +148,12 @@ pub fn menu<'a>() -> Menu<'a> {
                 .subcommand(App::new("remove")
                     .about("Remove attendee")
                     .arg(Arg::new("EID")
-                         .about("Event ID")
+                         .help("Event ID")
                          .required(true)
                          .index(1)
                          )
                     .arg(Arg::new("UID")
-                         .about("User ID")
+                         .help("User ID")
                          .required(true)
                          .index(2)
                          ),
@@ -176,7 +176,7 @@ pub fn menu<'a>() -> Menu<'a> {
                             Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
                         }
                       })
-                    .about("Calendar of the given month (YYYY-MM)")
+                    .help("Calendar of the given month (YYYY-MM)")
                  ),
             f: &export_csv::f
     };
@@ -196,19 +196,19 @@ pub fn menu<'a>() -> Menu<'a> {
                             Err(_) => Err(String::from("The value is not given in the correct format YYYY-MM"))
                         }
                       })
-                    .about("Calendar of the given month (YYYY-MM)")
+                    .help("Calendar of the given month (YYYY-MM)")
                  )
                 .arg(Arg::new("size")
                      .short('s')
                      .long("size")
                      .value_name("FONTSIZE")
                      .possible_values(&["smaller", "small", "normal", "large", "larger"])
-                     .about("Font size of the item text")
+                     .help("Font size of the item text")
                  )
                 .arg(Arg::new("split_at")
                      .long("split_at")
                      .value_name("INT")
-                     .about("Number of items in the first column")
+                     .help("Number of items in the first column")
                  ),
             f: &export_pdf::f
     };

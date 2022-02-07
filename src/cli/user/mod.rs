@@ -25,12 +25,12 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("new")
                 .about("Add new user")
                 .arg(Arg::new("USERNAME")
-                     .about("Username of the new user")
+                     .help("Username of the new user")
                      .required(true)
                      .index(1)
                      )
                 .arg(Arg::new("EMAIL")
-                     .about("Email of the new user")
+                     .help("Email of the new user")
                      .required(true)
                      .index(2)
                      ),
@@ -50,7 +50,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .alias("rm")
                 .about("Remove the user given by ID")
                 .arg(Arg::new("ID")
-                     .about("User ID")
+                     .help("User ID")
                      .required(true)
                      .index(1)
                      ),
@@ -64,7 +64,7 @@ pub fn menu<'a>() -> Menu<'a> {
                 .arg(Arg::new("yes")
                      .short('y')
                      .long("yes")
-                     .about("Confirmation")
+                     .help("Confirmation")
                      .required(true)
                      ),
             f: &dropall::f
@@ -75,7 +75,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("edit")
                 .about("Edit user given by ID")
                 .arg(Arg::new("ID")
-                     .about("User ID")
+                     .help("User ID")
                      .required(true)
                      .index(1)
                      ),
@@ -90,7 +90,7 @@ pub fn menu<'a>() -> Menu<'a> {
                      .about("Set new password")
                      .arg(
                          Arg::new("ID")
-                         .about("User ID")
+                         .help("User ID")
                          .required(true)
                          .index(1)
                         )
@@ -99,7 +99,7 @@ pub fn menu<'a>() -> Menu<'a> {
                       .about("Check user password")
                       .arg(
                          Arg::new("ID")
-                         .about("User ID")
+                         .help("User ID")
                          .required(true)
                          .index(1)
                         )
@@ -119,7 +119,7 @@ pub fn menu<'a>() -> Menu<'a> {
             app: App::new("import")
                 .about("Import users from CSV")
                 .arg(Arg::new("FILE")
-                     .about("CSV file")
+                     .help("CSV file")
                      .required(true)
                      .index(1)
                      ),
