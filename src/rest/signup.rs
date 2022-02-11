@@ -58,7 +58,7 @@ fn mail_to_user(form: &SignupForm) -> () {
         subject: "Future Hub Križevci - Uspješna prijava",
         body: format!("Draga/dragi {},\n
 hvala Vam na prijavi na obrazovni program \"{}\". Vaša je prijava zabilježena.\n
-Iako je automatski generirana i poslana poruka, za sva pitanja vezana uz prijavu ili program, slobodno odgovorite na ovaj mail.\n
+Iako je ova poruka automatski generirana i odaslana, za sva pitanja vezana uz prijavu ili program, slobodno pošaljite upit na ovu mail adresu.\n
 Projekt Future Hub Križevci",
                       &form.name,
                       &form.course,
