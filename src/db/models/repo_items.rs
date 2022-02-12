@@ -118,7 +118,9 @@ fn prepare_file(filepath_: &String) -> (String, Option<String>, Option<i64>) {
 pub fn insert(connection: &SqliteConnection,
               title_: String,
               filepath_: String,
-              datetime_utc: &DateTime<Utc>) {
+              datetime_utc: &DateTime<Utc>,
+              cat_: i32,
+              publish_: bool) {
     let datetime_ = datetime_utc.naive_utc();
     let slug_ = text::slugify(&title_);
     let (newpath_, filehash_, filesize_) = prepare_file(&filepath_);
@@ -128,12 +130,12 @@ pub fn insert(connection: &SqliteConnection,
         title: title_,
         slug: slug_,
         description: Some("".to_string()),
-        category_id: 0,
+        category_id: cat_,
         filepath: newpath_,
         filetype: Some("".to_string()),
         filehash: filehash_,
         filesize: filesize_, 
-        published: false };
+        published: publish_ };
 
     diesel::insert_into(repo_items::table)
         .values(&item_)
