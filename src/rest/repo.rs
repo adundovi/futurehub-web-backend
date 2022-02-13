@@ -143,21 +143,24 @@ pub fn get_stream_by_slug(conn: MainDbConn, slug: String, size: Option<String>) 
                 NamedFile::open(&thumbpath).ok()
             } else {
                 let mut img = image::open(&p.filepath).unwrap();
-                let (w, h) = &img.dimensions();
-                let orig_ratio = w/h;
-                let desired_ratio = desired_w/desired_h;
-                let smaller_w = std::cmp::min(*w, desired_w);
-                let smaller_h = std::cmp::min(*h, desired_h);
-                let (new_w, new_h) = if orig_ratio == desired_ratio {
-                    (smaller_w, smaller_h)
-                } else {
-                    let w_from_h = orig_ratio * smaller_h;
-                    if w_from_h > smaller_w {
-                        (smaller_w, smaller_w/orig_ratio)
+                let (w, h) = img.dimensions();
+                let orig_ratio = w as f32 / (h as f32);
+                let desired_ratio = desired_w as f32 / (desired_h as f32);
+                let (smaller_w, smaller_h) = (
+                    std::cmp::min(w, desired_w),
+                    std::cmp::min(h, desired_h));
+                let (new_w, new_h) = 
+                    if orig_ratio == desired_ratio {
+                        (smaller_w, smaller_h)
                     } else {
-                        (smaller_h*orig_ratio, smaller_h)
-                    }
-                };
+                        let w_from_h = orig_ratio * smaller_h as f32;
+                        if w_from_h > smaller_w as f32 {
+                            (smaller_w, (smaller_w as f32 / orig_ratio) as u32)
+                        } else {
+                            ((smaller_h as f32 * orig_ratio) as u32, smaller_h)
+                        }
+                    };
+                println!("dim: {}x{}", new_w, new_h);
                 let resized_img = image::imageops::resize(
                     &mut img, new_w, new_h, image::imageops::FilterType::Triangle);
                 let o = resized_img.save(&thumbpath);
