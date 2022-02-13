@@ -49,4 +49,21 @@ impl Consent {
             .execute(conn)
             .is_ok()
     }
+
+    pub fn verify(conn: &SqliteConnection,
+                  hash: &str) -> bool {
+        let c = consents::table.filter(consents::verify_hash.eq(hash)).first::<Consent>(conn);
+
+        match c {
+            Ok(i) => {
+                diesel::update(consents::table.filter(consents::id.eq(i.id)))
+                    .set((
+                        consents::verified.eq(true),
+                        consents::verify_hash.eq::<Option<String>>(None),
+                    ))
+                    .execute(conn).is_ok()
+            },
+            Err(_) => false
+        }
+    }
 }

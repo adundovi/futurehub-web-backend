@@ -1,7 +1,8 @@
 use rocket_contrib::json::Json;
 use rocket::{
     Route,
-    http::Status
+    http::Status,
+    response::Redirect,
 };
 use chrono::Utc;
 use sha2::{Sha256, Digest};
@@ -68,7 +69,7 @@ fn mail_to_user(c: &consent::NewConsent) -> () {
             subject: "Future Hub Križevci - Provjera privole",
             body: format!("Poštovani,\n
 obrazac privole uspješno je poslan, ali je samu privolu potrebno potvrditi na sljedećoj poveznici:\n
-{}\n
+https://futurehub.krizevci.eu/api/consent/verify?hash={}\n
 
 Iako je ova poruka automatski generirana i odaslana, za sva pitanja vezana uz davanje privole ili sam program, slobodno pošaljite upit na ovu mail adresu.\n
 Projekt Future Hub Križevci",
@@ -84,6 +85,16 @@ pub fn option<'a>() -> rocket::Response<'a> {
     let mut res = rocket::Response::new();
     res.set_status(Status::new(200, "No Content"));
     res
+}
+
+#[get("/consent/verify?<hash>")]
+pub fn verify(hash: String, conn: MainDbConn) -> Redirect {
+
+    if consent::Consent::verify(&conn, &hash) {
+        Redirect::to("https://futurehub.krizevci.eu")
+    } else {
+        Redirect::to("https://futurehub.krizevci.eu")
+    }
 }
 
 #[post("/consent", format = "json", data = "<form>")]
