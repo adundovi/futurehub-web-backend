@@ -3,7 +3,6 @@ use chrono::prelude::*;
 
 use crate::tools::import;
 use crate::db::sqlite_schema::consents as consents;
-use crate::tools;
 
 #[derive(Debug, Insertable, Serialize, Deserialize, Eq, Ord, PartialEq, PartialOrd)]
 #[table_name = "consents"]

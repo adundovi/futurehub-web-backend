@@ -21,6 +21,7 @@ pub fn get_routes() -> Vec<Route> {
     routes![
         post,
         option,
+        verify,
     ]
 }
 
@@ -37,7 +38,7 @@ pub struct ConsentForm {
     consent_type: String,
 }
 
-fn mail_to_owners(form: &consent::NewConsent) -> () {
+fn mail_to_owners(_form: &consent::NewConsent) -> () {
     /*let m = mail::Mail{
         to: "futurehub@udruga-point.hr",
         subject: &format!("[FHK] Prijava na {} - {}", &form.course, &form.email),
