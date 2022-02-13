@@ -10,6 +10,8 @@ use rocket::{
     Route,
     response::NamedFile
 };
+
+use image::GenericImageView;
                
 pub fn get_routes() -> Vec<Route> {
     routes![
@@ -106,8 +108,62 @@ pub fn get_by_slug(conn: MainDbConn, slug: String) -> ResponseWithStatus {
 }
 
 /* see also X-Sendfile */
-#[get("/repo/stream/<slug>")]
-pub fn get_stream_by_slug(conn: MainDbConn, slug: String) -> Option<NamedFile> {
+#[get("/repo/stream/<slug>?<size>")]
+pub fn get_stream_by_slug(conn: MainDbConn, slug: String, size: Option<String>) -> Option<NamedFile> {
     let p = repo_items::get_by_slug(&conn, slug).ok()?;
-    NamedFile::open(&p.filepath).ok() 
+    let path = std::path::Path::new(&p.filepath);
+    let filename = path.file_stem().and_then(std::ffi::OsStr::to_str).unwrap();
+    let ext = path.extension().and_then(std::ffi::OsStr::to_str).unwrap();
+    let thumb_location = std::path::Path::new("./tmp/thumb");
+    let allowed_exts = vec!["png", "jpg", "jpeg", "gif"];
+
+    match size {
+        None => NamedFile::open(&p.filepath).ok(),
+        Some(s) => {
+
+            if allowed_exts.contains(&ext) {
+                return NamedFile::open(&p.filepath).ok();
+            }
+
+            let desired_size: Vec<&str> = s.split("x").collect();
+            let (desired_w, desired_h): (u32, u32) = if desired_size.len() == 2 {
+                let w = desired_size[0].parse::<u32>().unwrap_or(400);
+                let h = desired_size[1].parse::<u32>().unwrap_or(300);
+                (w, h)
+            } else {
+                (400, 300)
+            };
+
+            let thumbpath = thumb_location
+                .join(format!("{}-{}x{}.{}",
+                        &filename, desired_w, desired_h, &ext
+                ));
+
+            if thumbpath.exists() {
+                NamedFile::open(&thumbpath).ok()
+            } else {
+                let mut img = image::open(&p.filepath).unwrap();
+                let (w, h) = &img.dimensions();
+                let orig_ratio = w/h;
+                let desired_ratio = desired_w/desired_h;
+                let smaller_w = std::cmp::min(*w, desired_w);
+                let smaller_h = std::cmp::min(*h, desired_h);
+                let (new_w, new_h) = if orig_ratio == desired_ratio {
+                    (smaller_w, smaller_h)
+                } else {
+                    let w_from_h = orig_ratio * smaller_h;
+                    if w_from_h > smaller_w {
+                        (smaller_w, smaller_w/orig_ratio)
+                    } else {
+                        (smaller_h*orig_ratio, smaller_h)
+                    }
+                };
+                let resized_img = image::imageops::resize(
+                    &mut img, new_w, new_h, image::imageops::FilterType::Triangle);
+                let o = resized_img.save(&thumbpath);
+                println!("{:?}", o);
+                NamedFile::open(&thumbpath).ok()
+            }
+        }
+    }
 }
