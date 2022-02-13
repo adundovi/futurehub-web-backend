@@ -72,12 +72,11 @@ obrazac privole uspješno je poslan, ali je samu privolu potrebno potvrditi na s
 
 Iako je ova poruka automatski generirana i odaslana, za sva pitanja vezana uz davanje privole ili sam program, slobodno pošaljite upit na ovu mail adresu.\n
 Projekt Future Hub Križevci",
-                      &c.verify_hash,
+                      &c.verify_hash.as_ref().unwrap(),
                 ).to_string(),
     };
     
     mail::send_mail(&m);
-*/
 }
 
 #[options("/consent")]
