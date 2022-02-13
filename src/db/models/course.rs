@@ -24,11 +24,11 @@ pub struct NewCourse {
     pub lecturer: Option<String>,
     pub organizer: Option<String>,
     pub lectures: Option<i32>,
-    pub lecture_duration: Option<i32>,
     pub students: Option<i32>,
     pub max_students: Option<i32>,
     pub finished: bool,
     pub published: bool,
+    pub lecture_duration: Option<i32>,
 }
 
 #[derive(Queryable, Serialize, Clone)]
@@ -43,11 +43,11 @@ pub struct Course {
     pub lecturer: Option<String>,
     pub organizer: Option<String>,
     pub lectures: Option<i32>,
-    pub lecture_duration: Option<i32>,
     pub students: Option<i32>,
     pub max_students: Option<i32>,
     pub finished: bool,
     pub published: bool,
+    pub lecture_duration: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

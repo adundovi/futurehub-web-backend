@@ -1,5 +1,6 @@
 pub mod event;
 pub mod category;
+pub mod consent;
 pub mod course;
 pub mod login_history;
 pub mod post;

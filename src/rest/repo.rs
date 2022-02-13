@@ -163,8 +163,7 @@ pub fn get_stream_by_slug(conn: MainDbConn, slug: String, size: Option<String>) 
                 println!("dim: {}x{}", new_w, new_h);
                 let resized_img = image::imageops::resize(
                     &mut img, new_w, new_h, image::imageops::FilterType::Triangle);
-                let o = resized_img.save(&thumbpath);
-                println!("{:?}", o);
+                let _ = resized_img.save(&thumbpath);
                 NamedFile::open(&thumbpath).ok()
             }
         }

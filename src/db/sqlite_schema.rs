@@ -9,6 +9,24 @@ table! {
 }
 
 table! {
+    consents (id) {
+        id -> Integer,
+        name -> Text,
+        surname -> Text,
+        email -> Text,
+        phone -> Nullable<Text>,
+        oib -> Text,
+        child_name -> Text,
+        child_surname -> Text,
+        consent_on_off -> Text,
+        consent_type -> Text,
+        entry_date -> Timestamp,
+        verified -> Bool,
+        verify_hash -> Nullable<Text>,
+    }
+}
+
+table! {
     course_users (id) {
         id -> Integer,
         course_id -> Integer,
@@ -32,11 +50,11 @@ table! {
         lecturer -> Nullable<Text>,
         organizer -> Nullable<Text>,
         lectures -> Nullable<Integer>,
-        lecture_duration -> Nullable<Integer>,
         students -> Nullable<Integer>,
         max_students -> Nullable<Integer>,
         finished -> Bool,
         published -> Bool,
+        lecture_duration -> Nullable<Integer>,
     }
 }
 
@@ -128,6 +146,7 @@ joinable!(repo_items -> categories (category_id));
 
 allow_tables_to_appear_in_same_query!(
     categories,
+    consents,
     course_users,
     courses,
     event_attendees,
