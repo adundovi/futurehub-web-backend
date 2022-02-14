@@ -38,30 +38,28 @@ pub struct ConsentForm {
     consent_type: String,
 }
 
-fn mail_to_owners(_form: &consent::NewConsent) -> () {
-    /*let m = mail::Mail{
-        to: "futurehub@udruga-point.hr",
-        subject: &format!("[FHK] Prijava na {} - {}", &form.course, &form.email),
-        body: format!("Prijava na obrazovni program - {}\n
-                Ime: {}\n
-                Prezime: {}\n
+fn mail_to_owners(c: &consent::Consent) -> () {
+    let m = mail::Mail{
+        to: "andrej.dundovic@udruga-point.hr",
+        subject: &format!("[FHK] Nova privola za: {} {}", &c.child_surname, &c.child_name),
+        body: format!("Potvrđen je obrazac za privolu - {} {}\n
+                Ime i prezime roditelja/staratelja: {} {}\n
                 Email: {}\n
-                Telefon: {}\n
                 OIB: {}\n
-                Adresa: {}\n
-                Napomena: {}",
-                      &form.course,
-                      &form.name,
-                      &form.surname,
-                      &form.email,
-                      form.phone.as_ref().unwrap_or(&"Telefon nije unesen".to_string()),
-                      &form.oib,
-                      &form.address,
-                      &form.message.as_ref().unwrap_or(&"Nema napomene".to_string())
+                Ime i prezime djeteta: {} {}\n
+                ",
+                      &c.consent_type,
+                      &c.consent_on_off,
+                      &c.name,
+                      &c.surname,
+                      &c.email,
+                      &c.oib,
+                      &c.child_name,
+                      &c.child_surname,
                 ).to_string(),
     };
     
-    mail::send_mail(&m);*/
+    mail::send_mail(&m);
 }
 
 fn mail_to_user(c: &consent::NewConsent) -> () {
@@ -91,11 +89,14 @@ pub fn option<'a>() -> rocket::Response<'a> {
 #[get("/consent/verify?<hash>")]
 pub fn verify(hash: String, conn: MainDbConn) -> Redirect {
 
-    if consent::Consent::verify(&conn, &hash) {
-        //mail_to_owners(&form);
-        Redirect::to("https://futurehub.krizevci.eu")
-    } else {
-        Redirect::to("https://futurehub.krizevci.eu")
+    match consent::Consent::verify(&conn, &hash) {
+        Ok(c) => {
+            mail_to_owners(&c);
+            Redirect::to("https://futurehub.krizevci.eu/consent/accepted")
+        },
+        Err(_) => {
+            Redirect::to("https://futurehub.krizevci.eu/consent/error")
+        }
     }
 }
 
