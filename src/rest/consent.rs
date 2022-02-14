@@ -1,5 +1,6 @@
 use rocket_contrib::json::Json;
 use rocket::{
+    uri,
     Route,
     http::Status,
     response::Redirect,
@@ -7,7 +8,6 @@ use rocket::{
 use chrono::Utc;
 use sha2::{Sha256, Digest};
 use rand::Rng;
-use base64ct::{Base64, Encoding};
 
 use super::response::{Response, ResponseWithStatus, Message};
 use crate::services::mail;
@@ -69,12 +69,12 @@ fn mail_to_user(c: &consent::NewConsent) -> () {
             to:  &c.email,
             subject: "Future Hub Križevci - Provjera privole",
             body: format!("Poštovani,\n
-obrazac privole uspješno je poslan, ali je samu privolu potrebno potvrditi na sljedećoj poveznici:\n
-https://futurehub.krizevci.eu/api/consent/verify?hash={}\n
+obrazac privole uspješno je poslan, ali je samu privolu potrebno potvrditi na sljedećoj poveznici:\n\n
+https://futurehub.krizevci.eu{}\n\n
 
 Iako je ova poruka automatski generirana i odaslana, za sva pitanja vezana uz davanje privole ili sam program, slobodno pošaljite upit na ovu mail adresu.\n
 Projekt Future Hub Križevci",
-                      &c.verify_hash.as_ref().unwrap(),
+                      uri!(verify: hash = c.verify_hash.as_ref().unwrap()),
                 ).to_string(),
     };
     
@@ -92,6 +92,7 @@ pub fn option<'a>() -> rocket::Response<'a> {
 pub fn verify(hash: String, conn: MainDbConn) -> Redirect {
 
     if consent::Consent::verify(&conn, &hash) {
+        //mail_to_owners(&form);
         Redirect::to("https://futurehub.krizevci.eu")
     } else {
         Redirect::to("https://futurehub.krizevci.eu")
@@ -107,7 +108,7 @@ pub fn post(form: Json<ConsentForm>, conn: MainDbConn) -> ResponseWithStatus {
     let r: u8 = rng.gen();
     hasher.update(format!("{}{}", &form.email, r));
     let hash = hasher.finalize();
-    let encoded_hash = Base64::encode_string(&hash);
+    let encoded_hash = base16ct::lower::encode_string(&hash);
 
     let c = consent::NewConsent{
         name: form.name.clone(),
@@ -126,7 +127,6 @@ pub fn post(form: Json<ConsentForm>, conn: MainDbConn) -> ResponseWithStatus {
     
     consent::Consent::insert(&conn, &c);
 
-    //mail_to_owners(&form);
     mail_to_user(&c);
 
     ResponseWithStatus {
