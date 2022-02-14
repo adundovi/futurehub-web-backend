@@ -74,7 +74,7 @@ https://futurehub.krizevci.eu{}\n\n
 
 Iako je ova poruka automatski generirana i odaslana, za sva pitanja vezana uz davanje privole ili sam program, slobodno pošaljite upit na ovu mail adresu.\n
 Projekt Future Hub Križevci",
-                      uri!(verify: hash = c.verify_hash.as_ref().unwrap()),
+                      uri!("/api", verify: hash = c.verify_hash.as_ref().unwrap()),
                 ).to_string(),
     };
     
