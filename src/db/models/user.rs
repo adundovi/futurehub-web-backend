@@ -24,7 +24,7 @@ pub struct LoginInfo {
     pub login_session: String,
 }
 
-#[derive(Queryable, Serialize, Deserialize, Clone)]
+#[derive(Hash, std::cmp::Eq, Queryable, Serialize, Deserialize, Clone)]
 pub struct User {
     pub id: i32,
     pub username: String,
@@ -83,6 +83,12 @@ pub struct NewUser {
     pub birthday: Option<NaiveDateTime>,
     #[serde(with= "import::date_serializer")]
     pub creation_date: NaiveDateTime,
+}
+
+impl PartialEq for User {
+    fn eq(&self, other: &User) -> bool {
+        self.id == other.id
+    }
 }
 
 impl Queries for User {

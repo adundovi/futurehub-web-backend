@@ -123,7 +123,11 @@ pub fn menu<'a>() -> Menu<'a> {
                          ),
                 )
                 .subcommand(App::new("recalculate")
-                    .about("Recalculate")),
+                    .about("Recalculate participants")
+                )
+                .subcommand(App::new("export")
+                    .about("Export all participants to PDF")
+                ),
             f: &participant::f
     };
     m.push_subcommand("participant", menu_participant);

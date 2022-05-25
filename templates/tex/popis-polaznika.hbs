@@ -1,0 +1,87 @@
+\documentclass[a4paper,landscape,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{noto}
+\usepackage[a4paper,left=1cm,right=1cm,top=1cm,bottom=1.4cm,heightrounded]{geometry}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pifont}
+
+%opening
+\title{}
+\author{Udruga P.O.I.N.T.}
+
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\setlength\extrarowheight{10pt}
+
+\newcommand*\rot{\rotatebox{90}}
+\newcommand*\OK{\ding{51}}
+
+%\pagestyle{empty}
+
+\begin{document}
+
+\begin{flushleft}
+{\footnotesize
+ \textbf{Future Hub Križevci} / UP.04.2.1.07.0129 \\
+ Udruga P.O.I.N.T. \\
+ OIB: 75093177043 \\
+ Trg svetog Florijana 16, HR-48260 Križevci, Hrvatska
+}
+\end{flushleft}
+\vspace{0.2cm}
+
+\begin{center}
+{\Large Popis sudionika obrazovnih programa}
+\end{center}
+
+\noindent
+
+\begin{center}
+\small
+\begin{longtable}{|M{0.5cm}|M{2.2cm}|M{2cm}|M{0.5cm}||%
+    {{#each courses as |c|}}%
+M{0.3cm}|%
+    {{/each}}%
+}%
+\hline
+\# & Prezime & Ime & \rot{Rod} %
+    {{#each courses as |c|}}%
+        & \rot{ {{c}} }%
+    {{/each}}%
+\\
+\hline
+{{#each participants as |p|}}%
+ {{p.idx}} & {{p.surname}} & {{p.name}} & %
+{{#if gender}}%
+Ž%
+{{else}}%
+M%
+{{/if}}%
+    {{#each courses as |c|}}%
+        &
+{{#if c}}%
+ \OK %
+{{else}}%
+ %
+{{/if}}%
+    {{/each}}%
+\\%
+\hline
+{{/each}}%
+\hline
+ \multicolumn{3}{|r}{Ukupno po programima} & %
+    {{#each courses_n as |n|}}%
+        & {{n}} %
+    {{/each}}%
+\\%
+\hline
+ \multicolumn{3}{|r}{} &
+ & \multicolumn{4}{r}{Uk. polaznika} & \multicolumn{1}{|l}{ {{total}} } & 
+ & \multicolumn{5}{r}{Uk. polaznica (ž)} &\multicolumn{1}{|l}{  {{total_women}} } &
+\\%
+\hline
+\end{longtable}
+\end{center}
+\end{document}

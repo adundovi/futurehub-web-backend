@@ -20,3 +20,7 @@ Mali Potočec, Križevci > Malog Potočca, Križevci
 Doljanec, Križevci > Doljanca, Križevci
 Pavlovec Ravenski, Križevci > Pavlovca Ravenskog, Križevci
 Ivanec Križevački > Ivanca Križevačkog
+Cubinec, Križevci > Cubinca, Križevci
+Cirkvena, Sveti Ivan Žabno > Cirkvene, Sveti Ivan Žabno
+Brezovljani, Sveti Ivan Žabno > Brezovljana, Sveti Ivan Žabno
+Konšćani > Konšćana
