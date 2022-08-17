@@ -24,3 +24,5 @@ Cubinec, Križevci > Cubinca, Križevci
 Cirkvena, Sveti Ivan Žabno > Cirkvene, Sveti Ivan Žabno
 Brezovljani, Sveti Ivan Žabno > Brezovljana, Sveti Ivan Žabno
 Konšćani > Konšćana
+Voljavec Riječki, Sveti Petar Orehovec > Voljavca Riječkog, Sveti Petar Orehovec
+Guščerovec, Sveti Petar Orehovec > Guščerovca, Sveti Petar Orehovec
