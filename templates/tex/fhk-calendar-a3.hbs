@@ -64,7 +64,7 @@
 \Large{https://futurehub.krizevci.eu}\\
 \vspace{1cm}
 \large{
-Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
+Udruga P.O.I.N.T. | AD Perzeidi | POU Križevci | Grad Križevci}
 \vspace{-1.2cm}
 }
 
@@ -121,6 +121,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{#unless events_in_hub_2}}
     \column{0.5}
  {{/unless}}
+{{#if events_outside_hub}}
     \block{\vspace{-0.8cm}\large Izvan prostorija Huba}{
 \begin{description}
  {{#each events_outside_hub as |e|}}
@@ -132,6 +133,7 @@ Udruga P.O.I.N.T. | Udruga Perzeidi | POU Križevci | Grad Križevci}
  {{/each}}
 \end{description}
     }
+{{/if}}
  
  \block{}{
  \footnotesize
